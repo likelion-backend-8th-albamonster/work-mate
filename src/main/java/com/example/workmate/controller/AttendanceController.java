@@ -25,13 +25,13 @@ public class AttendanceController {
         return "home";
     }
 
-    //퇴근요청
-    //퇴근시간이 자신의 근무종료시간보다 늦다면 추가정산이 이루어진다.
-    @PostMapping("/checkIn")
-    public String checkOut(){
-        service.checkOut();
-        return "home";
-    }
+//    //퇴근요청
+//    //퇴근시간이 자신의 근무종료시간보다 늦다면 추가정산이 이루어진다.
+//    @PostMapping("/checkIn")
+//    public String checkOut(){
+//        service.checkOut();
+//        return "home";
+//    }
 
     //쉬는시간요청
     @PostMapping("/restIn")

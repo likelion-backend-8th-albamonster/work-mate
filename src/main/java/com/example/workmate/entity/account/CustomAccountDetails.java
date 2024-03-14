@@ -1,4 +1,4 @@
-package com.example.workmate.entity.Account;
+package com.example.workmate.entity.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

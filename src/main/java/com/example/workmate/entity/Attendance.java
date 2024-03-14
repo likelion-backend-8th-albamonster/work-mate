@@ -1,5 +1,6 @@
 package com.example.workmate.entity;
 
+import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,9 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //TODO accountId 추가
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private Account account;
     
     //출근시간
     private LocalDateTime checkInTime;
@@ -26,6 +29,4 @@ public class Attendance {
     //출근상태
     @Enumerated(EnumType.STRING)
     private Status status;
-
-
 }

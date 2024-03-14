@@ -1,4 +1,5 @@
 package com.example.workmate.entity;
+import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
