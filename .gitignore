@@ -5,6 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### properties ###
+**/src/main/resources/application-home.yaml
+
 ### STS ###
 .apt_generated
 .classpath
