@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 ### properties ###
-**/src/main/**/application-home.yaml
+**/src/main/resources/application-home.yaml
 
 ### STS ###
 .apt_generated
