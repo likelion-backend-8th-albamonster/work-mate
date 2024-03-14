@@ -1,1 +1,1 @@
-AlbaMonster - 팀원 이서주
+AlbaMonster - 팀원 이서주.
