@@ -1,10 +1,10 @@
 ncp:
   api:
-    client-id: <client-id>
-    client-secret: <client-secret>
+    client-id: re2p8027kc
+    client-secret: QZ0gf3e6IqurEFZ6oaqmnBeJ1Wrpz53Bi0h0E4KM
 
-    api-access: <access-key>
-    api-secret: <secret-key>
+    api-access: bayBaYR8dcwmMeO2XLqE
+    api-secret: ilCwHf4BYfA2yr0u0LgpqpZMaNF5oH5tdXwBmNcS
 
 jwt:
   secret: aaaabbbsdifqbvaesoioegwaaaabbbsdifqbvaesoioegwaaaabbbsdifqbvaes
