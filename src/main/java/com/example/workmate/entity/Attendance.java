@@ -16,11 +16,10 @@ public class Attendance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    //사용자
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
-    
     //출근시간
     private LocalDateTime checkInTime;
     //퇴근시간

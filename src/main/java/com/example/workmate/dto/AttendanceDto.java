@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AttendanceDto {
     private Long id;
-    //TODO accountId 추가
+    //사용자id
+    private Long accountId;
     //출근시간
     private LocalDateTime checkInTime;
     //퇴근시간
@@ -27,7 +28,7 @@ public class AttendanceDto {
     public static AttendanceDto fromEntity(Attendance entity){
         return AttendanceDto.builder()
                 .id(entity.getId())
-                //TODO accountId 추가
+                .accountId(entity.getAccount().getId())
                 .checkInTime(entity.getCheckInTime())
                 .checkOutTime(entity.getCheckOutTime())
                 .status(entity.getStatus())
