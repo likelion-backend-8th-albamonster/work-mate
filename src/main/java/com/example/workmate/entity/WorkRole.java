@@ -4,7 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @Entity
-public class Board {
+public class WorkRole {
     @Id
-    private String board;
+    public String workRole;
 }
