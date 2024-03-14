@@ -13,8 +13,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("schedule")
 public class ScheduleController {
-    @GetMapping("view-daily/{day}")
-    public List<>
-    @GetMapping("view-monthly/{month}")
-    public List<>
+//    @GetMapping("view-daily/{day}")
+//    public List<>
+//    @GetMapping("view-monthly/{month}")
+//    public List<>
 }

@@ -1,7 +1,7 @@
 package com.example.workmate.dto;
 
 
-import com.example.workmate.entity.Account;
+import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.Shop;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
