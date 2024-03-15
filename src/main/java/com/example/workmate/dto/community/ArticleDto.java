@@ -22,7 +22,7 @@ public class ArticleDto {
     private List<CommentDto> comments;
     private String title;
     private String content;
-
+    //
     public static ArticleDto fromEntity(Article entity) {
         return ArticleDto.builder()
                 .id(entity.getId())
