@@ -2,32 +2,49 @@ package com.example.workmate.controller;
 
 import com.example.workmate.dto.AttendanceDto;
 import com.example.workmate.service.AttendanceService;
+import com.example.workmate.service.ncpservice.NaviService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/attendance")
 @RequiredArgsConstructor
 public class AttendanceController {
     private final AttendanceService service;
-
+    private final NaviService naviService;
     //출근요청페이지
     @GetMapping
-    public String attendance(){
+    public String attendance(
+            //사용자의 ip와 매장 주소가 model에 들어가야 함
+    ){
         return "home";
     }
 
     //출근요청
     //NCP api를 통해 사용자의 위치가 매장 근처인지 확인
     //이미 기록된 시간이 있는 경우 출근 등록 거부
-    @PostMapping("/checkIn")
-    public String checkIn(){
-        service.checkIn();
+    @PostMapping("/checkIn/{userId}")
+    public String checkIn(
+            @PathVariable("userId")
+            Long userId,
+            @RequestParam("userIp")
+            String userIp,
+            @RequestParam("shopAddress")
+            String shopAddress,
+            //출근정보
+            Model model
+    ){
+        //사용자가 매장 위치에 있는지 확인
+        if (naviService.checkTwoPoint(userIp, shopAddress)){
+            //사용자 출근 정보 저장
+            AttendanceDto dto = service.checkIn(userId);
+            //저장된 값을 모델에 담기
+            
+        }
+        //매장위치에 있지 않으면 분기
         return "home";
     }
 
