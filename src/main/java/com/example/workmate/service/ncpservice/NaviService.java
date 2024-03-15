@@ -115,12 +115,12 @@ public class NaviService {
     //사용자의 ip를 기반한 좌표와, 매장의 주소를 기반한 좌표를 받아
     //두 좌표가 근처에 있는지 확인
 
-    public boolean checkTwoPoint(String userIp, String address) {
+    public boolean checkTwoPoint(String userIp, String shopAddress) {
         boolean isHere = false;
         //사용자 좌표
         PointDto userPoint = ipToPoints(userIp);
         //매장좌표
-        PointDto shopPoint = addressToPoints(address);
+        PointDto shopPoint = addressToPoints(shopAddress);
 
         //사용자와 매장의 좌표 확인
         log.info("사용자의 Y좌표: {}",String.format("%.4f", userPoint.getLat()));
@@ -161,10 +161,10 @@ public class NaviService {
     }
 
     //주소를 받아 좌표를 리턴
-    public PointDto addressToPoints(String address){
+    public PointDto addressToPoints(String shopAddress){
         // 사용자가 입력한 주소의 좌표부터 찾기
         Map<String, Object> params = new HashMap<>();
-        params.put("query", address);
+        params.put("query", shopAddress);
         params.put("page", 1);
         params.put("count", 1);
         //params.put("coordinate", dto.getStart().toQueryValue());
