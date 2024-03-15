@@ -33,14 +33,14 @@ public class Article {
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
-    private Account accountId;
+    private Account account;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
-    private Shop shopId;
+    private Shop shop;
 
     @Setter
-    @OneToMany(mappedBy = "articleId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 }
