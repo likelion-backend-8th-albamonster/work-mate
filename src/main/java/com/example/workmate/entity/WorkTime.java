@@ -19,11 +19,11 @@ public class WorkTime {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
@@ -34,4 +34,12 @@ public class WorkTime {
 
     private LocalDateTime workStartTime;
     private LocalDateTime workEndTime;
+
+    public void changeTime(
+            LocalDateTime workStartTime,
+            LocalDateTime workEndTime
+    ){
+        this.workStartTime = workStartTime;
+        this.workEndTime = workEndTime;
+    }
 }
