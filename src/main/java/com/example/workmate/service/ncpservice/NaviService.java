@@ -42,7 +42,7 @@ public class NaviService {
                 );
         return new NaviRouteDto(path);
     }
-
+    //좌표로 주소찾기
     public RGeoResponseDto getAddress(PointDto pointDto){
         Map<String, Object> params = new HashMap<>();
         params.put("coords", pointDto.toQueryValue());
@@ -111,15 +111,69 @@ public class NaviService {
         return twoPointRoute(new NaviWithPointsDto(start, goal));
     }
 
-    //사용자 출퇴근 위치 확인
-    //TODO 사용자의 ip를 받아오는 기능 추가
-    /*
-    *   사용자의 ip를 받는다
-        ip를 기반으로 사용자 좌표를 확인한다
-        매장의 주소를 받는다
-        매장 주소를 기반으로 좌표를 확인한다
+    //사용자 출퇴근 위치 확인 
+    //사용자의 ip를 기반한 좌표와, 매장의 주소를 기반한 좌표를 받아
+    //두 좌표가 근처에 있는지 확인
 
-        사용자 좌표가 매장 좌표의 근처에 있는지 확인
-        (얼마만큼의 영역 안에서 출근 / 퇴근을 인정할 것인지는 추후 논의)
-    * */
+    public boolean checkTwoPoint(String userIp, String address) {
+        boolean isHere = false;
+        //사용자 좌표
+        PointDto userPoint = ipToPoints(userIp);
+        //매장좌표
+        PointDto shopPoint = addressToPoints(address);
+
+        //사용자와 매장의 좌표 확인
+        log.info("사용자의 Y좌표: {}",String.format("%.4f", userPoint.getLat()));
+        log.info("사용자의 X좌표: {}",String.format("%.4f", userPoint.getLng()));
+        log.info("매장의 Y좌표: {}",String.format("%.4f", shopPoint.getLat()));
+        log.info("매장의 X좌표: {}",String.format("%.4f", shopPoint.getLng()));
+
+        //사용자 좌표와 매장 좌표를
+        //소수점 1번째자리까지 비교(4번째자리까지가 목표)했을 때 그 값이 같은지 체크
+        if (
+                String.format("%.1f", userPoint.getLat())
+                        .equals(String.format("%.1f", shopPoint.getLat())) &&
+                String.format("%.1f", userPoint.getLng())
+                        .equals(String.format("%.1f", shopPoint.getLng()))
+        ) {
+            isHere = true;
+        }
+
+        return isHere;
+    }
+    //ip를 받아 좌표를 리턴
+    public PointDto ipToPoints(String userIp){
+        Map<String, Object> params = new HashMap<>();
+        //사용자 ip로 좌표 받아오기
+        //params.put("ip", dto.getStartIp());
+        params.put("ip", userIp);
+        params.put("responseFormatType", "json");
+        params.put("ext", "t");
+        GeoLocationNcpResponse userInfo
+                = geolocationService.geoLocation(params);
+        log.info(userInfo.toString());
+        //사용자의 좌표
+        return  new PointDto(
+                userInfo.getGeoLocation().getLat(),
+                userInfo.getGeoLocation().getLng()
+        );
+
+    }
+
+    //주소를 받아 좌표를 리턴
+    public PointDto addressToPoints(String address){
+        // 사용자가 입력한 주소의 좌표부터 찾기
+        Map<String, Object> params = new HashMap<>();
+        params.put("query", address);
+        params.put("page", 1);
+        params.put("count", 1);
+        //params.put("coordinate", dto.getStart().toQueryValue());
+        GeoNcpResponse response = mapApiService.geocode(params);
+        log.info(response.toString());
+        Double lat = Double.valueOf(response.getAddresses().get(0).getY());
+        Double lng = Double.valueOf(response.getAddresses().get(0).getX());
+        PointDto goal = new PointDto(lat,lng);
+        //경로를 찾아서 반환하기
+        return goal;
+    }
 }
