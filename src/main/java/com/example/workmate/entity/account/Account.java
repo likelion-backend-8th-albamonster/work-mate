@@ -29,13 +29,13 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Authority authority;    // 권한
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AccountShop> accountShops;
 
     //TODO 관계 추가
     private Long salaryId;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Attendance> attendances;
     // TODO 관계 추가
     private Long ArticleId;
