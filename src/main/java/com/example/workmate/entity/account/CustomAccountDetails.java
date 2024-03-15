@@ -2,6 +2,7 @@ package com.example.workmate.entity.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomAccountDetails implements UserDetails {
@@ -19,7 +21,6 @@ public class CustomAccountDetails implements UserDetails {
     private String password;
     private String email;
     private Authority authority;
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
