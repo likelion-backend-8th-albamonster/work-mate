@@ -3,7 +3,7 @@ package com.example.workmate.service.community;
 import com.example.workmate.dto.community.ArticleDto;
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Board;
-import com.example.workmate.repo.community.ArticleRepo;
+import com.example.workmate.repo.community.ArticleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 
 
 @Slf4j
-@Service
+@Service("communityArticleService")
 @RequiredArgsConstructor
 public class ArticleService {
-    private final ArticleRepo articleRepo;
+    private final ArticleRepository articleRepo;
 
     public ArticleDto create(
             ArticleDto dto
