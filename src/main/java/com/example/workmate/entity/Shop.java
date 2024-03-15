@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +21,6 @@ public class Shop {
     private String name;
     private String address;
 
-    @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "shop")
     private List<AccountShop> accountShops;
 }

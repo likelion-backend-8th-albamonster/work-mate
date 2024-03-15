@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class WorkTimeDto {
     private Long id;
-    private Long name;
+    private String name;
     private Long accountId;
     private Long shopId;
 
@@ -24,9 +24,10 @@ public class WorkTimeDto {
     private LocalDateTime workEndTime;
     private WorkRole workRole;
 
-    public WorkTimeDto fromEntity(WorkTime entity){
+    public static WorkTimeDto fromEntity(WorkTime entity){
         WorkTimeDtoBuilder builder = WorkTimeDto.builder()
                 .id(entity.getId())
+                .name(entity.getAccount().getUsername())
                 .workStartTime(entity.getWorkStartTime())
                 .workEndTime(entity.getWorkEndTime())
                 .workRole(entity.getWorkRole());

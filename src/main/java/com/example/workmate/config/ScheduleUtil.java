@@ -1,20 +1,24 @@
 package com.example.workmate.config;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.example.workmate.dto.schedule.ScheduleDto;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.time.YearMonth;
 
 @Component
 public class ScheduleUtil {
-    @Bean
-    public LocalDateTime GetLastDayOfMonth(){
-        LocalDateTime now = LocalDateTime.now();
-        YearMonth month = YearMonth.from(now);
-        return month.atEndOfMonth().atTime(LocalTime.MAX);
+
+    //flag가 true면 해당 달의 시작일을 넘겨줌
+    public LocalDate GetDay(Boolean flag, ScheduleDto dto){
+        if((dto.getDay() == 0)){
+            LocalDate localDate = LocalDate.of(dto.getYear(), dto.getMonth(), 1);
+            YearMonth month = YearMonth.from(localDate);
+            if (flag == true)
+                return month.atEndOfMonth();
+            return month.atEndOfMonth();
+        }
+        LocalDate localDate = LocalDate.of(dto.getYear(), dto.getMonth(), dto.getDay());
+        return localDate;
     }
 }
