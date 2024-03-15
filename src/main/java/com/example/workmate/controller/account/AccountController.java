@@ -23,19 +23,19 @@ public class AccountController {
     private final AuthenticationFacade authFacade;
     private final ResourceLoader resourceLoader;
 
-    @GetMapping("/home")
-    public String home() {
-        return "index";
+    @GetMapping("/login")
+    public String loginForm() {
+        return "login-form";
     }
 
     // 회원가입 화면
-    @GetMapping("/register")
-    public String registerForm() {
-        return "register-form";
+    @GetMapping("/users-register")
+    public String userRegisterForm() {
+        return "user-register-form";
     }
 
-    @PostMapping("/register")
-    public String signUpRequest(
+    @PostMapping("/users-register")
+    public String userSignUpRequest(
             @RequestParam("username")
             String username,
             @RequestParam("password")
@@ -46,7 +46,7 @@ public class AccountController {
             String email
     ) {
         if (password.equals(passwordCheck)) {
-            accountService.create(AccountDto.builder()
+            accountService.userCreate(AccountDto.builder()
                     .username(username)
                     .password(passwordEncoder.encode(password))
                     .email(email)
@@ -56,8 +56,34 @@ public class AccountController {
         return "redirect:/account/login";
     }
 
-    @GetMapping("/login")
-    public String loginForm() {
-        return "login-form";
+    @GetMapping("/business-register")
+    public String businessRegisterForm() {
+        return "business-register-form";
     }
+
+    @PostMapping("/business-register")
+    public String businessSignUpRequest(
+            @RequestParam("username")
+            String username,
+            @RequestParam("password")
+            String password,
+            @RequestParam("password-check")
+            String passwordCheck,
+            @RequestParam("email")
+            String email,
+            @RequestParam("business-number")
+            String businessNumber
+    ) {
+        if (password.equals(passwordCheck)) {
+            accountService.businessCreate(AccountDto.builder()
+                    .username(username)
+                    .password(passwordEncoder.encode(password))
+                    .email(email)
+                    .businessNumber(businessNumber)
+                    .build());
+        }
+        return "redirect:/account/login";
+    }
+
+
 }

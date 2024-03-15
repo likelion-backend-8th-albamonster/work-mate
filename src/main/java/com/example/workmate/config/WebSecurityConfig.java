@@ -27,7 +27,9 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
-                                        "/account/**"
+                                        "/account/users-register",
+                                        "/account/business-register",
+                                        "/account/login"
                                 )
                                 .permitAll()
                 )
