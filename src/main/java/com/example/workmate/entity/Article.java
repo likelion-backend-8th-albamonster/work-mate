@@ -1,5 +1,6 @@
 package com.example.workmate.entity;
 
+import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,18 +30,17 @@ public class Article {
     @Enumerated(EnumType.STRING)
     private Board board = Board.NOTICE;
 
-    public enum Board {
-        NOTICE, // 공지사항
-        REQUEST, // 요청사항
-        SUGGESTIONS, // 건의사항
-        FREE // 자유게시판
-    }
-
-//    @Setter
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    private Account accountId;
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account accountId;
 
     @Setter
-    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "shop_id")
+    private Shop shopId;
+
+    @Setter
+    @OneToMany(mappedBy = "articleId", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 }

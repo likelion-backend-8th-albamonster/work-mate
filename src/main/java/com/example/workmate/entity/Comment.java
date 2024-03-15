@@ -1,5 +1,6 @@
 package com.example.workmate.entity;
 
+import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,12 +16,14 @@ public class Comment {
     @Setter
     private String content;
 
-//    @Setter
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    private Account accountId;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "articleId")
-    private Article article;
+    @JoinColumn(name = "article_id")
+    private Article articleId;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id")
+    private Account accountId;
 }
