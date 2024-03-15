@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkTimeController {
     private final WorkTimeService workTimeService;
 
-    @PostMapping("create")
-    public WorkTimeDto create(
-            @RequestParam("shopId")
-            Long shopId
-    ){
-        workTimeService.create(shopId);
-    }
+//    @PostMapping("create")
+//    public WorkTimeDto create(
+//            @RequestParam("shopId")
+//            Long shopId
+//    ){
+//        workTimeService.create(shopId);
+//    }
 }

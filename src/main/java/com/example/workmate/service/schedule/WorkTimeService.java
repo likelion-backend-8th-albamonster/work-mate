@@ -15,14 +15,14 @@ import org.springframework.web.server.ResponseStatusException;
 public class WorkTimeService {
     private final WorkTimeRepo workTimeRepo;
 
-    public WorkTimeDto create(Long shopId){
-        /*//checkMember(shopId);
-
-        WorkTime workTime = WorkTime.builder()
-
-                .build()
-        return WorkTimeDto.builder().build();*/
-    }
+//    public WorkTimeDto create(Long shopId){
+//        /*//checkMember(shopId);
+//
+//        WorkTime workTime = WorkTime.builder()
+//
+//                .build()
+//        return WorkTimeDto.builder().build();*/
+//    }
 
     // 해당 매장 직원인지 확인하기
     public Account checkMember(Long shopId){
