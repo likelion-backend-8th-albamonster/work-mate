@@ -1,6 +1,6 @@
 package com.example.workmate.service;
 
-import com.example.workmate.dto.ArticleDto;
+import com.example.workmate.dto.community.ArticleDto;
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Board;
 import com.example.workmate.repo.ArticleRepo;
