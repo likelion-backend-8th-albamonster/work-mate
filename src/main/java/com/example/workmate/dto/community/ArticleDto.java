@@ -1,4 +1,4 @@
-package com.example.workmate.dto;
+package com.example.workmate.dto.community;
 
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Board;
@@ -32,8 +32,8 @@ public class ArticleDto {
                 .comments(entity.getComments().stream()
                         .map(CommentDto::fromEntity)
                         .collect(Collectors.toList()))
-                .accountId(entity.getAccountId())
-                .shopId(entity.getShopId())
+                .accountId(entity.getAccount())
+                .shopId(entity.getShop())
                 .build();
     }
 }
