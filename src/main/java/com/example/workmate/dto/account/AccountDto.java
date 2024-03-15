@@ -5,6 +5,7 @@ import com.example.workmate.entity.account.Authority;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Builder
@@ -14,6 +15,8 @@ public class AccountDto {
     private String username;
     private String password;
     private String email;
+    private String businessNumber;
+    @Setter
     private Authority authority;
 
     public static AccountDto fromEntity(Account account) {
@@ -21,6 +24,7 @@ public class AccountDto {
                 .id(account.getId())
                 .username(account.getUsername())
                 .password(account.getPassword())
+                .businessNumber(account.getBusinessNumber())
                 .authority(account.getAuthority())
                 .build();
     }

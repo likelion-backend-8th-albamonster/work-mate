@@ -1,5 +1,6 @@
 package com.example.workmate.config;
 
+import com.example.workmate.entity.account.Authority;
 import com.example.workmate.jwt.JwtTokenFilter;
 import com.example.workmate.jwt.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +28,19 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
-                                        "/account/**"
+                                        "/account/home"
                                 )
                                 .permitAll()
+
+                                .requestMatchers(
+                                        "/account/login",
+                                        "/account/users-register",
+                                        "/account/business-register"
+                                )
+                                .anonymous()
+
+                                .requestMatchers("/account/my-profile")
+                                .hasAnyRole(Authority.ROLE_USER.getAuthority(), Authority.ROLE_BUSINESS_USER.getAuthority(), Authority.ROLE_ADMIN.getAuthority())
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

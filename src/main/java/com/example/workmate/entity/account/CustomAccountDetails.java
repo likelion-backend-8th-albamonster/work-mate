@@ -20,6 +20,7 @@ public class CustomAccountDetails implements UserDetails {
     private String username;
     private String password;
     private String email;
+    private String businessNumber;
     private Authority authority;
 
     @Override
@@ -40,7 +41,7 @@ public class CustomAccountDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
@@ -55,6 +56,6 @@ public class CustomAccountDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }
