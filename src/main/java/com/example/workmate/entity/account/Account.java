@@ -21,7 +21,7 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(nullable = false, unique = true)
     private String username;    // 유저 아이디
     private String password;    // 비밀번호
     private String email;   // 이메일

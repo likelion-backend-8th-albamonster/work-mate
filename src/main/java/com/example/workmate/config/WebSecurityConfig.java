@@ -26,7 +26,8 @@ public class WebSecurityConfig {
                         authorizeHttpRequests
                                 .requestMatchers(
                                         "/token/issue",
-                                        "/token/validate"
+                                        "/token/validate",
+                                        "/account/**"
                                 )
                                 .permitAll()
                 )
