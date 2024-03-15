@@ -23,6 +23,7 @@ public class AccountService {
         Account newAccount = Account.builder()
                 .username(dto.getUsername())
                 .password(passwordEncoder.encode(dto.getPassword()))
+                .email(dto.getEmail())
                 .authority(Authority.ROLE_USER)
                 .build();
 

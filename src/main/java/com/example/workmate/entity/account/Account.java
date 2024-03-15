@@ -24,6 +24,7 @@ public class Account {
     @Column(nullable = false, unique = true)
     private String username;    // 유저 아이디
     private String password;    // 비밀번호
+    @Column(unique = true)
     private String email;   // 이메일
     @Enumerated(EnumType.STRING)
     private Authority authority;    // 권한

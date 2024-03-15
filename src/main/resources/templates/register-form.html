@@ -17,16 +17,20 @@
                         <h1 class="text-center mb-5">회원가입</h1>
                         <form action="/account/register" method="post">
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="identifier" name="username" type="text" placeholder="Enter your identifier...">
+                                <input class="form-control" id="identifier" name="username" type="text" placeholder="Enter your identifier">
                                 <label for="identifier">ID</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input class="form-control" id="password" name="password" type="password" placeholder="Enter your password...">
+                                <input class="form-control" id="password" name="password" type="password" placeholder="Enter your password">
                                 <label for="password">Password</label>
                             </div>
                             <div class="form-floating mb-3">
                                 <input class="form-control" id="password-check" name="password-check" type="password" placeholder="Re-enter your password...">
                                 <label for="password-check">Password Check</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input class="form-control" id="email" name="email" type="email" placeholder="Enter your email">
+                                <label for="password-check">Email</label>
                             </div>
                             <div class="d-grid"><button class="btn btn-primary btn-lg" id="sign-in-button" type="submit">Submit</button></div>
                             <div style="margin-top: 16px; text-align: right"><a href="/account/login">로그인</a></div>

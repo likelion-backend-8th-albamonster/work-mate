@@ -1,25 +1,17 @@
 package com.example.workmate.controller.account;
 
 import com.example.workmate.dto.account.AccountDto;
-import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Controller
@@ -49,12 +41,15 @@ public class AccountController {
             @RequestParam("password")
             String password,
             @RequestParam("password-check")
-            String passwordCheck
+            String passwordCheck,
+            @RequestParam("email")
+            String email
     ) {
         if (password.equals(passwordCheck)) {
             accountService.create(AccountDto.builder()
                     .username(username)
                     .password(passwordEncoder.encode(password))
+                    .email(email)
                     .build());
 
         }
