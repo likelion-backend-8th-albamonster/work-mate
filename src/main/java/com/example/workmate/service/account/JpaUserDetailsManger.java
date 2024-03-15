@@ -6,7 +6,6 @@ import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.repo.AccountRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,6 +26,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
             createUser(CustomAccountDetails.builder()
                     .username("admin")
                     .password(passwordEncoder.encode("password"))
+                    .email("admin")
                     .authority(Authority.ROLE_ADMIN)
                     .build());
         }
@@ -59,6 +58,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
             Account newAccount = Account.builder()
                     .username(accountDetails.getUsername())
                     .password(accountDetails.getPassword())
+                    .email(accountDetails.getEmail())
                     .authority(accountDetails.getAuthority())
                     .build();
             log.info("authority: {}", accountDetails.getAuthorities());
