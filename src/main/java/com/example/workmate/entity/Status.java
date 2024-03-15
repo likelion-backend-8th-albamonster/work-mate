@@ -6,6 +6,11 @@ import lombok.Getter;
 @Getter
 public enum Status {
     //정상출근 / 지각 / 조퇴
-    OK, LATE, EARLY
+    OK("정상출근"),
+    LATE("지각"),
+    EARLY("조퇴");
+
+    private String status;
+    Status(String status) { this.status = status; }
 
 }

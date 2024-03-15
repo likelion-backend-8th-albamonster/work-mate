@@ -16,8 +16,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AttendanceController {
     private final AttendanceService service;
 
+    //출근요청페이지
+    @GetMapping
+    public String attendance(){
+        return "home";
+    }
+
     //출근요청
-    //NCP api를 통해 사용자의 위치를 확인
+    //NCP api를 통해 사용자의 위치가 매장 근처인지 확인
     //이미 기록된 시간이 있는 경우 출근 등록 거부
     @PostMapping("/checkIn")
     public String checkIn(){
@@ -25,13 +31,13 @@ public class AttendanceController {
         return "home";
     }
 
-//    //퇴근요청
-//    //퇴근시간이 자신의 근무종료시간보다 늦다면 추가정산이 이루어진다.
-//    @PostMapping("/checkIn")
-//    public String checkOut(){
-//        service.checkOut();
-//        return "home";
-//    }
+    //퇴근요청
+    //퇴근시간이 자신의 근무종료시간보다 늦다면 추가정산이 이루어진다.
+    @PostMapping("/checkOut")
+    public String checkOut(){
+        service.checkOut();
+        return "home";
+    }
 
     //쉬는시간요청
     @PostMapping("/restIn")
@@ -56,7 +62,6 @@ public class AttendanceController {
         return "home";
     }
 
-    
     //출퇴근 수정(관리자)
     //모든 아르바이트생의 출퇴근 기록 수정 가능
     //Status를 수정하여, 정상출근 / 지각 / 조퇴 상태 변경
