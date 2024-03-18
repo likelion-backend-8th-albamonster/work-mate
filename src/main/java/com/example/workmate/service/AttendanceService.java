@@ -2,10 +2,12 @@ package com.example.workmate.service;
 
 import com.example.workmate.dto.AttendanceDto;
 import com.example.workmate.entity.Attendance;
+import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.Status;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AttendanceRepo;
+import com.example.workmate.repo.ShopRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -23,27 +25,33 @@ import java.util.Optional;
 public class AttendanceService {
     private final AttendanceRepo attendanceRepo;
     private final AccountRepo accountRepo;
+    private final ShopRepo shopRepo;
 
     //출근요청
     //이미 기록된 시간이 있는 경우 출근 등록 거부
     @Transactional
-    public AttendanceDto checkIn(Long userId){
+    public AttendanceDto checkIn(Long userId, Long shopId){
         //사용자 확인
         Account account = accountRepo.findById(userId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
                 );
+        //매장 확인
+        Shop shop = shopRepo.findById(shopId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "매장 정보를 확인해주세요")
+                );
 
         //오늘 날짜에 이미 기록된 출근이 있는지 확인
-        //db에서 사용자 id로 출근시간 가장 최근 데이터 꺼내오기
-        // 오늘 날짜의 출근기록을 가져올 수 있도록 리팩토링
-        Optional<Attendance> attendanceCk = attendanceRepo.findByAccountOrderByCheckInTime(account);
+        //db에서 사용자 id와 매장 id로 가장 최근 데이터 하나 꺼내오기
+        Optional<Attendance> attendanceCk
+                = attendanceRepo.findTopByAccountAndShopOrderByCheckInTimeDesc(account, shop);
         if (attendanceCk.isPresent()){
-            //현재시간 받기
+            //오늘날짜 받기
             LocalDate today = LocalDate.now();
-            //DB에서 꺼내온 시간
+            //DB에서 꺼내온 시간을 날짜형태로 변경
             LocalDate attendanceToday = attendanceCk.get().getCheckInTime().toLocalDate();
-            //같은 날짜라면
+            //같은 날짜인지 비교
             if (today.isEqual(attendanceToday)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복 출근 요청입니다.");
             }
