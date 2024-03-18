@@ -26,6 +26,8 @@ public class Account {
     @Column(nullable = false)
     private String password;    // 비밀번호
     @Column(nullable = false)
+    private String name;        // 유저 이름
+    @Column(nullable = false)
     private String email;       // 이메일
     private String businessNumber;  // 사업자 등록번호
     @Enumerated(EnumType.STRING)

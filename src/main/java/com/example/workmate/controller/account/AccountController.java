@@ -3,6 +3,7 @@ package com.example.workmate.controller.account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.facade.AuthenticationFacade;
+import com.example.workmate.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/account")
 @RequiredArgsConstructor
 public class AccountController {
+    private final AccountService service;
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationFacade authFacade;
@@ -35,14 +37,17 @@ public class AccountController {
         return "login-form";
     }
 
-//    @PostMapping("/login")
-//    public String login(
-//            @RequestParam("username") String username,
-//            @RequestParam("password") String password,
-//            Model model)
-//    {
-//
-//    }
+    @PostMapping("/login")
+    public String login(
+            @RequestParam("username") String username,
+            @RequestParam("password") String password
+    ) {
+        if (service.checkLogin(username, password)) {
+
+            return "my-profile";
+        }
+        return "redirect:/account/login";
+    }
 
     @GetMapping("/my-profile")
     public String myProfile(
@@ -70,6 +75,8 @@ public class AccountController {
             String password,
             @RequestParam("password-check")
             String passwordCheck,
+            @RequestParam("name")
+            String name,
             @RequestParam("email")
             String email
     ) {
@@ -77,6 +84,7 @@ public class AccountController {
             manager.createUser(CustomAccountDetails.builder()
                     .username(username)
                     .password(passwordEncoder.encode(password))
+                    .name(name)
                     .email(email)
                     .authority(Authority.ROLE_USER)
                     .build());
@@ -97,6 +105,8 @@ public class AccountController {
             String password,
             @RequestParam("password-check")
             String passwordCheck,
+            @RequestParam("name")
+            String name,
             @RequestParam("email")
             String email,
             @RequestParam("business-number")
@@ -106,8 +116,10 @@ public class AccountController {
             manager.createUser(CustomAccountDetails.builder()
                     .username(username)
                     .password(passwordEncoder.encode(password))
+                    .name(name)
                     .email(email)
                     .businessNumber(businessNumber)
+                    .authority(Authority.ROLE_BUSINESS_USER)
                     .build());
         }
         return "redirect:/account/login";
