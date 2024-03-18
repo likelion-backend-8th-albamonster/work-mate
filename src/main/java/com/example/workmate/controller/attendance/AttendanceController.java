@@ -26,12 +26,7 @@ public class AttendanceController {
     //출근요청
     //NCP api를 통해 사용자의 위치가 매장 근처인지 확인
     //이미 기록된 시간이 있는 경우 출근 등록 거부
-    @ResponseBody
-    @RequestMapping(
-            value = "/checkIn/{userId}/{shopId}",
-            method = RequestMethod.POST
-    )
-    //@PostMapping("/checkIn/{userId}/{shopId}")
+    @PostMapping("/checkIn/{userId}/{shopId}")
     public String checkIn(
             @PathVariable("userId")
             Long userId,

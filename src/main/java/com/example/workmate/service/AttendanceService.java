@@ -60,8 +60,9 @@ public class AttendanceService {
         //저장
         Attendance attendance = Attendance.builder()
                 .account(account)
-                //.checkInTime(LocalDateTime.now())
-                .checkInTime(LocalDateTime.of(2024,3,14,13,10,11))
+                .shop(shop)
+                .checkInTime(LocalDateTime.now())
+                //.checkInTime(LocalDateTime.of(2024,3,14,13,10,17))
                 .status(Status.OK)
                 .build();
         return AttendanceDto.fromEntity(attendanceRepo.save(attendance));
