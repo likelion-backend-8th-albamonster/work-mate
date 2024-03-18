@@ -1,4 +1,4 @@
-package com.example.workmate.dto;
+package com.example.workmate.dto.attendance;
 
 import com.example.workmate.entity.Attendance;
 import com.example.workmate.entity.Status;
@@ -17,6 +17,8 @@ public class AttendanceDto {
     private Long id;
     //사용자id
     private Long accountId;
+    //매장 id
+    private Long shopId;
     //출근시간
     private LocalDateTime checkInTime;
     //퇴근시간
@@ -29,6 +31,7 @@ public class AttendanceDto {
         return AttendanceDto.builder()
                 .id(entity.getId())
                 .accountId(entity.getAccount().getId())
+                .shopId(entity.getShop().getId())
                 .checkInTime(entity.getCheckInTime())
                 .checkOutTime(entity.getCheckOutTime())
                 .status(entity.getStatus())
