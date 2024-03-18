@@ -20,6 +20,10 @@ public class Attendance {
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
+    //매장
+    @ManyToOne
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
     //출근시간
     private LocalDateTime checkInTime;
     //퇴근시간
