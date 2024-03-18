@@ -3,6 +3,7 @@ package com.example.workmate.config;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.jwt.JwtTokenFilter;
 import com.example.workmate.jwt.JwtTokenUtils;
+import com.example.workmate.service.account.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.security.web.access.intercept.AuthorizationFilter;
 public class WebSecurityConfig {
     private final JwtTokenUtils jwtTokenUtils;
     private final UserDetailsManager manager;
+    private final OAuth2UserServiceImpl oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,6 +43,18 @@ public class WebSecurityConfig {
 
                                 .requestMatchers("/account/my-profile")
                                 .hasAnyRole(Authority.ROLE_USER.getAuthority(), Authority.ROLE_BUSINESS_USER.getAuthority(), Authority.ROLE_ADMIN.getAuthority())
+                )
+                .formLogin(
+                        formLogin -> formLogin
+                                .loginPage("/account/login")
+                                .defaultSuccessUrl("/account/my-profile")
+                                .failureUrl("/account/login?fail")
+                )
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .loginPage("/account/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oAuth2UserService))
+
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
