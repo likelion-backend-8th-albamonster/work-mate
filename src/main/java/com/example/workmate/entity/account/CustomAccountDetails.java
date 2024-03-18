@@ -26,8 +26,12 @@ public class CustomAccountDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = authority.getAuthority();
-        return Collections.singleton(new SimpleGrantedAuthority(role));
+        if (authority != null) {
+            String role = authority.getAuthority();
+            return Collections.singleton(new SimpleGrantedAuthority(role));
+        } else {
+            return Collections.emptySet();
+        }
     }
 
     @Override
