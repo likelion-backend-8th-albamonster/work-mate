@@ -26,6 +26,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
             createUser(CustomAccountDetails.builder()
                     .username("admin")
                     .password(passwordEncoder.encode("password"))
+                    .name("admin")
                     .email("admin")
                     .authority(Authority.ROLE_ADMIN)
                     .build());
@@ -43,6 +44,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
         return CustomAccountDetails.builder()
                 .username(account.getUsername())
                 .password(account.getPassword())
+                .name(account.getName())
                 .email(account.getEmail())
                 .businessNumber(account.getBusinessNumber())
                 .authority(account.getAuthority())
@@ -58,6 +60,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
             Account newAccount = Account.builder()
                     .username(accountDetails.getUsername())
                     .password(accountDetails.getPassword())
+                    .name(accountDetails.getName())
                     .email(accountDetails.getEmail())
                     .businessNumber(accountDetails.getBusinessNumber())
                     .authority(accountDetails.getAuthority())
@@ -88,5 +91,4 @@ public class JpaUserDetailsManger implements UserDetailsManager {
     public boolean userExists(String username) {
         return accountRepo.existsByUsername(username);
     }
-
 }

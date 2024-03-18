@@ -64,6 +64,14 @@ public class AccountService {
         manager.createUser(newAccount);
     }
 
+    // 로그인
+    public boolean checkLogin(String username, String password) {
+        Account account = accountRepo.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return account.getUsername().equals(username) && passwordEncoder.matches(password, account.getPassword());
+    }
+
+
     // AccountDto를 UserDetails로 변환하는 메서드
     private UserDetails buildUserDetails(AccountDto dto) {
         return CustomAccountDetails.builder()
