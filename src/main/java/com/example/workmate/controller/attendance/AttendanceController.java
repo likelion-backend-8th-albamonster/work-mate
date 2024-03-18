@@ -1,4 +1,4 @@
-package com.example.workmate.controller;
+package com.example.workmate.controller.attendance;
 
 import com.example.workmate.dto.AttendanceDto;
 import com.example.workmate.service.AttendanceService;
@@ -26,10 +26,17 @@ public class AttendanceController {
     //출근요청
     //NCP api를 통해 사용자의 위치가 매장 근처인지 확인
     //이미 기록된 시간이 있는 경우 출근 등록 거부
-    @PostMapping("/checkIn/{userId}")
+    @ResponseBody
+    @RequestMapping(
+            value = "/checkIn/{userId}/{shopId}",
+            method = RequestMethod.POST
+    )
+    //@PostMapping("/checkIn/{userId}/{shopId}")
     public String checkIn(
             @PathVariable("userId")
             Long userId,
+            @PathVariable("shopId")
+            Long shopId,
             @RequestParam("userIp")
             String userIp,
             @RequestParam("shopAddress")
@@ -40,7 +47,7 @@ public class AttendanceController {
         //사용자가 매장 위치에 있는지 확인
         if (naviService.checkTwoPoint(userIp, shopAddress)){
             //사용자 출근 정보 저장
-            AttendanceDto dto = service.checkIn(userId);
+            AttendanceDto dto = service.checkIn(userId, shopId);
             //저장된 값을 모델에 담기
             
         }
