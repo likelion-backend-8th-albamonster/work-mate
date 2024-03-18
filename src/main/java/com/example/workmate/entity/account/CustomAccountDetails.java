@@ -28,6 +28,7 @@ public class CustomAccountDetails implements UserDetails {
         String role = authority.getAuthority();
         return Collections.singleton(new SimpleGrantedAuthority(role));
     }
+    private Account account;
 
     @Override
     public String getPassword() {

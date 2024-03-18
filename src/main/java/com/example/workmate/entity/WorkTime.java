@@ -35,6 +35,16 @@ public class WorkTime {
     private LocalDateTime workStartTime;
     private LocalDateTime workEndTime;
 
+    public void updateTime(
+            LocalDateTime workStartTime,
+            LocalDateTime workEndTime,
+            WorkRole workRole
+    ){
+        this.workStartTime = workStartTime;
+        this.workEndTime = workEndTime;
+        this.workRole = workRole;
+    }
+
     public void changeTime(
             LocalDateTime workStartTime,
             LocalDateTime workEndTime

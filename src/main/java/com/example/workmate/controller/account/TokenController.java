@@ -1,12 +1,17 @@
 package com.example.workmate.controller.account;
 
+import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.account.CustomAccountDetails;
+import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.jwt.dto.JwtRequestDto;
 import com.example.workmate.jwt.dto.JwtResponseDto;
+import com.example.workmate.service.schedule.ScheduleService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
