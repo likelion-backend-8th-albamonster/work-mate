@@ -14,6 +14,7 @@ public class AccountDto {
     private Long id;
     private String username;
     private String password;
+    private String name;
     private String email;
     private String businessNumber;
     @Setter
@@ -24,6 +25,8 @@ public class AccountDto {
                 .id(account.getId())
                 .username(account.getUsername())
                 .password(account.getPassword())
+                .name(account.getName())
+                .email(account.getEmail())
                 .businessNumber(account.getBusinessNumber())
                 .authority(account.getAuthority())
                 .build();

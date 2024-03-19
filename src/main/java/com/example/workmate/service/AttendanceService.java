@@ -1,7 +1,6 @@
 package com.example.workmate.service;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
-import com.example.workmate.dto.community.ArticleDto;
 import com.example.workmate.entity.Attendance;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.Status;
@@ -61,27 +60,20 @@ public class AttendanceService {
     }
 
     //퇴근요청
+    //front단에서 출근데이터 존재 확인
     //퇴근시간이 자신의 근무종료시간보다 늦다면 추가정산이 이루어진다.
     @Transactional
-    public AttendanceDto checkOut(Long userId, Long shopId){
-        //사용자 확인
-        Account account = accountRepo.findById(userId)
+    public AttendanceDto checkOut(Long attendanceId){
+        Attendance attendance = attendanceRepo.findById(attendanceId)
                 .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "출퇴근 정보를 확인해주세요")
                 );
-        //매장 확인
-        Shop shop = shopRepo.findById(shopId)
-                .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "매장 정보를 확인해주세요")
-                );
-
+        //출근 데이터 값이 이미 퇴근상태일때
+        if (Status.OUT.equals(attendance.getStatus())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복퇴근 요청입니다.");
+        }
         //오늘 날짜의 출근 데이터 status 수정
-        Attendance attendance = Attendance.builder()
-                .account(account)
-                .shop(shop)
-                .checkInTime(LocalDateTime.now())
-                .status(Status.OUT)
-                .build();
+        attendance.setStatus(Status.OUT);
         return AttendanceDto.fromEntity(attendanceRepo.save(attendance));
     }
     //쉬는시간요청

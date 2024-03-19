@@ -30,6 +30,7 @@ public class Attendance {
     private LocalDateTime checkOutTime;
 
     //출근상태
+    @Setter
     @Enumerated(EnumType.STRING)
     private Status status;
 }
