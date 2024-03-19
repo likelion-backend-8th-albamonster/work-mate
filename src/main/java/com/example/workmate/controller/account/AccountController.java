@@ -3,15 +3,12 @@ package com.example.workmate.controller.account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.facade.AuthenticationFacade;
-import com.example.workmate.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -19,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/account")
 @RequiredArgsConstructor
 public class AccountController {
-    private final AccountService service;
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationFacade authFacade;
@@ -29,42 +25,23 @@ public class AccountController {
         log.info(SecurityContextHolder.getContext().getAuthentication().getName());
         log.info(authFacade.getAuth().getName());
 
-        return "index";
+        return "account/index";
     }
 
     @GetMapping("/login")
     public String loginForm() {
-        return "login-form";
-    }
-
-    @PostMapping("/login")
-    public String login(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password
-    ) {
-        if (service.checkLogin(username, password)) {
-
-            return "my-profile";
-        }
-        return "redirect:/account/login";
-    }
-
-    @GetMapping("/my-profile")
-    public String myProfile(
-            Authentication authentication,
-            Model model
-    ) {
-        model.addAttribute("username", authentication.getName());
-        log.info(authentication.getName());
-        log.info(((CustomAccountDetails) authentication.getPrincipal()).getPassword());
-        log.info(((CustomAccountDetails) authentication.getPrincipal()).getEmail());
-        return "my-profile";
+        return "account/login-form";
     }
 
     // 회원가입 화면
+    @GetMapping("/register")
+    public String registerForm() {
+        return "account/register";
+    }
+
     @GetMapping("/users-register")
     public String userRegisterForm() {
-        return "user-register-form";
+        return "account/user-register-form";
     }
 
     @PostMapping("/users-register")
@@ -94,7 +71,7 @@ public class AccountController {
 
     @GetMapping("/business-register")
     public String businessRegisterForm() {
-        return "business-register-form";
+        return "account/business-register-form";
     }
 
     @PostMapping("/business-register")

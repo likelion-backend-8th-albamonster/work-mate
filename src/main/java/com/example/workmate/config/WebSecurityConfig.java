@@ -1,7 +1,6 @@
 package com.example.workmate.config;
 
 import com.example.workmate.component.OAuth2SuccessHandler;
-import com.example.workmate.entity.account.Authority;
 import com.example.workmate.jwt.JwtTokenFilter;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.service.account.OAuth2UserServiceImpl;
@@ -43,8 +42,10 @@ public class WebSecurityConfig {
                                 )
                                 .anonymous()
 
-                                .requestMatchers("/account/my-profile")
-                                .hasAnyRole(Authority.ROLE_USER.getAuthority(), Authority.ROLE_BUSINESS_USER.getAuthority(), Authority.ROLE_ADMIN.getAuthority())
+                                // 권한 설정 필요
+                                .requestMatchers("/profile/{id}")
+                                .permitAll()
+//                                .hasAnyRole(Authority.ROLE_USER.getAuthority(), Authority.ROLE_BUSINESS_USER.getAuthority(), Authority.ROLE_ADMIN.getAuthority())
                 )
                 .formLogin(
                         formLogin -> formLogin
