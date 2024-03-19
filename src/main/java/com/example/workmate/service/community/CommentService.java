@@ -4,7 +4,7 @@ import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.community.CommentDto;
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Comment;
-import com.example.workmate.repo.community.ArticleRepository;
+import com.example.workmate.repo.community.ArticleRepo;
 import com.example.workmate.repo.community.CommentRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CommentService {
-    private final ArticleRepository articleRepo;
+    private final ArticleRepo articleRepo;
     private final CommentRepo commentRepo;
 
     public CommentDto create(
