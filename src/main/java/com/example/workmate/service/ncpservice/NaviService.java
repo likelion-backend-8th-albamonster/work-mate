@@ -112,29 +112,27 @@ public class NaviService {
     }
 
     //사용자 출퇴근 위치 확인 
-    //사용자의 ip를 기반한 좌표와, 매장의 주소를 기반한 좌표를 받아
+    //사용자 좌표와, 매장의 주소를 기반한 좌표를 받아
     //두 좌표가 근처에 있는지 확인
 
-    public boolean checkTwoPoint(String userIp, String shopAddress) {
+    public boolean checkTwoPoint(PointDto userPointDto, String shopAddress) {
         boolean isHere = false;
-        //사용자 좌표
-        PointDto userPoint = ipToPoints(userIp);
         //매장좌표
-        PointDto shopPoint = addressToPoints(shopAddress);
+        PointDto shopPointDto = addressToPoints(shopAddress);
 
         //사용자와 매장의 좌표 확인
-        log.info("사용자의 Y좌표: {}",String.format("%.4f", userPoint.getLat()));
-        log.info("사용자의 X좌표: {}",String.format("%.4f", userPoint.getLng()));
-        log.info("매장의 Y좌표: {}",String.format("%.4f", shopPoint.getLat()));
-        log.info("매장의 X좌표: {}",String.format("%.4f", shopPoint.getLng()));
+        log.info("사용자의 Y좌표: {}",String.format("%.4f", userPointDto.getLat()));
+        log.info("사용자의 X좌표: {}",String.format("%.4f", userPointDto.getLng()));
+        log.info("매장의 Y좌표: {}",String.format("%.4f", shopPointDto.getLat()));
+        log.info("매장의 X좌표: {}",String.format("%.4f", shopPointDto.getLng()));
 
         //사용자 좌표와 매장 좌표를
         //소수점 1번째자리까지 비교(4번째자리까지가 목표)했을 때 그 값이 같은지 체크
         if (
-                String.format("%.1f", userPoint.getLat())
-                        .equals(String.format("%.1f", shopPoint.getLat())) &&
-                String.format("%.1f", userPoint.getLng())
-                        .equals(String.format("%.1f", shopPoint.getLng()))
+                String.format("%.1f", userPointDto.getLat())
+                        .equals(String.format("%.1f", shopPointDto.getLat())) &&
+                String.format("%.1f", userPointDto.getLng())
+                        .equals(String.format("%.1f", shopPointDto.getLng()))
         ) {
             isHere = true;
         }

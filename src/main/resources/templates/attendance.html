@@ -12,27 +12,74 @@
     <!--출/퇴근 버튼-->
     <!--출근 데이터가 없다면 출근 / 있다면 퇴근-->
     <!--추후 개인정보와 매장정보를 받아 이동할 수 있도록 변경-->
-    <!--th:action="@{/attendance/checkIn/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}"-->
     <div th:if="${isExist} == false">
-        <form action="/attendance/checkIn/2/1" method="post">
-            <!--user ip-->
-            <input type="hidden" name="userIp" value="1.231.178.134">
+        <form th:action="@{/attendance/checkIn/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}" method="post">
+            <!--사용자 좌표-->
+            <input type="hidden" id="userLat" name="userLat">
+            <input type="hidden" id="userLng" name="userLng">
             <!--매장 주소-->
-            <input type="hidden" name="shopAddress" value="서울시 동대문구 휘경동">
+            <input type="hidden" name="shopAddress" th:value="${shop.getAddress()}">
             <input type="submit" class="btn btn-danger" value="출근">
         </form>
     </div>
     <div th:unless="${isExist} == false">
-        <form action="/attendance/checkOut/2/1" method="post">
-            <!--user ip-->
-            <input type="hidden" name="userIp" value="1.231.178.134">
-            <!--매장 주소-->
-            <input type="hidden" name="shopAddress" value="서울시 동대문구 휘경동">
-            <!--출퇴근정보 id-->
-            <input type="hidden" name="attendanceId" th:value="${attendance.id}">
-            <input type="submit" class="btn btn-danger" value="퇴근">
-        </form>
+        <div th:if="${#strings.equals(attendance.getStatus(), 'OUT')}">
+            <input type="button" disabled class="btn btn-danger" value="퇴근 완료">
+        </div>
+        <div th:unless="${#strings.equals(attendance.getStatus(), 'OUT')}">
+            <form th:action="@{/attendance/checkOut/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}" method="post">
+                <!--사용자 좌표-->
+                <input type="hidden" id="userLat" name="userLat">
+                <input type="hidden" id="userLng" name="userLng">
+                <!--매장 주소-->
+                <input type="hidden" name="shopAddress" th:value="${shop.getAddress()}">
+                <!--출퇴근정보 id-->
+                <input type="hidden" name="attendanceId" th:value="${attendance.id}">
+                <input type="submit" class="btn btn-danger" value="퇴근">
+            </form>
+        </div>
+
     </div>
+
+    <p id="status"></p>
+    <script>
+        //사용자 위치정보를 가져오는 function
+        //로컬환경이 아닌경우, http에서 작동 X
+        //페이지 요청 시 자동 실행
+        //실행 실패 시, status 요소에 실패 상태를 나타낸다.
+        window.onload = function () {
+            //상태
+            const status = document.querySelector("#status");
+            //좌표
+            const userLat = document.querySelector("#userLat");
+            const userLng = document.querySelector("#userLng");
+
+            function success(position) {
+                //좌표받기
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+
+                status.textContent = "";
+                //유저 좌표
+                userLat.value = latitude;
+                userLng.value = longitude;
+            }
+
+            function error() {
+                status.textContent = "현재 위치를 가져올 수 없음";
+            }
+
+            if (!navigator.geolocation) {
+                status.textContent = "브라우저가 위치 정보를 지원하지 않음";
+            } else {
+                status.textContent = "위치 파악 중…";
+                navigator.geolocation.getCurrentPosition(success, error);
+            }
+        }
+
+        //document.querySelector("#find-me").addEventListener("click", geoFindMe);
+
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
             crossorigin="anonymous">
