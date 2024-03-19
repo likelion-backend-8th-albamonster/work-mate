@@ -15,7 +15,6 @@
     <!--th:action="@{/attendance/checkIn/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}"-->
     <div th:if="${isExist} == false">
         <form action="/attendance/checkIn/2/1" method="post">
-            <input type="submit" class="btn btn-danger" value="출근">
             <!--user ip-->
             <input type="hidden" name="userIp" value="1.231.178.134">
             <!--매장 주소-->
