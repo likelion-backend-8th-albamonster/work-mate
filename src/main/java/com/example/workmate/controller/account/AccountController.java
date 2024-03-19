@@ -29,12 +29,12 @@ public class AccountController {
         log.info(SecurityContextHolder.getContext().getAuthentication().getName());
         log.info(authFacade.getAuth().getName());
 
-        return "index";
+        return "account/index";
     }
 
     @GetMapping("/login")
     public String loginForm() {
-        return "login-form";
+        return "account/login-form";
     }
 
     @PostMapping("/login")
@@ -62,9 +62,14 @@ public class AccountController {
     }
 
     // 회원가입 화면
+    @GetMapping("/register")
+    public String registerForm() {
+        return "account/register";
+    }
+
     @GetMapping("/users-register")
     public String userRegisterForm() {
-        return "user-register-form";
+        return "account/user-register-form";
     }
 
     @PostMapping("/users-register")

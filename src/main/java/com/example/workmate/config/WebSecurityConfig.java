@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                                 .permitAll()
 
                                 .requestMatchers(
+                                        "/account/register",
                                         "/account/login",
                                         "/account/users-register",
                                         "/account/business-register"
