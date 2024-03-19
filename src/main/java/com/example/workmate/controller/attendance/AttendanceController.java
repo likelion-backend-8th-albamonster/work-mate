@@ -1,14 +1,19 @@
 package com.example.workmate.controller.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
+import com.example.workmate.dto.ncpdto.PointDto;
+import com.example.workmate.repo.AccountRepo;
+import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.service.AttendanceService;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.ncpservice.NaviService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 @RequestMapping("/attendance")
@@ -17,29 +22,36 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
     private final NaviService naviService;
     private final AccountService accountService;
+    private final AccountRepo accountRepo;
+    private final ShopRepo shopRepo;
     //출근요청페이지
     //요청 시 사용자 정보 / 매장정보 / 출근 정보를 확인
-    @GetMapping("/{userId}/{shopId}")
+    @GetMapping("/{accountId}/{shopId}")
     public String attendance(
-            @PathVariable("userId")
-            Long userId,
+            @PathVariable("accountId")
+            Long accountId,
             @PathVariable("shopId")
             Long shopId,
             //사용자의 ip와 매장 주소가 model에 들어가야 함
             Model model
     ){
-        //사용자 정보
-        //사용자 ip가 여기 담겨야함
-        //오늘 날짜에 이미 기록된 출근이 있는지 확인
-        model.addAttribute("account");
+        model.addAttribute("account", accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "사용자 정보를 확인해주세요")));
         //매장 정보
-        model.addAttribute("shop");
-        //출근정보가 존재하는지 확인
-        boolean isExist = attendanceService.isExistTodayCheckIn(userId, shopId);
+        model.addAttribute("shop", shopRepo.findById(shopId)
+                .orElseThrow(
+                        ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "매장 정보를 확인해주세요")));
+
+        model.addAttribute("userIp", "194.114.136.73");
+        //오늘 날짜에 이미 기록된 출근이 있는지 확인
+        boolean isExist = attendanceService.isExistTodayCheckIn(accountId, shopId);
         model.addAttribute("isExist", isExist);
         //출퇴근 데이터가 존재할때
         if (isExist){
-            model.addAttribute("attendance", attendanceService.readOne(userId, shopId));
+            model.addAttribute("attendance", attendanceService.readOne(accountId, shopId));
         }
         return "attendance";
     }
@@ -53,15 +65,19 @@ public class AttendanceController {
             Long userId,
             @PathVariable("shopId")
             Long shopId,
-            @RequestParam("userIp")
-            String userIp,
+            @RequestParam("userLat")
+            double userLat,
+            @RequestParam("userLng")
+            double userLng,
             @RequestParam("shopAddress")
             String shopAddress,
             //출근정보
             Model model
     ){
+        //사용자 좌표
+        PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
-        if (naviService.checkTwoPoint(userIp, shopAddress)){
+        if (naviService.checkTwoPoint(userPointDto, shopAddress)){
             //오늘 날짜에 이미 기록된 출근이 있는지 확인
             boolean isExist = attendanceService.isExistTodayCheckIn(userId, shopId);
             //이미 출근정보가 있다면
@@ -72,7 +88,7 @@ public class AttendanceController {
             AttendanceDto dto = attendanceService.checkIn(userId, shopId);
             //출근 확인되었습니다 alert창으로 나타내기
         }
-        //매장위치에 있지 않으면 
+        //매장위치에 있지 않으면
         else {
             //"현재 위치를 확인해주세요" alert창으로 나타내기
         }
@@ -87,19 +103,23 @@ public class AttendanceController {
             Long userId,
             @PathVariable("shopId")
             Long shopId,
-            @RequestParam("userIp")
-            String userIp,
+            @RequestParam("userLat")
+            double userLat,
+            @RequestParam("userLng")
+            double userLng,
             @RequestParam("shopAddress")
             String shopAddress,
             //출퇴근정보
-            @PathVariable("attendanceId")
+            @RequestParam("attendanceId")
             Long attendanceId,
             Model model
     ){
+        //사용자 좌표
+        PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
-        if (naviService.checkTwoPoint(userIp, shopAddress)){
+        if (naviService.checkTwoPoint(userPointDto, shopAddress)){
             //사용자 퇴근 정보 저장
-            attendanceService.checkOut(userId, shopId);
+            attendanceService.checkOut(attendanceId);
             //퇴근 확인되었습니다 alert창으로 나타내기
             
         }
