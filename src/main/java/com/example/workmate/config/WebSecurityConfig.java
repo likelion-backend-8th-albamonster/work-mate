@@ -32,7 +32,10 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
-                                        "/account/home"
+                                        "/account/home",
+
+                                        //근무표 관련 테스트중
+                                        "/schedule/**"
                                 )
                                 .permitAll()
 

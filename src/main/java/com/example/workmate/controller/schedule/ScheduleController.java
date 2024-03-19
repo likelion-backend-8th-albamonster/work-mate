@@ -3,21 +3,43 @@ package com.example.workmate.controller.schedule;
 import com.example.workmate.dto.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
+import com.example.workmate.entity.AccountShop;
+import com.example.workmate.service.schedule.ScheduleDataService;
 import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequiredArgsConstructor
-@RequestMapping("schedule")
+@RequestMapping("/schedule")
 public class ScheduleController {
     private final ScheduleService scheduleService;
+    private final ScheduleDataService scheduleDataService;
+
+    //스케쥴 보는 테스트
+    @ResponseBody
+    @PostMapping("/make")
+    public String make(){
+        //사람, 상점, accountShop 만들기
+        scheduleDataService.accountShop();
+        // 사람의 한 달 동안의 랜덤시간 근무 만들기
+        scheduleDataService.makeWorkTime(2L);
+        scheduleDataService.makeWorkTime(3L);
+        return "done";
+    }
+
+    @GetMapping("/schedule")
+    public String month(){
+        return "monthly-schedule";
+    }
+
     // 근무 만들기
     @PostMapping("/create")
     public WorkTimeDto create(
@@ -27,6 +49,7 @@ public class ScheduleController {
     }
 
     // 근무 수정하기
+    @ResponseBody
     @GetMapping("/update/{workTimeId}")
     public WorkTimeDto update(
             @RequestParam WorkTimeDto dto,
@@ -37,6 +60,7 @@ public class ScheduleController {
     }
 
     // 근무 모두 보기
+    @ResponseBody
     @GetMapping("/read/{shopId}")
     public Page<WorkTimeDto> readPage(
             Pageable pageable,
@@ -47,6 +71,7 @@ public class ScheduleController {
     }
 
     //근무 하나 보기
+    @ResponseBody
     @GetMapping("/read-one/{workTimeId}")
     public WorkTimeDto readOne(
             @PathVariable("workTimeId")
@@ -55,6 +80,7 @@ public class ScheduleController {
         return scheduleService.readOne(workTimeId);
     }
     // 근무 지우기
+    @ResponseBody
     @DeleteMapping("/delete/{workTimeId}")
     public WorkTimeDto delete(
             @PathVariable("workTimeId")
@@ -64,6 +90,7 @@ public class ScheduleController {
     }
 
     // 한달 씩으로 보기.
+    @ResponseBody
     @GetMapping("view-month/{shopId}")
     public List<WorkTimeDto> viewMonth(
             @PathVariable("shopId")
@@ -75,6 +102,7 @@ public class ScheduleController {
     }
 
     // 시작 기간과 끝 기간을 정해서 보기 0번은 시작, 1번은 끝
+    @ResponseBody
     @GetMapping("view-period/{shopId}")
     public List<WorkTimeDto> viewPeriod(
             @PathVariable("shopId")
@@ -86,6 +114,7 @@ public class ScheduleController {
     }
 
     // 근무표 변경요청만들기
+    @ResponseBody
     @PostMapping("create-change")
     public ChangeRequestDto changeRequest(
             @RequestBody
@@ -94,6 +123,7 @@ public class ScheduleController {
         return scheduleService.createChange(dto);
     }
     // 근무표 변경요청 보기, 아직 제안 중인 것만
+    @ResponseBody
     @GetMapping("view-change-all")
     public List<ChangeRequestDto> viewChangeAll(
             @RequestParam("shopId")
@@ -103,6 +133,7 @@ public class ScheduleController {
     }
 
     // 근무 교체 승인
+    @ResponseBody
     @PutMapping ("confirm-change")
     public ChangeRequestDto confirmChange(
             @RequestParam("changeRequestId")
@@ -112,6 +143,7 @@ public class ScheduleController {
     }
 
     //근무 교체 거절
+    @ResponseBody
     @PutMapping("decline-change")
     public ChangeRequestDto declineChange(
             @RequestParam("changeRequestId")

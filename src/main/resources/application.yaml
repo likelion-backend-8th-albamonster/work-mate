@@ -12,3 +12,4 @@ spring:
       mode: always
   profiles:
     active: git
+
