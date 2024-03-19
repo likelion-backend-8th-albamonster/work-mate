@@ -15,7 +15,7 @@ public class CommentDto {
     private String content;
     private Account accountId;
     private Article articleId;
-
+    //
     public static CommentDto fromEntity(Comment entity) {
         return CommentDto.builder()
                 .id(entity.getId())
