@@ -3,7 +3,10 @@ package com.example.workmate.service.community;
 import com.example.workmate.dto.community.ArticleDto;
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Board;
+import com.example.workmate.entity.Shop;
+import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.repo.community.ArticleRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -13,20 +16,23 @@ import org.springframework.stereotype.Service;
 
 
 @Slf4j
-@Service("communityArticleService")
+@Service
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepo articleRepo;
+    private final ShopRepo shopRepo;
 
     public ArticleDto create(
-            ArticleDto dto
+            ArticleDto articleDto
     ) {
+        Shop shop = shopRepo.findById(articleDto.getShopId())
+                .orElseThrow(() -> new EntityNotFoundException("Shop not found with id: " + articleDto.getShopId()));
         Article article = articleRepo.save(Article.builder()
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .board(dto.getBoard())
-                .account(dto.getAccountId())
-                .shop(dto.getShopId())
+                .title(articleDto.getTitle())
+                .content(articleDto.getContent())
+                .board(articleDto.getBoard())
+                .account(articleDto.getAccountId())
+                .shop(shop)
                 .build());
         return ArticleDto.fromEntity(article);
     }

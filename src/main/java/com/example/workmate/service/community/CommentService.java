@@ -1,6 +1,5 @@
 package com.example.workmate.service.community;
 
-import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.community.CommentDto;
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Comment;
@@ -19,23 +18,22 @@ public class CommentService {
 
     public CommentDto create(
             Long articleId,
-            CommentDto dto
+            CommentDto commentDto
     ) {
         Article article = articleRepo.findById(articleId)
                 .orElseThrow();
 
         Comment comment = commentRepo.save(Comment.builder()
-                .content(dto.getContent())
-                .article(dto.getArticleId())
-                .account(dto.getAccountId())
+                .content(commentDto.getContent())
+                .article(commentDto.getArticleId())
+                .account(commentDto.getAccountId())
                 .build());
         return CommentDto.fromEntity(commentRepo.save(comment));
     }
 
     public CommentDto update(
-        Long commentId,
-        AccountDto accountId,
-        CommentDto commentDto
+            Long commentId,
+            CommentDto commentDto
     ) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow();
@@ -48,8 +46,8 @@ public class CommentService {
     }
 
     public void delete(
-        Long commentId,
-        CommentDto commentDto
+            Long commentId,
+            CommentDto commentDto
     ) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow();
