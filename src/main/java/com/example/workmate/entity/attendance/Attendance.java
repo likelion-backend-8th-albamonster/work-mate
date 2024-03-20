@@ -28,6 +28,7 @@ public class Attendance {
     //출근시간
     private LocalDateTime checkInTime;
     //퇴근시간
+    @Setter
     private LocalDateTime checkOutTime;
 
     //출근상태
