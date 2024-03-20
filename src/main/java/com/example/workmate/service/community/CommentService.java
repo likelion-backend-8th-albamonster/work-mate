@@ -3,11 +3,16 @@ package com.example.workmate.service.community;
 import com.example.workmate.dto.community.CommentDto;
 import com.example.workmate.entity.Article;
 import com.example.workmate.entity.Comment;
+import com.example.workmate.entity.account.Account;
+import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.community.ArticleRepo;
 import com.example.workmate.repo.community.CommentRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -15,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class CommentService {
     private final ArticleRepo articleRepo;
     private final CommentRepo commentRepo;
+    private final AccountRepo accountRepo;
 
     public CommentDto create(
             Long articleId,
@@ -22,11 +28,16 @@ public class CommentService {
     ) {
         Article article = articleRepo.findById(articleId)
                 .orElseThrow();
-
+        Account account = null;
+        if (commentDto.getAccountId() != null) {
+            account = accountRepo.findById(commentDto.getAccountId())
+                    .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + commentDto.getAccountId()));
+        }
         Comment comment = commentRepo.save(Comment.builder()
                 .content(commentDto.getContent())
-                .article(commentDto.getArticleId())
-                .account(commentDto.getAccountId())
+                .article(article)
+                .account(account)
+                .commentWriteTime(LocalDateTime.now())
                 .build());
         return CommentDto.fromEntity(commentRepo.save(comment));
     }
@@ -37,7 +48,7 @@ public class CommentService {
     ) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow();
-        if (comment.getAccount().equals(commentDto.getAccountId())) {
+        if (comment.getAccount() != null && comment.getAccount().getId().equals(commentDto.getAccountId())) {
             comment.setContent(commentDto.getContent());
         } else {
             throw new IllegalStateException("권한이 없습니다.");
@@ -51,10 +62,11 @@ public class CommentService {
     ) {
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow();
-        if (comment.getAccount().equals(commentDto.getAccountId())) {
+        if (comment.getAccount() != null &&comment.getAccount().getId().equals(commentDto.getAccountId())) {
             commentRepo.delete(comment);
         } else {
             throw new IllegalStateException("권한이 없습니다.");
         }
     }
 }
+

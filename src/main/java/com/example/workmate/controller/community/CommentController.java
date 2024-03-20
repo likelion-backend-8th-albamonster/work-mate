@@ -28,6 +28,7 @@ public class CommentController {
             CommentDto commentDto
     ) {
         commentService.create(articleId, commentDto);
+
         return "redirect:/" + shopId + "/community/" + board + "/" + articleId;
     }
 
@@ -61,7 +62,7 @@ public class CommentController {
             Long articleId,
             @PathVariable("commentId")
             Long commentId,
-            @RequestBody
+            @ModelAttribute
             CommentDto commentDto
     ) {
         commentService.delete(commentId, commentDto);
