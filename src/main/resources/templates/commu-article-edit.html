@@ -9,14 +9,16 @@
 <body class="p-3">
 <div class="d-flex align-items-center">
   <h1 class="me-3">게시글 수정</h1>
-  <a class="fs-3" href="/board">뒤로가기</a>
+  <p><a th:href="@{'/' + ${shopId} + '/community'}">홈으로 가기</a></p>
 </div>
 <hr>
 <form th:action="@{'/' + ${shopId} + '/community/' + ${board} + '/' + ${article.id} + '/update'}" method="post">
   <div class="mb-3">
     <label for="board-select" class="form-label">게시판</label>
     <select name="board-id" id="board-select" class="form-select">
-      <option disabled selected th:text="${article.board}"></option>
+      <option disabled selected th:text="${article.board.board}"></option>
+      <option th:each="board : ${filteredBoards}"
+              th:value="${board.name()}" th:text="${board.board}"></option>
     </select>
   </div>
   <div class="mb-3">
