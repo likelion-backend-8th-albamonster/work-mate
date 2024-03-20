@@ -20,14 +20,14 @@
       <option th:each="board : ${boards}"
               th:value="${board.name()}" th:text="${board.board}"></option>
     </select>
-  <div class="mb-3">
-    <label for="title-input" class="form-label">제목</label>
-    <input type="text" name="title" class="form-control" id="title-input">
-  </div>
-  <div class="mb-3">
-    <label for="content-area" class="form-label">내용</label>
-    <textarea name="content" id="content-area" class="form-control"></textarea>
-  </div>
+    <div class="mb-3">
+      <label for="title-input" class="form-label">제목</label>
+      <input type="text" name="title" class="form-control" id="title-input">
+    </div>
+    <div class="mb-3">
+      <label for="content-area" class="form-label">내용</label>
+      <textarea name="content" id="content-area" class="form-control"></textarea>
+    </div>
   </div>
   <input type="submit" value="글쓰기" class="btn btn-primary">
 </form>

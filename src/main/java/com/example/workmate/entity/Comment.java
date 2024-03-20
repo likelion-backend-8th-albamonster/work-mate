@@ -4,6 +4,8 @@ import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -16,6 +18,9 @@ public class Comment {
 
     @Setter
     private String content;
+
+    @Setter
+    private LocalDateTime commentWriteTime;
 
 
     @Setter
