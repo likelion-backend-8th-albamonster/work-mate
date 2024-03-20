@@ -18,6 +18,7 @@ import com.example.workmate.repo.WorkTimeRepo;
 import com.example.workmate.repo.schedule.ChangeRequestRepo;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ScheduleService {
     private final WorkTimeRepo workTimeRepo;
@@ -121,13 +123,14 @@ public class ScheduleService {
     }
 
     // 한달 해당 매장의 근무표 불러오기
-    public List<WorkTimeDto> viewMonth(Long shopId,ScheduleDto dto){
-        checkMember(shopId);
+    public List<List<WorkTimeDto>> viewMonth(Long shopId,ScheduleDto dto){
+        // 테스트중이라 확인하는거 임시로 자름
+        // checkMember(shopId);
 
         // 시작일과 마지막날 구하기
         dto.setDay(0);
-        LocalDateTime startDay = scheduleUtil.GetDay(false,dto).atStartOfDay();
-        LocalDateTime endDay = scheduleUtil.GetDay(true, dto).atTime(LocalTime.MAX);
+        LocalDateTime startDay = scheduleUtil.getDay(false,dto).atStartOfDay();
+        LocalDateTime endDay = scheduleUtil.getDay(true, dto).atTime(LocalTime.MAX);
 
 
         List<WorkTime> workTimes = workTimeRepo
@@ -141,7 +144,27 @@ public class ScheduleService {
         for (WorkTime workTime : workTimes){
             dtos.add(WorkTimeDto.fromEntity(workTime));
         }
-        return dtos;
+
+        int dayOfWeek = scheduleUtil.getDayOfWeek(dto);
+        log.info("dayOfWeek : {}",dayOfWeek);
+        log.info("dayOfWeek + endDay : {}",dayOfWeek + endDay.getDayOfMonth());
+        List<List<WorkTimeDto>> daySchedule = new ArrayList<>();
+        List<WorkTimeDto> list = new ArrayList<>();
+        for (int i = 0; i < dayOfWeek + endDay.getDayOfMonth(); i++) {
+            if(i > dayOfWeek){
+                for (WorkTime workTime : workTimes) {
+                    if (workTime.getWorkStartTime().getDayOfMonth() == i){
+                        list.add(WorkTimeDto.fromEntity(workTime));
+                    }
+                }
+                daySchedule.add(list);
+                list.clear();
+            }
+            else
+                daySchedule.add(null);
+        }
+
+        return daySchedule;
     }
     // 처음 근무표 확인으로 들어왔을 때 정한 기간의 근무표를 보기
     public List<WorkTimeDto> viewPeriod(
@@ -152,8 +175,8 @@ public class ScheduleService {
         checkMember(shopId);
 
         // 시작일과 마지막날 구하기
-        LocalDateTime startDay = scheduleUtil.GetDay(false, start).atStartOfDay();
-        LocalDateTime endDay = scheduleUtil.GetDay(false, end).atTime(LocalTime.MAX);
+        LocalDateTime startDay = scheduleUtil.getDay(false, start).atStartOfDay();
+        LocalDateTime endDay = scheduleUtil.getDay(false, end).atTime(LocalTime.MAX);
         List<WorkTime> workTimes = workTimeRepo
                 .findAllByShop_IdAndWorkStartTimeBetween(
                         shopId, startDay, endDay
