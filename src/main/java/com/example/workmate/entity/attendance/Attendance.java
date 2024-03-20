@@ -1,5 +1,6 @@
-package com.example.workmate.entity;
+package com.example.workmate.entity.attendance;
 
+import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,7 @@ public class Attendance {
     //출근시간
     private LocalDateTime checkInTime;
     //퇴근시간
+    @Setter
     private LocalDateTime checkOutTime;
 
     //출근상태

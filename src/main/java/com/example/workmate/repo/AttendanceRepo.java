@@ -1,6 +1,6 @@
 package com.example.workmate.repo;
 
-import com.example.workmate.entity.Attendance;
+import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
