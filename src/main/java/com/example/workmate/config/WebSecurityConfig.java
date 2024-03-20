@@ -46,6 +46,10 @@ public class WebSecurityConfig {
                                 // 권한 설정 필요
                                 .requestMatchers("/profile/{id}")
                                 .authenticated()
+
+                                // 매장 생성 테스트용
+                                .requestMatchers("/shop/**")
+                                .permitAll()
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
