@@ -15,8 +15,8 @@
     <div th:if="${isExist} == false">
         <form th:action="@{/attendance/checkIn/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}" method="post">
             <!--사용자 좌표-->
-            <input type="hidden" id="userLat" name="userLat">
-            <input type="hidden" id="userLng" name="userLng">
+            <input type="hidden" name="userLat">
+            <input type="hidden" name="userLng">
             <!--매장 주소-->
             <input type="hidden" name="shopAddress" th:value="${shop.getAddress()}">
             <input type="submit" class="btn btn-danger" value="출근">
@@ -29,14 +29,43 @@
         <div th:unless="${#strings.equals(attendance.getStatus(), 'OUT')}">
             <form th:action="@{/attendance/checkOut/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}" method="post">
                 <!--사용자 좌표-->
-                <input type="hidden" id="userLat" name="userLat">
-                <input type="hidden" id="userLng" name="userLng">
+                <input type="hidden" name="userLat">
+                <input type="hidden" name="userLng">
                 <!--매장 주소-->
                 <input type="hidden" name="shopAddress" th:value="${shop.getAddress()}">
                 <!--출퇴근정보 id-->
                 <input type="hidden" name="attendanceId" th:value="${attendance.id}">
                 <input type="submit" class="btn btn-danger" value="퇴근">
             </form>
+            <!--여기에 휴식시간 추가-->
+            <!--휴식종료-->
+            <div th:if="${#strings.equals(attendance.getStatus(), 'REST_IN')}">
+                <form th:action="@{/attendance/restOut/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}" method="post">
+                    <!--사용자 좌표-->
+                    <input type="hidden" name="userLat2">
+                    <input type="hidden" name="userLng2">
+                    <!--매장 주소-->
+                    <input type="hidden" name="shopAddress" th:value="${shop.getAddress()}">
+                    <!--출퇴근정보 id-->
+                    <input type="hidden" name="attendanceId" th:value="${attendance.id}">
+                    <input type="submit" class="btn btn-danger" value="휴식종료">
+                </form>
+            </div>
+            <!--휴식시간-->
+            <!--휴식종료 상태가 아닐 때-->
+            <div th:unless="${#strings.equals(attendance.getStatus(), 'REST_IN')}">
+                <form th:action="@{/attendance/restIn/{userId}/{shopId}(userId=${account.id},shopId=${shop.id})}" method="post">
+                    <!--사용자 좌표-->
+                    <input type="hidden" name="userLat2">
+                    <input type="hidden" name="userLng2">
+                    <!--매장 주소-->
+                    <input type="hidden" name="shopAddress" th:value="${shop.getAddress()}">
+                    <!--출퇴근정보 id-->
+                    <input type="hidden" name="attendanceId" th:value="${attendance.id}">
+                    <input type="submit" class="btn btn-danger" value="휴식시작">
+                </form>
+            </div>
+
         </div>
 
     </div>
@@ -57,8 +86,11 @@
             //상태
             const status = document.querySelector("#status");
             //좌표
-            const userLat = document.querySelector("#userLat");
-            const userLng = document.querySelector("#userLng");
+            const userLat = document.getElementsByName("userLat")[0];
+            const userLng = document.getElementsByName("userLng")[0];
+            //휴식시간용 좌표
+            const userLat2 = document.getElementsByName("userLat2")[0];
+            const userLng2 = document.getElementsByName("userLng2")[0];
 
             function success(position) {
                 //좌표받기
@@ -69,6 +101,11 @@
                 //유저 좌표
                 userLat.value = latitude;
                 userLng.value = longitude;
+                if (userLat2 !== undefined && userLng2 !== undefined){
+                    userLat2.value = latitude;
+                    userLng2.value = longitude;
+                }
+
             }
 
             function error() {

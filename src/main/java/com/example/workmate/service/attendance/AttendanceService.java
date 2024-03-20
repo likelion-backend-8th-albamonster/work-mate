@@ -74,15 +74,38 @@ public class AttendanceService {
         }
         //오늘 날짜의 출근 데이터 status 수정
         attendance.setStatus(Status.OUT);
+        attendance.setCheckOutTime(LocalDateTime.now());
         return AttendanceDto.fromEntity(attendanceRepo.save(attendance));
     }
     //쉬는시간요청
-    public void restIn(){
-
+    @Transactional
+    public void restIn(Long attendanceId){
+        Attendance attendance = attendanceRepo.findById(attendanceId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "출퇴근 정보를 확인해주세요")
+                );
+        //이미 휴식상태일때
+        if (Status.REST_IN.equals(attendance.getStatus())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복 휴식 요청입니다.");
+        }
+        //오늘 날짜의 출근 데이터 status 수정
+        attendance.setStatus(Status.REST_IN);
+        attendanceRepo.save(attendance);
     }
     //쉬는시간종료요청
-    public void restOut(){
-
+    @Transactional
+    public void restOut(Long attendanceId){
+        Attendance attendance = attendanceRepo.findById(attendanceId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "출퇴근 정보를 확인해주세요")
+                );
+        //이미 휴식상태일때
+        if (Status.REST_OUT.equals(attendance.getStatus())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "중복 휴식종료 요청입니다.");
+        }
+        //오늘 날짜의 출근 데이터 status 수정
+        attendance.setStatus(Status.REST_OUT);
+        attendanceRepo.save(attendance);
     }
 
     //오늘 날짜에 이미 기록된 출근이 있는지 확인
