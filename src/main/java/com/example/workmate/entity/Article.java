@@ -4,6 +4,7 @@ import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +22,11 @@ public class Article {
     private String title;
     @Setter
     private String content;
-    // 사장님-근무자 비밀글 기능
-//    @Setter
-//    private String password;
+    @Setter
+    @Column(name = "article_write_time")
+    private LocalDateTime articleWriteTime;
+    @Setter
+    private String password;
 
     @Setter
     @Builder.Default
