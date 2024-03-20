@@ -4,7 +4,7 @@ import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.ncpdto.PointDto;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
-import com.example.workmate.service.AttendanceService;
+import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.ncpservice.NaviService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/attendance")
@@ -71,7 +72,9 @@ public class AttendanceController {
             double userLng,
             @RequestParam("shopAddress")
             String shopAddress,
-            //출근정보
+            //리다이렉트 값을 보내기 위한 변수
+            RedirectAttributes redirectAttributes,
+            //model
             Model model
     ){
         //사용자 좌표
@@ -83,14 +86,16 @@ public class AttendanceController {
             //이미 출근정보가 있다면
             if (isExist){
                 //"중복 출근 요청입니다." alert창으로 나타내기
+                redirectAttributes.addFlashAttribute("msg", "중복 출근 요청입니다.");
             }
             //사용자 출근 정보 저장
             AttendanceDto dto = attendanceService.checkIn(userId, shopId);
             //출근 확인되었습니다 alert창으로 나타내기
+            redirectAttributes.addFlashAttribute("msg", "출근 확인되었습니다.");
         }
         //매장위치에 있지 않으면
         else {
-            //"현재 위치를 확인해주세요" alert창으로 나타내기
+            redirectAttributes.addFlashAttribute("msg", "현재 위치를 확인해주세요.");
         }
         return String.format("redirect:/attendance/%d/%d", userId, shopId);
     }
@@ -112,6 +117,9 @@ public class AttendanceController {
             //출퇴근정보
             @RequestParam("attendanceId")
             Long attendanceId,
+            //리다이렉트 값을 보내기 위한 변수
+            RedirectAttributes redirectAttributes,
+            //page로 보내기 위한 변수
             Model model
     ){
         //사용자 좌표
@@ -121,11 +129,12 @@ public class AttendanceController {
             //사용자 퇴근 정보 저장
             attendanceService.checkOut(attendanceId);
             //퇴근 확인되었습니다 alert창으로 나타내기
-            
+            redirectAttributes.addFlashAttribute("msg", "퇴근 확인되었습니다.");
         }
         //매장위치에 있지 않으면
         else {
             //"현재 위치를 확인해주세요" alert창으로 나타내기
+            redirectAttributes.addFlashAttribute("msg", "현재 위치를 확인해주세요.");
         }
         return String.format("redirect:/attendance/%d/%d", userId, shopId);
     }

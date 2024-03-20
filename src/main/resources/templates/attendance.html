@@ -42,12 +42,18 @@
     </div>
 
     <p id="status"></p>
-    <script>
+     <script th:inline="javascript">
         //사용자 위치정보를 가져오는 function
         //로컬환경이 아닌경우, http에서 작동 X
         //페이지 요청 시 자동 실행
         //실행 실패 시, status 요소에 실패 상태를 나타낸다.
         window.onload = function () {
+            //alert
+            const alertMsg = [[${msg}]];
+
+            if (alertMsg){
+                alert(alertMsg);
+            }
             //상태
             const status = document.querySelector("#status");
             //좌표
