@@ -1,5 +1,6 @@
 package com.example.workmate.controller.schedule;
 
+import com.example.workmate.config.ScheduleUtil;
 import com.example.workmate.dto.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
@@ -11,8 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -22,7 +25,7 @@ import java.util.List;
 public class ScheduleController {
     private final ScheduleService scheduleService;
     private final ScheduleDataService scheduleDataService;
-
+    private final ScheduleUtil scheduleUtil;
     //스케쥴 보는 테스트
     @ResponseBody
     @PostMapping("/make")
@@ -35,8 +38,21 @@ public class ScheduleController {
         return "done";
     }
 
-    @GetMapping("/schedule")
-    public String month(){
+    // 근무표 보기 만드는거 테스트중
+    @RequestMapping("/schedule")
+    public String month(Model model){
+        LocalDate now = LocalDate.now();
+        Long shopId = 1L;
+        ScheduleDto dto = ScheduleDto.builder()
+                .year(now.getYear())
+                .month(now.getMonthValue())
+                .day(now.getDayOfMonth())
+                .build();
+        List<List<WorkTimeDto>> schedules = scheduleService.viewMonth(shopId, dto);
+        int week = schedules.size() / 7 + 1;
+        model.addAttribute("schedules", schedules);
+        model.addAttribute("week",week);
+        model.addAttribute("calender",scheduleUtil.makeCalender(dto));
         return "monthly-schedule";
     }
 
@@ -92,7 +108,7 @@ public class ScheduleController {
     // 한달 씩으로 보기.
     @ResponseBody
     @GetMapping("view-month/{shopId}")
-    public List<WorkTimeDto> viewMonth(
+    public List<List<WorkTimeDto>> viewMonth(
             @PathVariable("shopId")
             Long shopId,
             @RequestBody

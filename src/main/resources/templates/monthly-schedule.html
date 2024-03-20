@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <style>
@@ -40,20 +40,21 @@
         <th class="day">금</th>
         <th class="day" style = "background : cornflowerblue; color : aliceblue;">토</th>
     </tr>
-    <tr>
+    <tr th:each=" weeks : ${#numbers.sequence(0,week - 1)}">
         <th style = "background : #ff5464; color : aliceblue;">일</th>
-        <th class="day">월</th>
+<!--        <th th:each="schedule : ${schedules.get(weeks * 7 + 1)}" -->
+<!--            th:unless="${#lists.isEmpty(schedules.get(weeks * 7 + 1))}"-->
+<!--            th:text="${#strings.toString(schedule.name)}"-->
+
+        <th th:each="schedule : ${schedules.get(20)}">
+            시간
+        </th>
         <th class="day">화</th>
         <th class="day">수</th>
         <th class="day">목</th>
         <th class="day">금</th>
         <th class="day" style = "background : cornflowerblue; color : aliceblue;">토</th>
     </tr>
-    <tr>
-        <td class="worker" style = "background : Plum  ;">문화와 역사2</td>
-    </tr>
-
-
 </table>
 </body>
 </html>
