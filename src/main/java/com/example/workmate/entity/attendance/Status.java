@@ -1,4 +1,4 @@
-package com.example.workmate.entity;
+package com.example.workmate.entity.attendance;
 
 import lombok.Getter;
 

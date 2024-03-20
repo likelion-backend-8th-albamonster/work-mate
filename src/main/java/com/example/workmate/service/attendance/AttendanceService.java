@@ -3,7 +3,7 @@ package com.example.workmate.service.attendance;
 import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.Shop;
-import com.example.workmate.entity.Status;
+import com.example.workmate.entity.attendance.Status;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AttendanceRepo;
