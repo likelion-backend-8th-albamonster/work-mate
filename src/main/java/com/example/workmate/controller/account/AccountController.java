@@ -58,11 +58,13 @@ public class AccountController {
         log.info("password: {}", userDetails.getPassword());
 
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            log.error("비밀번호가 일치하지 않습니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         Account account = accountRepo.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        log.info("account Id: {}", account.getId());
 
         JwtResponseDto dto = new JwtResponseDto();
         dto.setToken(tokenUtils.generateToken(userDetails));
