@@ -1,4 +1,4 @@
-package com.example.workmate.service;
+package com.example.workmate.service.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.entity.Attendance;
