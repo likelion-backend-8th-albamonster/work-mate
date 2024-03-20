@@ -40,6 +40,7 @@ public class WebSecurityConfig {
 
                                 .requestMatchers(
                                         "/account/login",
+                                        "/account/register",
                                         "/account/users-register",
                                         "/account/business-register"
                                 )
@@ -47,14 +48,11 @@ public class WebSecurityConfig {
 
                                 // 권한 설정 필요
                                 .requestMatchers("/profile/{id}")
+                                .authenticated()
+
+                                // 매장 생성 테스트용
+                                .requestMatchers("/shop/**")
                                 .permitAll()
-//                                .hasAnyRole(Authority.ROLE_USER.getAuthority(), Authority.ROLE_BUSINESS_USER.getAuthority(), Authority.ROLE_ADMIN.getAuthority())
-                )
-                .formLogin(
-                        formLogin -> formLogin
-                                .loginPage("/account/login")
-                                .defaultSuccessUrl("/account/my-profile")
-                                .failureUrl("/account/login?fail")
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
