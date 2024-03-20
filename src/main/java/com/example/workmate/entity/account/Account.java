@@ -1,9 +1,7 @@
 package com.example.workmate.entity.account;
 
 import com.example.workmate.entity.AccountShop;
-import com.example.workmate.entity.Attendance;
-import com.example.workmate.entity.Shop;
-import com.example.workmate.entity.account.Authority;
+import com.example.workmate.entity.attendance.Attendance;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

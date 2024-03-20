@@ -1,6 +1,6 @@
 package com.example.workmate.dto.attendance;
 
-import com.example.workmate.entity.Attendance;
+import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.Status;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
