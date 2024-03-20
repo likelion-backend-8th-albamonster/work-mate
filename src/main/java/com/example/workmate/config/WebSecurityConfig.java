@@ -46,13 +46,6 @@ public class WebSecurityConfig {
                                 // 권한 설정 필요
                                 .requestMatchers("/profile/{id}")
                                 .authenticated()
-//                                .hasAnyRole(Authority.ROLE_USER.getAuthority(), Authority.ROLE_BUSINESS_USER.getAuthority(), Authority.ROLE_ADMIN.getAuthority())
-                )
-                .formLogin(
-                        formLogin -> formLogin
-                                .loginPage("/account/login")
-                                .defaultSuccessUrl("/profile/{id}")
-                                .failureUrl("/account/login?fail")
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")

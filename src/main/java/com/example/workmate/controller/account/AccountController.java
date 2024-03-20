@@ -70,7 +70,7 @@ public class AccountController {
         dto.setToken(tokenUtils.generateToken(userDetails));
         log.info("token: {}", dto.getToken());
 
-        return "redirect:/profile/"+account.getId();
+        return "redirect:/account/login";
     }
 
     // 회원가입 화면
