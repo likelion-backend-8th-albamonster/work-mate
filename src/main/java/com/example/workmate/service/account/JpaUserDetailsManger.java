@@ -33,7 +33,6 @@ public class JpaUserDetailsManger implements UserDetailsManager {
         }
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Account> optionalAccount = accountRepo.findByUsername(username);
@@ -54,6 +53,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
     @Override
     public void createUser(UserDetails user) {
         if (userExists(user.getUsername())) {
+            log.error("이미 존재하는 아이디입니다.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         if (user instanceof CustomAccountDetails accountDetails) {
@@ -66,6 +66,12 @@ public class JpaUserDetailsManger implements UserDetailsManager {
                     .authority(accountDetails.getAuthority())
                     .build();
             log.info("authority: {}", accountDetails.getAuthorities());
+
+            if (emailExists(newAccount.getEmail())) {
+                log.error("이미 존재하는 이메일입니다.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+
             accountRepo.save(newAccount);
         } else {
             throw new IllegalArgumentException("Unsupported UserDetails type");
@@ -89,5 +95,9 @@ public class JpaUserDetailsManger implements UserDetailsManager {
     @Override
     public boolean userExists(String username) {
         return accountRepo.existsByUsername(username);
+    }
+
+    public boolean emailExists(String email) {
+        return accountRepo.existsByEmail(email);
     }
 }
