@@ -35,25 +35,22 @@
         <th style = "background : #ff5464; color : aliceblue;">일</th>
         <th class="day">월</th>
         <th class="day">화</th>
-        <th class="day">수</th>
+        <th class="day", th:text="${schedules.size()}">수</th>
         <th class="day">목</th>
         <th class="day">금</th>
         <th class="day" style = "background : cornflowerblue; color : aliceblue;">토</th>
     </tr>
-    <tr th:each=" weeks : ${#numbers.sequence(0,week - 1)}">
-        <th style = "background : #ff5464; color : aliceblue;">일</th>
-<!--        <th th:each="schedule : ${schedules.get(weeks * 7 + 1)}" -->
-<!--            th:unless="${#lists.isEmpty(schedules.get(weeks * 7 + 1))}"-->
-<!--            th:text="${#strings.toString(schedule.name)}"-->
-
-        <th th:each="schedule : ${schedules.get(20)}">
-            시간
-        </th>
-        <th class="day">화</th>
-        <th class="day">수</th>
-        <th class="day">목</th>
-        <th class="day">금</th>
-        <th class="day" style = "background : cornflowerblue; color : aliceblue;">토</th>
+    <tr th:each=" weeks : ${#numbers.sequence(0,calender.size() / 7 - 1)}">
+        <td th:each=" days : ${#numbers.sequence(0,6)}">
+            <th:block th:each="schedule : ${schedules}">
+                <th:block th:with ="day = ${days} + ${weeks} * 7">
+                       <p th:text="${schedule.name} + ' : ' + ${schedule.workStartTime}"
+                          th:if="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
+                       <p th:text="${calender[day]}"
+                          th:unless="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
+                </th:block>
+            </th:block>
+        </td>
     </tr>
 </table>
 </body>
