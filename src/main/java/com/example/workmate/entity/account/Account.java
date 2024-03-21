@@ -3,10 +3,7 @@ package com.example.workmate.entity.account;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.attendance.Attendance;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -31,6 +28,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private Authority authority;    // 권한
 
+    @Setter
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AccountShop> accountShops;
 

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface ShopRepo extends JpaRepository<Shop, Long> {
     Optional<Shop> findByNameContaining(String name);
+    Optional<Shop> findByName(String name);
 }
