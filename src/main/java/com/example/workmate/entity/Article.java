@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Getter
 @Builder
 @NoArgsConstructor
@@ -18,6 +19,8 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter
+    private Long shopArticleId;
     @Setter
     private String title;
     @Setter
