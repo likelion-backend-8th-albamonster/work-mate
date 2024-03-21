@@ -2,8 +2,12 @@ package com.example.workmate.controller.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.ncpdto.PointDto;
+import com.example.workmate.dto.shop.ShopDto;
+import com.example.workmate.entity.Shop;
+import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
+import com.example.workmate.service.ShopService;
 import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.ncpservice.NaviService;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/attendance")
 @RequiredArgsConstructor
@@ -25,6 +31,8 @@ public class AttendanceController {
     private final AccountService accountService;
     private final AccountRepo accountRepo;
     private final ShopRepo shopRepo;
+    private final AuthenticationFacade authFacade;
+    private final ShopService shopService;
     //출근요청페이지
     //요청 시 사용자 정보 / 매장정보 / 출근 정보를 확인
     @GetMapping("/{accountId}/{shopId}")
@@ -54,7 +62,7 @@ public class AttendanceController {
         if (isExist){
             model.addAttribute("attendance", attendanceService.readOne(accountId, shopId));
         }
-        return "attendance";
+        return "attendance/attendance";
     }
 
     //출근요청
@@ -208,21 +216,66 @@ public class AttendanceController {
 
     //출퇴근 기록 보기(아르바이트생/관리자)
     //pagenation
-    @GetMapping("/showLog")
+    @GetMapping("/showLog/{accountId}")
     public String showLog(
+            @PathVariable("accountId")
+            Long accountId,
+            @RequestParam(value = "shopId", defaultValue = "0", required = false)
+            Long shopId,
+            @RequestParam(value = "pageNumber", defaultValue = "0")
             Integer pageNumber,
-            Integer pageSize
+            @RequestParam(value = "pageSize", defaultValue = "2")
+            Integer pageSize,
+            Model model
     ){
-        Page<AttendanceDto> page = attendanceService.showLog(pageNumber,pageSize);
-        return "home";
+        //페이징
+        Page<AttendanceDto> attendanceList;
+        //사용자정보
+        model.addAttribute("account", accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "사용자 정보를 확인해주세요")));
+
+        //매장 id가 주어지지 않을 때
+        if (shopId == 0){
+            //모두 가져오기
+            attendanceList
+                    = attendanceService.showLogAll(pageNumber,pageSize, accountId);
+
+        } else {
+            //한 매장꺼만 가져오기
+            attendanceList
+                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId);
+        }
+        model.addAttribute("attendanceList", attendanceList);
+        
+        //매장이름들
+        //account - shop 부분 확인 후 로직 변경 필요
+        model.addAttribute("shopList",
+                attendanceService.readOneAccountShopList(accountId));
+
+        return "attendance/attendanceLog";
     }
 
     //출퇴근 수정(관리자)
     //모든 아르바이트생의 출퇴근 기록 수정 가능
     //Status를 수정하여, 정상출근 / 지각 / 조퇴 상태 변경
-    @PutMapping("/update")
-    public String update(){
-        attendanceService.udpate();
+    @PutMapping("/update/{userId}/{shopId}")
+    public String update(
+            @PathVariable("userId")
+            Long userId,
+            @PathVariable("shopId")
+            Long shopId,
+            @RequestParam("adminId")
+            Long adminId,
+            //출퇴근정보
+            @RequestParam("attendanceId")
+            Long attendanceId,
+            //상태값
+            @RequestParam("status")
+            String status
+    ){
+        attendanceService.udpate(userId, shopId, adminId, attendanceId, status);
         return "home";
     }
 }
