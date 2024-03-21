@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Builder
 @Getter
 @Setter
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 public class ArticleDto {
     private Long id;
     private Long accountId;
+    private Long shopArticleId;
     private Long shopId;
     private Board board;
     private List<CommentDto> comments;
@@ -36,6 +36,7 @@ public class ArticleDto {
 
         return ArticleDto.builder()
                 .id(entity.getId())
+                .shopArticleId(entity.getShopArticleId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .board(entity.getBoard())

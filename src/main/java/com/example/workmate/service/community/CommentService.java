@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,20 +22,21 @@ public class CommentService {
     private final AccountRepo accountRepo;
 
     public CommentDto create(
-            Long articleId,
+            Long shopId,
+            Long shopArticleId,
             CommentDto commentDto
     ) {
-        Article article = articleRepo.findById(articleId)
+        Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
                 .orElseThrow();
         Account account = null;
         if (commentDto.getAccountId() != null) {
             account = accountRepo.findById(commentDto.getAccountId())
-                    .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + commentDto.getAccountId()));
+                    .orElseThrow();
         }
         Comment comment = commentRepo.save(Comment.builder()
-                .content(commentDto.getContent())
-                .article(article)
                 .account(account)
+                .article(article)
+                .content(commentDto.getContent())
                 .commentWriteTime(LocalDateTime.now())
                 .build());
         return CommentDto.fromEntity(commentRepo.save(comment));
@@ -69,4 +69,3 @@ public class CommentService {
         }
     }
 }
-

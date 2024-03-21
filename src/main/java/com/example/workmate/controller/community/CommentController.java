@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @Controller
-@RequestMapping("{shopId}/community/{board}/{articleId}/comment")
+@RequestMapping("{shopId}/community/{board}/{shopArticleId}/comment")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
@@ -22,14 +22,14 @@ public class CommentController {
             Long shopId,
             @PathVariable("board")
             String board,
-            @PathVariable("articleId")
-            Long articleId,
+            @PathVariable("shopArticleId")
+            Long shopArticleId,
             @ModelAttribute
             CommentDto commentDto
     ) {
-        commentService.create(articleId, commentDto);
+        commentService.create(shopArticleId, shopId, commentDto);
 
-        return "redirect:/" + shopId + "/community/" + board + "/" + articleId;
+        return "redirect:/" + shopId + "/community/" + board + "/" + shopArticleId;
     }
 
 
@@ -40,15 +40,15 @@ public class CommentController {
             Long shopId,
             @PathVariable("board")
             String board,
-            @PathVariable("articleId")
-            Long articleId,
+            @PathVariable("shopArticleId")
+            Long shopArticleId,
             @PathVariable("commentId")
             Long commentId,
             @ModelAttribute
             CommentDto commentDto
     ) {
         commentService.update(commentId, commentDto);
-        return "redirect:/" + shopId + "/community/" + board + "/" + articleId;
+        return "redirect:/" + shopId + "/community/" + board + "/" + shopArticleId;
     }
 
     // 댓글 삭제
@@ -58,14 +58,14 @@ public class CommentController {
             Long shopId,
             @PathVariable("board")
             String board,
-            @PathVariable("articleId")
-            Long articleId,
+            @PathVariable("shopArticleId")
+            Long shopArticleId,
             @PathVariable("commentId")
             Long commentId,
             @ModelAttribute
             CommentDto commentDto
     ) {
         commentService.delete(commentId, commentDto);
-        return "redirect:/" + shopId + "/community/" + board + "/" + articleId;
+        return "redirect:/" + shopId + "/community/" + board + "/" + shopArticleId;
     }
 }
