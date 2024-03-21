@@ -19,6 +19,7 @@ public class Shop {
     @Setter
     private String address;
 
+    @Setter
     @OneToMany(mappedBy = "shop")
     private List<AccountShop> accountShops;
 }
