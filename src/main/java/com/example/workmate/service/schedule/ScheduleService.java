@@ -123,7 +123,7 @@ public class ScheduleService {
     }
 
     // 한달 해당 매장의 근무표 불러오기
-    public List<List<WorkTimeDto>> viewMonth(Long shopId,ScheduleDto dto){
+    public List<WorkTimeDto> viewMonth(Long shopId,ScheduleDto dto){
         // 테스트중이라 확인하는거 임시로 자름
         // checkMember(shopId);
 
@@ -131,7 +131,6 @@ public class ScheduleService {
         dto.setDay(0);
         LocalDateTime startDay = scheduleUtil.getDay(false,dto).atStartOfDay();
         LocalDateTime endDay = scheduleUtil.getDay(true, dto).atTime(LocalTime.MAX);
-
 
         List<WorkTime> workTimes = workTimeRepo
                 .findAllByShop_IdAndWorkStartTimeBetween(
@@ -148,23 +147,11 @@ public class ScheduleService {
         int dayOfWeek = scheduleUtil.getDayOfWeek(dto);
         log.info("dayOfWeek : {}",dayOfWeek);
         log.info("dayOfWeek + endDay : {}",dayOfWeek + endDay.getDayOfMonth());
-        List<List<WorkTimeDto>> daySchedule = new ArrayList<>();
-        List<WorkTimeDto> list = new ArrayList<>();
-        for (int i = 0; i < dayOfWeek + endDay.getDayOfMonth(); i++) {
-            if(i > dayOfWeek){
-                for (WorkTime workTime : workTimes) {
-                    if (workTime.getWorkStartTime().getDayOfMonth() == i){
-                        list.add(WorkTimeDto.fromEntity(workTime));
-                    }
-                }
-                daySchedule.add(list);
-                list.clear();
-            }
-            else
-                daySchedule.add(null);
-        }
+        log.info("startday: {}, endday: {}",startDay,endDay);
+        log.info("worTimes size: {}",workTimes.size());
+        log.info("dto size: {}",dtos.size());
 
-        return daySchedule;
+        return dtos;
     }
     // 처음 근무표 확인으로 들어왔을 때 정한 기간의 근무표를 보기
     public List<WorkTimeDto> viewPeriod(

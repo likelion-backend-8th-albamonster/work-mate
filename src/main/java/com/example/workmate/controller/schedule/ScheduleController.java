@@ -30,7 +30,7 @@ public class ScheduleController {
     @ResponseBody
     @PostMapping("/make")
     public String make(){
-        //사람, 상점, accountShop 만들기
+        // 사람, 상점, accountShop 만들기
         scheduleDataService.accountShop();
         // 사람의 한 달 동안의 랜덤시간 근무 만들기
         scheduleDataService.makeWorkTime(2L);
@@ -48,10 +48,8 @@ public class ScheduleController {
                 .month(now.getMonthValue())
                 .day(now.getDayOfMonth())
                 .build();
-        List<List<WorkTimeDto>> schedules = scheduleService.viewMonth(shopId, dto);
-        int week = schedules.size() / 7 + 1;
+        List<WorkTimeDto> schedules = scheduleService.viewMonth(shopId, dto);
         model.addAttribute("schedules", schedules);
-        model.addAttribute("week",week);
         model.addAttribute("calender",scheduleUtil.makeCalender(dto));
         return "monthly-schedule";
     }
@@ -108,13 +106,14 @@ public class ScheduleController {
     // 한달 씩으로 보기.
     @ResponseBody
     @GetMapping("view-month/{shopId}")
-    public List<List<WorkTimeDto>> viewMonth(
+    public List<WorkTimeDto> viewMonth(
             @PathVariable("shopId")
             Long shopId,
             @RequestBody
             ScheduleDto month
     ){
-        return scheduleService.viewMonth(shopId, month);
+        List<WorkTimeDto> workTimeDtos = scheduleService.viewMonth(shopId, month);
+        return workTimeDtos;
     }
 
     // 시작 기간과 끝 기간을 정해서 보기 0번은 시작, 1번은 끝

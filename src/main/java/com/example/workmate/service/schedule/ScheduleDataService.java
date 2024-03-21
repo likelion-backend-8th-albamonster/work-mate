@@ -106,7 +106,6 @@ public class ScheduleDataService {
         List<WorkTime> workTimes1 = new ArrayList<>();
 
         for (int i = 0; i < intEndDay; i++) {
-            log.info("i: {}",i);
             int startHour = (int)(Math.random() * 24);
             LocalDateTime startTime = LocalDateTime.of(
                     now.getYear(),
@@ -125,5 +124,6 @@ public class ScheduleDataService {
                     .build());
         }
         workTimeRepo.saveAll(workTimes1);
+        log.info("userid: {} count: {}",account1.getId(), workTimes1.size());
     }
 }
