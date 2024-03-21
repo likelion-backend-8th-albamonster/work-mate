@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,27 +27,34 @@ public class ArticleService {
     private final ShopRepo shopRepo;
     private final AccountRepo accountRepo;
 
+    // 게시글 작성
     public ArticleDto create(
             ArticleDto articleDto
     ) {
         Shop shop = shopRepo.findById(articleDto.getShopId())
-                .orElseThrow(() -> new EntityNotFoundException("Shop not found with id: " + articleDto.getShopId()));
-        Account account = null;
+                .orElseThrow();
+
+        Account account = null; // 테스트용
         if (articleDto.getAccountId() != null) {
             account = accountRepo.findById(articleDto.getAccountId())
-                    .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + articleDto.getAccountId()));
+                    .orElseThrow();
         }
+
+        Long lastShopArticleId = articleRepo.findLastShopArticleIdByShop(shop.getId())
+                .orElse(0L) + 1;
         Article article = articleRepo.save(Article.builder()
                 .title(articleDto.getTitle())
                 .content(articleDto.getContent())
                 .board(articleDto.getBoard())
                 .articleWriteTime(LocalDateTime.now())
+                .shopArticleId(lastShopArticleId)
                 .account(account)
                 .shop(shop)
                 .build());
         return ArticleDto.fromEntity(article);
     }
 
+    // 게시글 목록 읽기
     public Page<ArticleDto> readPage(
             Long shopId,
             Pageable pageable
@@ -64,20 +72,22 @@ public class ArticleService {
                 .map(ArticleDto::fromEntity);
     }
 
+    // 게시글 한개 읽기
     public ArticleDto readOne(
             Long shopId,
-            Long articleId
+            Long shopArticleId
     ) {
-        return ArticleDto.fromEntity(articleRepo.findByIdAndShopId(articleId, shopId)
+        return ArticleDto.fromEntity(articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
                 .orElseThrow());
     }
 
+    // 게시글 수정하기
     public ArticleDto update(
             Long shopId,
-            Long articleId,
+            Long shopArticleId,
             ArticleDto articleDto
     ) {
-        Article article = articleRepo.findByIdAndShopId(articleId, shopId)
+        Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
                 .orElseThrow();
         if (article.getAccount() != null && article.getAccount().getId().equals(articleDto.getAccountId())) {
             article.setTitle(articleDto.getTitle());
@@ -88,12 +98,13 @@ public class ArticleService {
         return ArticleDto.fromEntity(articleRepo.save(article));
     }
 
+    // 게시글 삭제하기
     public void delete(
             Long shopId,
-            Long articleId,
+            Long shopArticleId,
             ArticleDto articleDto
     ) {
-        Article article = articleRepo.findByIdAndShopId(articleId, shopId)
+        Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
                 .orElseThrow();
         if (article.getAccount() != null && article.getAccount().getId().equals(articleDto.getAccountId())) {
             articleRepo.delete(article);
@@ -101,6 +112,43 @@ public class ArticleService {
             throw new IllegalStateException("권한이 없습니다.");
         }
     }
+
+    // 게시글 검색하기
+    public Page<ArticleDto> search(
+            String type,
+            String keyword,
+            Pageable pageable
+    ) {
+        return articleRepo.findByKeyewordContaining(type, keyword, pageable)
+                .map(ArticleDto::fromEntity);
+    }
+
+    // 게시판 별 게시글 검색하기
+    public Page<ArticleDto> searchWithBoard(
+            String type,
+            String keyword,
+            Board board,
+            Pageable pageable
+    ) {
+        return articleRepo.findByKeyewordContainingAndBoard(type, keyword, board, pageable)
+                .map(ArticleDto::fromEntity);
+    }
+
+
+    // 공지사항 게시글 최신순 3개 읽어들이기
+    public Page<ArticleDto> findNoticeArticles(Long shopId, Pageable pageable) {
+        return articleRepo.findByShopIdAndBoardOrderByIdDesc(shopId, Board.NOTICE, PageRequest.of(0, 3))
+                .map(ArticleDto::fromEntity);
+    }
+
+    // 비밀게시판 패스워드 비교하기
+    public boolean comparePassword(Long ShopArticleId, Long shopId, String password) {
+        Article article = articleRepo.findByShopArticleIdAndShopId(ShopArticleId, shopId)
+                .orElseThrow();
+
+        return true;
+    }
 }
+
 
 
