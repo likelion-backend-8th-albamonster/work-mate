@@ -5,8 +5,10 @@ import com.example.workmate.service.community.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Slf4j
 @Controller
@@ -27,7 +29,7 @@ public class CommentController {
             @ModelAttribute
             CommentDto commentDto
     ) {
-        commentService.create(shopArticleId, shopId, commentDto);
+        commentService.create(shopId, shopArticleId, commentDto);
 
         return "redirect:/" + shopId + "/community/" + board + "/" + shopArticleId;
     }

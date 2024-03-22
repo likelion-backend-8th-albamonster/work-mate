@@ -1,10 +1,9 @@
 package com.example.workmate.dto.community;
 
-import com.example.workmate.entity.Comment;
+import com.example.workmate.entity.community.Comment;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
 
 @Builder
 @Getter

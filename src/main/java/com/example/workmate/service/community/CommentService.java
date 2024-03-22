@@ -1,13 +1,12 @@
 package com.example.workmate.service.community;
 
 import com.example.workmate.dto.community.CommentDto;
-import com.example.workmate.entity.Article;
-import com.example.workmate.entity.Comment;
+import com.example.workmate.entity.community.Article;
+import com.example.workmate.entity.community.Comment;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.community.ArticleRepo;
 import com.example.workmate.repo.community.CommentRepo;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

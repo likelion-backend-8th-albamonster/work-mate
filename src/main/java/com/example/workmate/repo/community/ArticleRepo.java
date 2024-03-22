@@ -1,7 +1,7 @@
 package com.example.workmate.repo.community;
 
-import com.example.workmate.entity.Article;
-import com.example.workmate.entity.Board;
+import com.example.workmate.entity.community.Article;
+import com.example.workmate.entity.community.Board;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
