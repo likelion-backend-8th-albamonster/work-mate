@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                                 .anonymous()
 
                                 // 권한 설정 필요
-                                .requestMatchers("/profile/{id}")
+                                .requestMatchers("/profile/{id}/**")
                                 .authenticated()
 
                                 // 매장 생성 테스트용

@@ -29,7 +29,9 @@ public class Account {
     private Authority authority;    // 권한
 
     @Setter
+
     private boolean mailAuth;   // 메일 인증 여부, false면 아직. true면 받음
+
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AccountShop> accountShops;
 
