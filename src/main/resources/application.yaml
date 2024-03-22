@@ -11,5 +11,5 @@ spring:
     init:
       mode: always
   profiles:
-    active: git
+    active: home
 

@@ -1,10 +1,9 @@
 package com.example.workmate.controller.schedule;
 
-import com.example.workmate.config.ScheduleUtil;
+import com.example.workmate.component.ScheduleUtil;
 import com.example.workmate.dto.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
-import com.example.workmate.entity.AccountShop;
 import com.example.workmate.service.schedule.ScheduleDataService;
 import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;

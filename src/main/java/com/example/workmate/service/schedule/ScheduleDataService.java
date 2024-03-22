@@ -54,6 +54,7 @@ public class ScheduleDataService {
                         .password(passwordEncoder.encode("yang1"))
                         .email("yang1")
                         .authority(Authority.ROLE_USER)
+                        .mailAuth(true)
                         .build(),
                 Account.builder()
                         .name("yang2")
@@ -61,6 +62,7 @@ public class ScheduleDataService {
                         .password(passwordEncoder.encode("yang2"))
                         .email("yang2")
                         .authority(Authority.ROLE_USER)
+                        .mailAuth(true)
                         .build()
         ));
         this.shopRepo.saveAll(List.of(
