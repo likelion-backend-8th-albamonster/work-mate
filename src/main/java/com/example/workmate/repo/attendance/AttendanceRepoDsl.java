@@ -2,6 +2,7 @@ package com.example.workmate.repo.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.attendance.AttendanceLogDto;
+import com.example.workmate.dto.attendance.AttendanceLogUpdateDto;
 import com.example.workmate.entity.QShop;
 import com.example.workmate.entity.attendance.QAttendance;
 import com.querydsl.core.Tuple;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,28 @@ public class AttendanceRepoDsl {
     @Autowired
     private final EntityManager entityManager;
     private final JPAQueryFactory queryFactory;
+    
+    //여러 출퇴근데이터 update
+    @Transactional
+    public void udpateAttendanceList(
+            Long shopId,
+            List<AttendanceLogUpdateDto> updateDto
+    ){
+        QAttendance qAttendance = new QAttendance("attendance");
+
+        for (int i = 0; i < updateDto.size(); i++) {
+            long result = queryFactory
+                    .update(qAttendance)
+                    .set(qAttendance.status, updateDto.get(i).getStatus())
+                    .where(qAttendance.shop.id.eq(shopId))
+                    .where(qAttendance.id.eq(updateDto.get(i).getAttendanceId()))
+                    .execute();
+        }
+
+        entityManager.flush();
+        entityManager.clear();
+    }
+    
     //한 사용자에 대한 정보
     public Page<AttendanceLogDto> readUserAttendanceLog(Long accountId, Pageable pageable){
         QAttendance qAttendance = new QAttendance("attendance");
