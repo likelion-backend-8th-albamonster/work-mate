@@ -1,7 +1,6 @@
 package com.example.workmate.controller.account;
 
 import com.example.workmate.dto.account.AccountDto;
-import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +21,20 @@ public class ProfileController {
 
     // shop에 아르바이트 신청
     @PostMapping("/submit")
-    public AccountShopDto submit(
+    public String submit(
             @PathVariable("id") Long id,
             @RequestParam("name") String name
     ) {
-        return service.submit(id, name);
+        return String.format("%d Status: %s", id, service.submit(id,name).toString());
     }
 
-
+    @PostMapping("/accept/{accountShopId}")
+    public String accept(
+            @PathVariable("id") Long id,
+            @PathVariable("accountShopId") Long accountShopId,
+            @RequestParam("flag") boolean flag
+    ) {
+        return String.format("%d Status: %s", id, service.accept(id, accountShopId, flag));
+    }
 }
 
