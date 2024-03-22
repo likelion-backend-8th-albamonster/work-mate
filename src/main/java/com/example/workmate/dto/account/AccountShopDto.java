@@ -14,15 +14,15 @@ import lombok.Getter;
 public class AccountShopDto {
     private Long id;
     private AccountStatus status;
-    private Account account;
-    private Shop shop;
+    private Long accountId;
+    private Long shopId;
 
     public static AccountShopDto fromEntity(AccountShop accountShop) {
         return AccountShopDto.builder()
                 .id(accountShop.getId())
                 .status(accountShop.getStatus())
-                .account(accountShop.getAccount())
-                .shop(accountShop.getShop())
+                .accountId(accountShop.getAccount().getId())
+                .shopId(accountShop.getShop().getId())
                 .build();
     }
 }

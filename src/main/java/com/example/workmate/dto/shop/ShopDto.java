@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -15,14 +16,20 @@ public class ShopDto {
     private Long id;
     private String name;
     private String address;
-    private List<AccountShop> accountShops;
+    private List<Long> accountShopsId;
 
     public static ShopDto fromEntity(Shop shop) {
-        return ShopDto.builder()
+        ShopDtoBuilder builder = ShopDto.builder()
                 .id(shop.getId())
                 .name(shop.getName())
-                .address(shop.getAddress())
-                .accountShops(shop.getAccountShops())
-                .build();
+                .address(shop.getAddress());
+
+        if (shop.getAccountShops() != null) {
+            builder.accountShopsId(shop.getAccountShops().stream().map(AccountShop::getId).toList());
+        } else {
+            builder.accountShopsId(Collections.emptyList());
+        }
+
+        return builder.build();
     }
 }
