@@ -1,9 +1,8 @@
 package com.example.workmate.controller.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
+import com.example.workmate.dto.attendance.AttendanceLogDto;
 import com.example.workmate.dto.ncpdto.PointDto;
-import com.example.workmate.dto.shop.ShopDto;
-import com.example.workmate.entity.Shop;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
@@ -12,16 +11,18 @@ import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.ncpservice.NaviService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
 
+@Slf4j
 @Controller
 @RequestMapping("/attendance")
 @RequiredArgsConstructor
@@ -228,26 +229,37 @@ public class AttendanceController {
             Integer pageSize,
             Model model
     ){
+
+
         //페이징
-        Page<AttendanceDto> attendanceList;
+        Page<AttendanceLogDto> attendanceLogList;
         //사용자정보
         model.addAttribute("account", accountRepo.findById(accountId)
                 .orElseThrow(
                         ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 "사용자 정보를 확인해주세요")));
-
         //매장 id가 주어지지 않을 때
         if (shopId == 0){
             //모두 가져오기
-            attendanceList
+        attendanceLogList
                     = attendanceService.showLogAll(pageNumber,pageSize, accountId);
 
-        } else {
-            //한 매장꺼만 가져오기
-            attendanceList
-                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId);
         }
-        model.addAttribute("attendanceList", attendanceList);
+        else {
+            //관리자라면 : 이후 추가
+            //log.info(SecurityContextHolder.getContext().getAuthentication().getName());
+            //log.info(authFacade.getAuth().getName());
+            //한 매장의 모든 출근 데이터를 가져오기
+//            attendanceLogList
+//                    = attendanceService.showOneShopLog(pageNumber,pageSize,accountId,shopId);
+
+            //한 유저의 매장꺼만 가져오기
+            attendanceLogList
+                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId);
+
+        }
+
+        model.addAttribute("attendanceLogList", attendanceLogList);
         
         //매장이름들
         //account - shop 부분 확인 후 로직 변경 필요
