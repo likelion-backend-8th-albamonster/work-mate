@@ -33,6 +33,8 @@ public class WebSecurityConfig {
                                         "/token/validate",
                                         "/account/home",
 
+                                        // 메일 코드 확인
+                                        "/account/check-code",
                                         //근무표 관련 테스트중
                                         "/schedule/**"
                                 )

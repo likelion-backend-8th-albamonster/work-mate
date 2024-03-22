@@ -1,4 +1,4 @@
-package com.example.workmate.config;
+package com.example.workmate.component;
 
 import com.example.workmate.dto.WorkTimeDto;
 import com.example.workmate.dto.schedule.ScheduleDto;

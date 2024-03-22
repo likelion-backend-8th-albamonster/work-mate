@@ -7,6 +7,7 @@ import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.jwt.dto.JwtResponseDto;
 import com.example.workmate.repo.AccountRepo;
+import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class AccountController {
     private final JwtTokenUtils tokenUtils;
     private final AuthenticationFacade authFacade;
     private final AccountRepo accountRepo;
+    private final MailService mailService;
 
     @GetMapping("/home")
     public String home() {
@@ -106,8 +108,35 @@ public class AccountController {
                     .email(email)
                     .authority(Authority.ROLE_USER)
                     .build());
+
+            mailService.send(username, email);
         }
         return "redirect:/account/login";
+    }
+
+    @PostMapping("check-code")
+    public String checkCode(
+            @RequestParam("username")
+            String username,
+            @RequestParam("password")
+            String password,
+            @RequestParam("code")
+            String code
+    ){
+        if (!manager.userExists(username)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        UserDetails userDetails = manager.loadUserByUsername(username);
+        log.info("username: {}", userDetails.getUsername());
+        log.info("password: {}", userDetails.getPassword());
+
+        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
+            log.error("비밀번호가 일치하지 않습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        return mailService.checkCode(username, code);
     }
 
     @GetMapping("/business-register")

@@ -1,6 +1,6 @@
 package com.example.workmate.service.schedule;
 
-import com.example.workmate.config.ScheduleUtil;
+import com.example.workmate.component.ScheduleUtil;
 import com.example.workmate.dto.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;

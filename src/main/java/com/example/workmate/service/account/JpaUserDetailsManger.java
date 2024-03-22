@@ -3,7 +3,9 @@ package com.example.workmate.service.account;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
+import com.example.workmate.entity.account.MailAuth;
 import com.example.workmate.repo.AccountRepo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,6 +66,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
                     .email(accountDetails.getEmail())
                     .businessNumber(accountDetails.getBusinessNumber())
                     .authority(accountDetails.getAuthority())
+                    .mailAuth(false)
                     .build();
             log.info("authority: {}", accountDetails.getAuthorities());
 
