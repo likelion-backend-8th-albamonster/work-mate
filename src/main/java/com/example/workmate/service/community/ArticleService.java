@@ -1,14 +1,13 @@
 package com.example.workmate.service.community;
 
 import com.example.workmate.dto.community.ArticleDto;
-import com.example.workmate.entity.Article;
-import com.example.workmate.entity.Board;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.community.Article;
+import com.example.workmate.entity.community.Board;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.repo.community.ArticleRepo;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-
 
 @Slf4j
 @Service
@@ -46,6 +44,7 @@ public class ArticleService {
                 .title(articleDto.getTitle())
                 .content(articleDto.getContent())
                 .board(articleDto.getBoard())
+                .password(articleDto.getPassword())
                 .articleWriteTime(LocalDateTime.now())
                 .shopArticleId(lastShopArticleId)
                 .account(account)
@@ -141,14 +140,12 @@ public class ArticleService {
                 .map(ArticleDto::fromEntity);
     }
 
-    // 비밀게시판 패스워드 비교하기
-    public boolean comparePassword(Long ShopArticleId, Long shopId, String password) {
-        Article article = articleRepo.findByShopArticleIdAndShopId(ShopArticleId, shopId)
+    //비밀게시판 패스워드 체크하기
+    public boolean checkPassword(Long shopArticleId, Long shopId, String password) {
+        Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
                 .orElseThrow();
 
-        return true;
+        return article.getPassword().equals(password);
     }
 }
-
-
 

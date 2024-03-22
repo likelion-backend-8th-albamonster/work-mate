@@ -1,7 +1,7 @@
 package com.example.workmate.dto.community;
 
-import com.example.workmate.entity.Article;
-import com.example.workmate.entity.Board;
+import com.example.workmate.entity.community.Article;
+import com.example.workmate.entity.community.Board;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 @Builder
 @Getter
 @Setter
