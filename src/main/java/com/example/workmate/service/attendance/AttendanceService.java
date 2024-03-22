@@ -1,13 +1,18 @@
 package com.example.workmate.service.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
+import com.example.workmate.dto.attendance.AttendanceLogDto;
+import com.example.workmate.dto.attendance.AttendanceLogUpdateDto;
+import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.attendance.Status;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.repo.AccountRepo;
+import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.attendance.AttendanceRepo;
 import com.example.workmate.repo.ShopRepo;
+import com.example.workmate.repo.attendance.AttendanceRepoDsl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -28,6 +33,8 @@ public class AttendanceService {
     private final AttendanceRepo attendanceRepo;
     private final AccountRepo accountRepo;
     private final ShopRepo shopRepo;
+    private final AttendanceRepoDsl attendanceRepoDsl;
+    private final AccountShopRepo accountShopRepo;
 
     //출근요청
     //이미 기록된 시간이 있는 경우 출근 등록 거부
@@ -144,7 +151,7 @@ public class AttendanceService {
     }
 
     //한 사용자의 모든 출퇴근 기록
-    public Page<AttendanceDto> showLogAll(
+    public Page<AttendanceLogDto> showLogAll(
             Integer pageNumber,
             Integer pageSize,
             Long accountId
@@ -158,23 +165,18 @@ public class AttendanceService {
                 Sort.by("id").descending());
 
         //한 계정에 대한 것만 가져온다.
-        //TODO querydsl로 변경
-        // inner join 사용
-        Page<Attendance> attendancePage
-                = attendanceRepo.findAllByAccount(pageable, account);
+        //querydsl로 가져온다.
+        Page<AttendanceLogDto> attendanceLogDtoPage
+                = attendanceRepoDsl.readUserAttendanceLog(accountId, pageable);
 
-        return new PageImpl<>(
-                attendancePage.stream().map(AttendanceDto::fromEntity).toList(),
-                pageable,
-                attendancePage.getSize()
-        );
+        return attendanceLogDtoPage;
     }
 
     //출퇴근 기록 보기
     //권한을 확인하여. 관리자와 아르바이트생은 서로다른 결과를 return
     //아르바이트생은 자기 자신의 출퇴근 기록만 확인 가능
     //관리자는 모든 아르바이트생의 출퇴근 기록 확인 가능
-    public Page<AttendanceDto> showLog(
+    public Page<AttendanceLogDto> showLog(
             Integer pageNumber,
             Integer pageSize,
             Long accountId,
@@ -196,17 +198,47 @@ public class AttendanceService {
 
         //TODO querydsl로 변경
         // inner join 사용
-        //한 계정에 대한 것만 가져온다.
-        Page<Attendance> attendancePage
-                = attendanceRepo.findAllByAccountAndShop(pageable, account, shop);
+        //한 계정의 한 매장에 대한 것만 가져온다.
+        //querydsl로 가져온다.
+        Page<AttendanceLogDto> attendanceLogDtoPage
+                = attendanceRepoDsl.readUserOneShopAttendanceLog(accountId, shopId, pageable);
 
-        Page<AttendanceDto> attendanceDtoPage = new PageImpl<>(
-                attendancePage.stream().map(AttendanceDto::fromEntity).toList(),
-                pageable,
-                attendancePage.getSize()
-        );
+        return attendanceLogDtoPage;
+    }
 
-        return attendanceDtoPage;
+    //한 매장의 모든 출근 리스트
+    public Page<AttendanceLogDto> showOneShopLog(
+            Integer pageNumber,
+            Integer pageSize,
+            Long accountId,
+            Long shopId
+    ){
+        //사용자 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+
+        //매장 확인
+        Shop shop = shopRepo.findById(shopId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "매장 정보를 확인해주세요")
+                );
+
+        Pageable pageable = PageRequest.of(pageNumber,pageSize,
+                Sort.by("id").descending());
+
+
+
+
+        //TODO querydsl로 변경
+        // inner join 사용
+        //한 계정의 한 매장에 대한 것만 가져온다.
+        //querydsl로 가져온다.
+        Page<AttendanceLogDto> attendanceLogDtoPage
+                = attendanceRepoDsl.readOneShopAttendanceLog(shopId, pageable);
+
+        return attendanceLogDtoPage;
     }
 
     //한 사용자가 다니는 매장리스트
@@ -230,34 +262,27 @@ public class AttendanceService {
     }
 
 
+
+
     //출퇴근 수정(관리자)
     //모든 아르바이트생의 출퇴근 기록 수정 가능
     //Status를 수정하여, 정상출근 / 지각 / 조퇴 상태 변경
-    public void udpate(Long accountId, Long shopId, Long adminId, Long attendanceId, String status){
-        //수정 진행하는 관리자가 권한을 가지고 있는가
+    @Transactional
+    public void updateLogAll(
+            Long shopId,
+        List<AttendanceLogUpdateDto> updateDto
 
-        //수정할 사용자 확인
-        Account account = accountRepo.findById(accountId)
-                .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
-                );
-        //매장 확인
-        Shop shop = shopRepo.findById(shopId)
-                .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "매장 정보를 확인해주세요")
-                );
+    ){
+        attendanceRepoDsl.udpateAttendanceList(shopId, updateDto);
+    }
 
-        //수정할 사용자의 매장 직원이 맞는가
-            //attendance_shop에서 adminId로 data 가져오기
-            //가져온 데이터의 attendanceShopId가 shopId와 일치하는지 체크
-
-        //사용자의 출퇴근 데이터 가져오기
+    @Transactional
+    public void updateLog(Long attendanceId, String status){
         Attendance attendance = attendanceRepo.findById(attendanceId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "출퇴근 정보를 확인해주세요")
                 );
-        //출퇴근 데이터의 status 값을, 받아온 status값으로 변경
-        //enum에 존재하는 값일 때
+
         attendance.setStatus(Status.valueOf(status));
         attendanceRepo.save(attendance);
     }
