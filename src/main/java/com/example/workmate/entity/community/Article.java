@@ -1,5 +1,6 @@
-package com.example.workmate.entity;
+package com.example.workmate.entity.community;
 
+import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
 import lombok.*;
