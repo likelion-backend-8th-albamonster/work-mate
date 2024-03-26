@@ -20,22 +20,39 @@
             height: 20px;
         }
         .worker{
-            height: 100px
+            height: 200px;
+            margin-left: 85%;
         }
     </style>
 </head>
 <body>
-
+    <%
+    request.setAttribute("dateType", "")
+    %>
 <h1>근무표</h1>
 
-<table style="width:70%; margin-left: 15%; margin-right: 15%; margin-top: 10%">
-    <caption style="font-size: 30px; padding-bottom: 30px">가게의 근무표</caption>
+<a class="worker" th:href="@{/schedule/{shopId}/change(shopId = ${schedules.get(0).shopId})}">근무표 변경신청하기</a>
+<table style="border-style : none; width:20%; margin-left: 40%; margin-right: 45%; margin-top: 10%; " >
+    <td style="border: none;">
+        <form action="/board/create_article" method="get">
+            <label>시작날짜</label>
+        </form>
+    </td>
+    <td style="border: none;" th:text="${#temporals.month(schedules.get(0).workStartTime)} + ' 월'">
+    </td>
+    <td style="border: none;">
+        다음 달
+    </td>
+</table>
+<table style="width:70%; margin-left: 15%; margin-right: 15%;">
+    <caption style="font-size: 30px; padding-bottom: 30px">알바몬스터 분식 서울본점</caption>
+
 
     <tr>
         <th style = "background : #ff5464; color : aliceblue;">일</th>
         <th class="day">월</th>
         <th class="day">화</th>
-        <th class="day", th:text="${schedules.size()}">수</th>
+        <th class="day">수</th>
         <th class="day">목</th>
         <th class="day">금</th>
         <th class="day" style = "background : cornflowerblue; color : aliceblue;">토</th>
@@ -44,10 +61,9 @@
         <td th:each=" days : ${#numbers.sequence(0,6)}">
             <th:block th:each="schedule : ${schedules}">
                 <th:block th:with ="day = ${days} + ${weeks} * 7">
-                       <p th:text="${schedule.name} + ' : ' + ${schedule.workStartTime}"
+                       <p th:text="${schedule.name} + ' : ' + ${#temporals.hour(schedule.workStartTime)}"
                           th:if="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
-                       <p th:text="${calender[day]}"
-                          th:unless="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
+                       <p th:unless="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
                 </th:block>
             </th:block>
         </td>
