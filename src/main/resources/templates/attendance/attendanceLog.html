@@ -8,7 +8,7 @@
 <h2 th:if="${attendanceLogList.isEmpty()}">
     <p>출근기록이 없습니다.</p>
 </h2>
-<form th:action="@{/attendance/showLog/{accountId}/{shopId}(accountId=${account.getId()},shopId=${shopid})}" method="get">
+<form th:action="@{/attendance/showLog/{accountId}(accountId=${account.getId()})}" method="get">
     <select name="shopId" id="shopId" class="form-select">
         <option disabled selected>매장 선택</option>
         <option th:each="shop: ${shopList}" th:value="${shop.id}" th:text="${shop.name}"></option>
@@ -26,10 +26,6 @@
             <th scope="col">상태</th>
         </tr>
     </thead>
-    <!--관리자 권한이 확인되면, status를 selectbox로 나타낸다.-->
-    <!--<div th:unless="${#strings.equals(auth.getAuthority(), '아르바이트생')}">-->
-    <!--    <button id="updateBtn" class="btn btn-primary">수정</button>-->
-    <!--</div>-->
     <tbody th:if="${#strings.equals(auth.getAuthority(), '아르바이트생')}">
         <tr th:each="attendance: ${attendanceLogList}">
             <th scope="col" th:text="${attendance.shopName}"></th>
@@ -45,19 +41,21 @@
         <th scope="col" th:text="${attendance.checkInTime}"></th>
         <th scope="col" th:text="${attendance.checkOutTime}"></th>
         <th scope="col" th:text="${attendance.status.status}"></th>
+        <!--수정버튼을 누르면, status값들과 attendanceId들을 controller로 보낸다-->
         <th>
             <form
-                    th:action="@{/attendance/update/{accountId}/{shopId}(accountId=${account.id},shopId=${shopId})}"
+                    th:action="@{/attendance/update/{accountId}(accountId=${account.id}}"
                     method="post">
                 <select name="status" id="status" class="form-select">
                     <option th:each="status : ${statusList}" th:value="${status}" th:text="${status.status}"></option>
                 </select>
                 <input type="hidden" name="attendanceId" th:value="${attendance.getAttendanceId()}">
+                <input type="hidden" name="shopId" th:value="${attendance.getShopId()}">
                 <input type="submit" class="btn btn-primary" value="저장">
             </form>
         </th>
     </tr>
-    <!--수정버튼을 누르면, status값들과 attendanceId들을 controller로 보낸다-->
+
     <button></button>
     </tbody>
 </table>
@@ -70,16 +68,6 @@
     window.onload = function () {
         //리다이렉트시 발생하는 alert 메시지
         const alertMsg = [[${msg}]];
-        // //수정버튼
-        // const updateBtn = document.querySelector("#updateBtn");
-        //
-        // //수정버튼 클릭 시
-        // //
-        // // 상태값이 selectbox로 변화
-        // updateBtn.addEventListener('click', function (){
-        //     alert("ck");
-        // })
-
         //받은 메시지가 있으면 나타내기
         if (alertMsg) {
             alert(alertMsg);

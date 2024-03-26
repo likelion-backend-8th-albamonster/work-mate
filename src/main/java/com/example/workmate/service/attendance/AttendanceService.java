@@ -4,17 +4,21 @@ import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.attendance.AttendanceLogDto;
 import com.example.workmate.dto.attendance.AttendanceLogUpdateDto;
 import com.example.workmate.entity.AccountShop;
-import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.Shop;
-import com.example.workmate.entity.attendance.Status;
 import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.account.Authority;
+import com.example.workmate.entity.attendance.Attendance;
+import com.example.workmate.entity.attendance.Status;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
-import com.example.workmate.repo.attendance.AttendanceRepo;
 import com.example.workmate.repo.ShopRepo;
+import com.example.workmate.repo.attendance.AttendanceRepo;
 import com.example.workmate.repo.attendance.AttendanceRepoDsl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -154,33 +158,54 @@ public class AttendanceService {
     public Page<AttendanceLogDto> showLogAll(
             Integer pageNumber,
             Integer pageSize,
-            Long accountId
+            Long accountId,
+            Authority authority
     ){
-        //사용자 확인
-        Account account = accountRepo.findById(accountId)
-                .orElseThrow(
-                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
-                );
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
                 Sort.by("id").descending());
 
-        //한 계정에 대한 것만 가져온다.
-        //querydsl로 가져온다.
-        Page<AttendanceLogDto> attendanceLogDtoPage
-                = attendanceRepoDsl.readUserAttendanceLog(accountId, pageable);
+        Page<AttendanceLogDto> attendanceLogDtoPage;
+        //권한 확인
+        //관리자라면
+        if (authority != Authority.ROLE_USER){
+            //한 계정에 대한 모든 accountShop 데이터 가져오기
+            Optional<List<AccountShop>> optionalAccountShopList
+                    = accountShopRepo.findAllByAccount_id(accountId);
+            //데이터 존재 시
+            if (optionalAccountShopList.isPresent()){
+                List<AccountShop> accountShopList
+                        = optionalAccountShopList.orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요")
+                );
+                List<Long> accountShopIdList = new ArrayList<>();
+                //id 추출
+                for(AccountShop accountShop : accountShopList){
+                    accountShopIdList.add(accountShop.getShop().getId());
+                }
+                //데이터 가져오기(관리자용)
+                attendanceLogDtoPage
+                        = attendanceRepoDsl.readUserAttendanceLogForAdmin(accountShopIdList, pageable);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요");
+            }
+
+
+        } else {
+            //일반 사용자라면
+            attendanceLogDtoPage
+                    = attendanceRepoDsl.readUserAttendanceLog(accountId, pageable);
+        }
 
         return attendanceLogDtoPage;
     }
 
-    //출퇴근 기록 보기
-    //권한을 확인하여. 관리자와 아르바이트생은 서로다른 결과를 return
-    //아르바이트생은 자기 자신의 출퇴근 기록만 확인 가능
-    //관리자는 모든 아르바이트생의 출퇴근 기록 확인 가능
+    //출퇴근
     public Page<AttendanceLogDto> showLog(
             Integer pageNumber,
             Integer pageSize,
             Long accountId,
-            Long shopId
+            Long shopId,
+            Authority authority
     ){
         //사용자 확인
         Account account = accountRepo.findById(accountId)
@@ -196,12 +221,9 @@ public class AttendanceService {
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
                 Sort.by("id").descending());
 
-        //TODO querydsl로 변경
-        // inner join 사용
         //한 계정의 한 매장에 대한 것만 가져온다.
-        //querydsl로 가져온다.
         Page<AttendanceLogDto> attendanceLogDtoPage
-                = attendanceRepoDsl.readUserOneShopAttendanceLog(accountId, shopId, pageable);
+                = attendanceRepoDsl.readUserOneShopAttendanceLog(accountId, shopId, pageable, authority);
 
         return attendanceLogDtoPage;
     }
@@ -228,9 +250,6 @@ public class AttendanceService {
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
                 Sort.by("id").descending());
 
-
-
-
         //TODO querydsl로 변경
         // inner join 사용
         //한 계정의 한 매장에 대한 것만 가져온다.
@@ -248,14 +267,23 @@ public class AttendanceService {
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
                 );
-
         List<Long> accountShopIdList = new ArrayList<>();
-        //한 계정에 대한 모든 출퇴근 정보
-        List<Attendance> attendanceList
-                = attendanceRepo.findAllByAccount(account);
-        //id 넣기
-        for(Attendance attendance : attendanceList){
-            accountShopIdList.add(attendance.getShop().getId());
+
+        //accountShop에서 사용자가 다니는 매장리스트 추출
+        Optional<List<AccountShop>> optionalAccountShopList
+                = accountShopRepo.findAllByAccount_id(accountId);
+        //데이터 존재 시
+        if (optionalAccountShopList.isPresent()){
+            List<AccountShop> accountShopList
+                    = optionalAccountShopList.orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요")
+            );
+            //id 추출
+            for(AccountShop accountShop : accountShopList){
+                accountShopIdList.add(accountShop.getShop().getId());
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요");
         }
 
         return shopRepo.findAllById(accountShopIdList);

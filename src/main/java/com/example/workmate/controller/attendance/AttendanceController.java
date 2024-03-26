@@ -2,32 +2,26 @@ package com.example.workmate.controller.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.attendance.AttendanceLogDto;
-import com.example.workmate.dto.attendance.AttendanceLogUpdateDto;
 import com.example.workmate.dto.ncpdto.PointDto;
 import com.example.workmate.entity.account.Account;
-import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.attendance.Status;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.service.ShopService;
-import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.account.AccountService;
+import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.ncpservice.NaviService;
 import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Slf4j
@@ -37,11 +31,8 @@ import java.util.List;
 public class AttendanceController {
     private final AttendanceService attendanceService;
     private final NaviService naviService;
-    private final AccountService accountService;
     private final AccountRepo accountRepo;
     private final ShopRepo shopRepo;
-    private final AuthenticationFacade authFacade;
-    private final ShopService shopService;
     private final ScheduleService scheduleService;
 
     //출근요청페이지
@@ -55,6 +46,8 @@ public class AttendanceController {
             //사용자의 ip와 매장 주소가 model에 들어가야 함
             Model model
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         model.addAttribute("account", accountRepo.findById(accountId)
                 .orElseThrow(
                         ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -94,6 +87,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -137,6 +132,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -174,6 +171,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -209,6 +208,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -227,20 +228,20 @@ public class AttendanceController {
 
     //출퇴근 기록 보기(아르바이트생/관리자)
     //pagenation
-    @GetMapping("/showLog/{accountId}/{shopId}")
+    @GetMapping("/showLog/{accountId}")
     public String showLog(
             @PathVariable("accountId")
             Long accountId,
-            @PathVariable("shopId")
+            @RequestParam(value = "shopId", defaultValue = "0", required = false)
             Long shopId,
-//            @RequestParam(value = "shopId", defaultValue = "0", required = false)
-//            Long shopId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "2", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "5", required = false)
             Integer pageSize,
             Model model
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //페이징
         Page<AttendanceLogDto> attendanceLogList;
         //사용자정보 확인
@@ -248,30 +249,22 @@ public class AttendanceController {
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
                 );
-        //관리자라면
-        if (account.getAuthority() != Authority.ROLE_USER){
-            //이 '매장'의 관리자라면
-            //scheduleService.checkMember(shopId);
-            //한 매장의 모든 출근 데이터를 가져오기
-            attendanceLogList
-                    = attendanceService.showOneShopLog(pageNumber,pageSize,accountId,shopId);
-            model.addAttribute("statusList", Status.values());
-            model.addAttribute("shopId", shopId);
-        }
         //매장 id가 주어지지 않을 때
-        else if (shopId == 0){
+        if (shopId == 0){
             //한 유저의 모든 매장 출근 데이터 가져오기
-        attendanceLogList
-                    = attendanceService.showLogAll(pageNumber,pageSize, accountId);
+            attendanceLogList
+                    = attendanceService.showLogAll(pageNumber,pageSize, accountId, account.getAuthority());
         }
         //매장 id가 주어지고, 아르바이트생일 때
         else {
             //한 유저의 한 매장 출근 데이터 가져오기
             attendanceLogList
-                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId);
+                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId, account.getAuthority());
         }
         //사용자
         model.addAttribute("account", account);
+        //출퇴근상태
+        model.addAttribute("statusList", Status.values());
         //출근기록
         model.addAttribute("attendanceLogList", attendanceLogList);
         //매장명
