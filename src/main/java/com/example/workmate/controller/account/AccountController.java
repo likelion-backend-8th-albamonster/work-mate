@@ -21,15 +21,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Controller
-@RestController
 @RequestMapping("/account")
 @RequiredArgsConstructor
 public class AccountController {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtils tokenUtils;
     private final AuthenticationFacade authFacade;
-    private final AccountRepo accountRepo;
     private final MailService mailService;
 
     @GetMapping("/home")
@@ -43,37 +40,6 @@ public class AccountController {
     @GetMapping("/login")
     public String loginForm() {
         return "account/login-form";
-    }
-
-    @PostMapping("/login")
-    public String login(
-            @RequestParam("username")
-            String username,
-            @RequestParam("password")
-            String password
-    ) {
-        if (!manager.userExists(username)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        UserDetails userDetails = manager.loadUserByUsername(username);
-        log.info("username: {}", userDetails.getUsername());
-        log.info("password: {}", userDetails.getPassword());
-
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            log.error("비밀번호가 일치하지 않습니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        Account account = accountRepo.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("account Id: {}", account.getId());
-
-        JwtResponseDto dto = new JwtResponseDto();
-        dto.setToken(tokenUtils.generateToken(userDetails));
-        log.info("token: {}", dto.getToken());
-
-        return "redirect:/account/login";
     }
 
     // 회원가입 화면
