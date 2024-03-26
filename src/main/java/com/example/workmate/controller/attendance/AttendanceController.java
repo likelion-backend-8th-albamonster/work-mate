@@ -55,6 +55,8 @@ public class AttendanceController {
             //사용자의 ip와 매장 주소가 model에 들어가야 함
             Model model
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         model.addAttribute("account", accountRepo.findById(accountId)
                 .orElseThrow(
                         ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
@@ -94,6 +96,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -137,6 +141,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -174,6 +180,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -209,6 +217,8 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -241,6 +251,8 @@ public class AttendanceController {
             Integer pageSize,
             Model model
     ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
         //페이징
         Page<AttendanceLogDto> attendanceLogList;
         //사용자정보 확인
