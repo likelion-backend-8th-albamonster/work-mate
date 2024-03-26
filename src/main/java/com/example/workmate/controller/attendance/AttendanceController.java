@@ -237,17 +237,15 @@ public class AttendanceController {
 
     //출퇴근 기록 보기(아르바이트생/관리자)
     //pagenation
-    @GetMapping("/showLog/{accountId}/{shopId}")
+    @GetMapping("/showLog/{accountId}")
     public String showLog(
             @PathVariable("accountId")
             Long accountId,
-            @PathVariable("shopId")
+            @RequestParam(value = "shopId", defaultValue = "0", required = false)
             Long shopId,
-//            @RequestParam(value = "shopId", defaultValue = "0", required = false)
-//            Long shopId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "2", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "5", required = false)
             Integer pageSize,
             Model model
     ){
@@ -260,30 +258,22 @@ public class AttendanceController {
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
                 );
-        //관리자라면
-        if (account.getAuthority() != Authority.ROLE_USER){
-            //이 '매장'의 관리자라면
-            //scheduleService.checkMember(shopId);
-            //한 매장의 모든 출근 데이터를 가져오기
-            attendanceLogList
-                    = attendanceService.showOneShopLog(pageNumber,pageSize,accountId,shopId);
-            model.addAttribute("statusList", Status.values());
-            model.addAttribute("shopId", shopId);
-        }
         //매장 id가 주어지지 않을 때
-        else if (shopId == 0){
+        if (shopId == 0){
             //한 유저의 모든 매장 출근 데이터 가져오기
-        attendanceLogList
-                    = attendanceService.showLogAll(pageNumber,pageSize, accountId);
+            attendanceLogList
+                    = attendanceService.showLogAll(pageNumber,pageSize, accountId, account.getAuthority());
         }
         //매장 id가 주어지고, 아르바이트생일 때
         else {
             //한 유저의 한 매장 출근 데이터 가져오기
             attendanceLogList
-                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId);
+                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId, account.getAuthority());
         }
         //사용자
         model.addAttribute("account", account);
+        //출퇴근상태
+        model.addAttribute("statusList", Status.values());
         //출근기록
         model.addAttribute("attendanceLogList", attendanceLogList);
         //매장명
