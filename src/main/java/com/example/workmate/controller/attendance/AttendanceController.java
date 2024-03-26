@@ -2,32 +2,26 @@ package com.example.workmate.controller.attendance;
 
 import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.attendance.AttendanceLogDto;
-import com.example.workmate.dto.attendance.AttendanceLogUpdateDto;
 import com.example.workmate.dto.ncpdto.PointDto;
 import com.example.workmate.entity.account.Account;
-import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.attendance.Status;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.service.ShopService;
-import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.account.AccountService;
+import com.example.workmate.service.attendance.AttendanceService;
 import com.example.workmate.service.ncpservice.NaviService;
 import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Slf4j
@@ -37,11 +31,8 @@ import java.util.List;
 public class AttendanceController {
     private final AttendanceService attendanceService;
     private final NaviService naviService;
-    private final AccountService accountService;
     private final AccountRepo accountRepo;
     private final ShopRepo shopRepo;
-    private final AuthenticationFacade authFacade;
-    private final ShopService shopService;
     private final ScheduleService scheduleService;
 
     //출근요청페이지
