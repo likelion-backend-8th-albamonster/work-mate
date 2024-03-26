@@ -36,7 +36,8 @@ public class WebSecurityConfig {
                                         // 메일 코드 확인
                                         "/account/check-code",
                                         //근무표 관련 테스트중
-                                        "/schedule/**"
+                                        "/schedule/**",
+                                        "/schedule/view-month/{shopId}"
                                 )
                                 .permitAll()
 

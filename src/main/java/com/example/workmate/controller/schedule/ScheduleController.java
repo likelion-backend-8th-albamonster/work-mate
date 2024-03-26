@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -26,6 +27,7 @@ public class ScheduleController {
     private final ScheduleDataService scheduleDataService;
     private final ScheduleUtil scheduleUtil;
     //스케쥴 보는 테스트
+
     @ResponseBody
     @PostMapping("/make")
     public String make(){
@@ -36,8 +38,36 @@ public class ScheduleController {
         scheduleDataService.makeWorkTime(3L);
         return "done";
     }
+    // 근무표 메인페이지
+    @RequestMapping("/{shopId}")
+    public String mainSchedule(
+            Model model,
+            @PathVariable("shopId")
+            Long shopId
+    ){
+        LocalDate now = LocalDate.now();
+        ScheduleDto dto = ScheduleDto.builder()
+                .year(now.getYear())
+                .month(now.getMonthValue())
+                .day(now.getDayOfMonth())
+                .build();
+        List<WorkTimeDto> schedules = scheduleService.viewMonth(shopId, dto);
+        model.addAttribute("schedules", schedules);
+        model.addAttribute("calender",scheduleUtil.makeCalender(dto));
+        return "schedule/monthly-schedule";
+    }
 
-    // 근무표 보기 만드는거 테스트중
+    @GetMapping("/{shopId}")
+    public String otherSchedule(
+            Model model,
+            @PathVariable("shopId")
+            Long shopId,
+            @RequestParam
+            LocalDateTime otherDate
+    ){
+        return null;
+    }
+    // 근무표 달 마다 보기
     @RequestMapping("/schedule")
     public String month(Model model){
         LocalDate now = LocalDate.now();
@@ -50,10 +80,11 @@ public class ScheduleController {
         List<WorkTimeDto> schedules = scheduleService.viewMonth(shopId, dto);
         model.addAttribute("schedules", schedules);
         model.addAttribute("calender",scheduleUtil.makeCalender(dto));
-        return "monthly-schedule";
+        return "schedule/monthly-schedule";
     }
 
     // 근무 만들기
+    @ResponseBody
     @PostMapping("/create")
     public WorkTimeDto create(
             @RequestParam WorkTimeDto dto
@@ -68,6 +99,7 @@ public class ScheduleController {
             @RequestParam WorkTimeDto dto,
             @PathVariable("workTimeId")
             Long workTimeId
+            // git check
     ){
         return scheduleService.update(workTimeId, dto);
     }
@@ -111,8 +143,7 @@ public class ScheduleController {
             @RequestBody
             ScheduleDto month
     ){
-        List<WorkTimeDto> workTimeDtos = scheduleService.viewMonth(shopId, month);
-        return workTimeDtos;
+        return scheduleService.viewMonth(shopId, month);
     }
 
     // 시작 기간과 끝 기간을 정해서 보기 0번은 시작, 1번은 끝
@@ -163,6 +194,6 @@ public class ScheduleController {
             @RequestParam("changeRequestId")
             Long changeRequestId
     ){
-        return scheduleService.confirmChange(changeRequestId);
+        return scheduleService.declineChange(changeRequestId);
     }
 }
