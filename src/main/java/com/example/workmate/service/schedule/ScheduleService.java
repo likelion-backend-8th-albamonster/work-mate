@@ -129,11 +129,15 @@ public class ScheduleService {
 
         // 시작일과 마지막날 구하기
         dto.setDay(0);
-        LocalDateTime startDay = scheduleUtil.getDay(false,dto).atStartOfDay();
-        LocalDateTime endDay = scheduleUtil.getDay(true, dto).atTime(LocalTime.MAX);
+        LocalDateTime startDay = scheduleUtil.getDay(true,dto).atStartOfDay();
+        LocalDateTime endDay = scheduleUtil.getDay(false, dto).atTime(LocalTime.MAX);
 
+        int dayOfWeek = scheduleUtil.getDayOfWeek(dto);
+        log.info("dayOfWeek : {}",dayOfWeek);
+        log.info("dayOfWeek + endDay : {}",dayOfWeek + endDay.getDayOfMonth());
+        log.info("startDay: {}, endDay: {}",startDay,endDay);
         List<WorkTime> workTimes = workTimeRepo
-                .findAllByShop_IdAndWorkStartTimeBetween(
+                .findAllByShop_IdAndWorkStartTimeBetweenOrderByWorkStartTimeAsc(
                         shopId, startDay, endDay
                 );
         if (workTimes.isEmpty())
@@ -144,10 +148,6 @@ public class ScheduleService {
             dtos.add(WorkTimeDto.fromEntity(workTime));
         }
 
-        int dayOfWeek = scheduleUtil.getDayOfWeek(dto);
-        log.info("dayOfWeek : {}",dayOfWeek);
-        log.info("dayOfWeek + endDay : {}",dayOfWeek + endDay.getDayOfMonth());
-        log.info("startday: {}, endday: {}",startDay,endDay);
         log.info("worTimes size: {}",workTimes.size());
         log.info("dto size: {}",dtos.size());
 
@@ -165,7 +165,7 @@ public class ScheduleService {
         LocalDateTime startDay = scheduleUtil.getDay(false, start).atStartOfDay();
         LocalDateTime endDay = scheduleUtil.getDay(false, end).atTime(LocalTime.MAX);
         List<WorkTime> workTimes = workTimeRepo
-                .findAllByShop_IdAndWorkStartTimeBetween(
+                .findAllByShop_IdAndWorkStartTimeBetweenOrderByWorkStartTimeAsc(
                         shopId, startDay, endDay
                 );
         if (workTimes.isEmpty())

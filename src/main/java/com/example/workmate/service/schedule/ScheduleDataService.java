@@ -51,7 +51,7 @@ public class ScheduleDataService {
                 Account.builder()
                         .name("yang1")
                         .username("yang1")
-                        .password(passwordEncoder.encode("yang1"))
+                        .password(passwordEncoder.encode("1111"))
                         .email("yang1")
                         .authority(Authority.ROLE_USER)
                         .mailAuth(true)
@@ -59,9 +59,17 @@ public class ScheduleDataService {
                 Account.builder()
                         .name("yang2")
                         .username("yang2")
-                        .password(passwordEncoder.encode("yang2"))
+                        .password(passwordEncoder.encode("1111"))
                         .email("yang2")
                         .authority(Authority.ROLE_USER)
+                        .mailAuth(true)
+                        .build(),
+                Account.builder()
+                        .name("yangAdmin")
+                        .username("yangAdmin")
+                        .password(passwordEncoder.encode("1111"))
+                        .email("yangAdmi")
+                        .authority(Authority.ROLE_ADMIN)
                         .mailAuth(true)
                         .build()
         ));
@@ -93,9 +101,18 @@ public class ScheduleDataService {
                 .shop(shop)
                 .build();
         accountShopRepo.save(accountShop2);
+
+        Account account3 = accountRepo.findById(4L).orElseThrow(
+                ()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        AccountShop accountShop3 = AccountShop.builder()
+                .account(account3)
+                .shop(shop)
+                .build();
+        accountShopRepo.save(accountShop3);
     }
 
-    // 한달 동안 랜덤한 시간의 근무를 만들어냄
+    // 근무만들기
     public void makeWorkTime(Long accountId){
         Account account1 = accountRepo.findById(accountId).orElseThrow(
                 ()->new ResponseStatusException(HttpStatus.NOT_FOUND));
