@@ -10,7 +10,7 @@
 </h2>
 <form th:action="@{/attendance/showLog/{accountId}(accountId=${account.getId()})}" method="get">
     <select name="shopId" id="shopId" class="form-select">
-        <option disabled selected>매장 선택</option>
+        <option selected value="0">매장 선택</option>
         <option th:each="shop: ${shopList}" th:value="${shop.id}" th:text="${shop.name}"></option>
     </select>
     <input type="submit" class="btn btn-danger" value="매장 찾기">
@@ -62,37 +62,19 @@
 </table>
 <div th:if="${!attendanceLogList.isEmpty()}">
     <nav aria-label="Page navigation example">
-        <ul class="pagination"
-            th:with="
-                pageNumber = ${attendanceLogList.pageable.pageNumber},
-                pageSize = ${attendanceLogList.pageable.pageSize},
-                totalPages = ${attendanceLogList.getTotalPages()},
-                startPage = ${T(java.lang.Math).floor(pageNumber / pageSize) * pageSize + 1},
-                tempEndPage = ${startPage + pageSize - 1},
-                endPage = (${tempEndPage < totalPages ? tempEndPage : totalPages})">
-
-<!--            <li th:if="${attendanceLogList.pageable.getPageNumber() == 0}" class="page-item">-->
-<!--                <a type="disabled" class="page-link" th:href="@{/attendance/showLog/{accountId}?pageNumber={page}(accountId=${account.getId()}, page=${page - 2})}">-->
-<!--                    <span aria-hidden="true" th:text="${page}"></span>-->
-<!--                </a>-->
-<!--            </li>-->
-<!--            <li th:unless="${attendanceLogList.pageable.getPageNumber() == 0}" class="page-item">-->
-<!--                <a class="page-link" th:href="@{/attendance/showLog/{accountId}?pageNumber={page}(accountId=${account.getId()}, page=${page - 2})}">-->
-<!--                    <span aria-hidden="true" th:text="${page}"></span>-->
-<!--                </a>-->
-<!--            </li>-->
-
+        <ul th:if="${shopId.equals(0)}" class="pagination" >
             <li class="page-item" th:each="page : ${#numbers.sequence(1,attendanceLogList.getTotalPages())}">
                 <a class="page-link" th:href="@{/attendance/showLog/{accountId}?pageNumber={page}(accountId=${account.getId()}, page=${page - 1})}">
                     <span aria-hidden="true" th:text="${page}"></span>
                 </a>
             </li>
-
-    <!--        <li th:classappend="${attendanceLogList.last} ? 'disabled'" class="page-item">-->
-    <!--            <a class="page-link" th:href="${attendanceLogList.first} ? '#' : @{/attendance/showLog/{accountId}?pageNumber={pageNumber}(accountId=${account.getId()}, pageNumber=${attendanceLogList.pageable.pageNumber + 1})}">-->
-    <!--                <span aria-hidden="true">&gt;</span>-->
-    <!--            </a>-->
-    <!--        </li>-->
+        </ul>
+        <ul th:unless="${shopId.equals(0)}" class="pagination" >
+            <li class="page-item" th:each="page : ${#numbers.sequence(1,attendanceLogList.getTotalPages())}">
+                <a class="page-link" th:href="@{/attendance/showLog/{accountId}?shopId={shopId}&pageNumber={page}(accountId=${account.getId()}, shopId=${shopId}, page=${page - 1})}">
+                    <span aria-hidden="true" th:text="${page}"></span>
+                </a>
+            </li>
         </ul>
     </nav>
 </div>

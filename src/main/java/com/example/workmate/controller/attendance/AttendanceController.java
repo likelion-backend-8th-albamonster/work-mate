@@ -261,8 +261,6 @@ public class AttendanceController {
                     = attendanceService.showLog(pageNumber,pageSize, accountId, shopId, account.getAuthority());
         }
 
-        //총 데이터 개수
-
         //사용자
         model.addAttribute("account", account);
         //출퇴근상태
@@ -272,6 +270,8 @@ public class AttendanceController {
         //매장명
         model.addAttribute("shopList",
                 attendanceService.readOneAccountShopList(accountId));
+        //shop id
+        model.addAttribute("shopId", shopId);
         //사용자 권한
         model.addAttribute("auth", account.getAuthority());
         return "attendance/attendanceLog";

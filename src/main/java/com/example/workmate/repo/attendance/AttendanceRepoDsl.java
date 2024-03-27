@@ -179,8 +179,6 @@ public class AttendanceRepoDsl {
                             .where(
                                     qAttendance.shop.id.eq(shopId)
                             )
-                            .offset(pageable.getOffset())//페이지번호
-                            .limit(pageable.getPageSize())//페이지사이즈
                             .fetchOne();
         } 
         //일반사용자
@@ -218,8 +216,6 @@ public class AttendanceRepoDsl {
                                     qAttendance.account.id.eq(accountId),
                                     qAttendance.shop.id.eq(shopId)
                             )
-                            .offset(pageable.getOffset())//페이지번호
-                            .limit(pageable.getPageSize())//페이지사이즈
                             .fetchOne();
         }
 
@@ -263,8 +259,6 @@ public class AttendanceRepoDsl {
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
                         .where(qAttendance.shop.id.eq(shopId))
-                        .offset(pageable.getOffset())//페이지번호
-                        .limit(pageable.getPageSize())//페이지사이즈
                         .fetchOne();
         return new PageImpl<>(
                 attendanceLogDtoList,
