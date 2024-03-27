@@ -1,6 +1,7 @@
 package com.example.workmate.service.account;
 
 import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.MailAuth;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
@@ -138,6 +139,15 @@ public class MailService {
         }
         if (code.equals(mailAuth.getAuthString())){
             account.setMailAuth(true);
+
+            if (account.getBusinessNumber() != null) {
+                account.setAuthority(Authority.ROLE_BUSINESS_USER);
+                log.info("Set Authority: {} ", account.getAuthority());
+            } else {
+                account.setAuthority(Authority.ROLE_USER);
+                log.info("Set Authority: {} ", account.getAuthority());
+            }
+
             accountRepo.save(account);
             return "done";
         }
