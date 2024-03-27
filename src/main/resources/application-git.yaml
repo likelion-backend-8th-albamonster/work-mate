@@ -13,8 +13,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ydh511@gmail.com
-    password: fgpd gpia wepn sqgq
+    username: likelion8thworkmate@gmail.com
+    password: whrq anfu qdax aupa
     properties:
       mail:
         smtp:
