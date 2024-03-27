@@ -1,19 +1,23 @@
 package com.example.workmate.component;
 
+import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.jwt.JwtTokenUtils;
+import com.example.workmate.repo.AccountRepo;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -29,6 +33,7 @@ public class OAuth2SuccessHandler
     private final JwtTokenUtils tokenUtils;
     // 사용자 정보 등록을 위해 UserDetailsManager
     private final UserDetailsManager userDetailsManager;
+    private final AccountRepo accountRepo;
 
     @Override
     public void onAuthenticationSuccess(
@@ -64,9 +69,15 @@ public class OAuth2SuccessHandler
                 = userDetailsManager.loadUserByUsername(username);
         // JWT 생성
         String jwt = tokenUtils.generateToken(details);
+        log.info("Token: {}", jwt);
+
+        // Account DB에서 계정 가져옴
+        Account account = accountRepo.findByUsername(details.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        log.info("account ID: {}", account.getId());
+
         // 어디로 리다이렉트 할지 지정
-        // 현재는 임의로 토큰을 반환하는 페이지로 리다이렉트 설정해둠
-        String targetUrl = String.format("http://localhost:8080/token/validate?token=%s", jwt);
+        String targetUrl = String.format("http://localhost:8080/profile/%d", account.getId());
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
