@@ -26,7 +26,6 @@ public class AccountService {
     private final ShopRepo shopRepo;
     private final AccountShopRepo accountShopRepo;
     private final AuthenticationFacade authFacade;
-    private final MailService mailService;
 
     // 유저 정보 가져오기
     public AccountDto readOneAccount(Long id) {
@@ -41,6 +40,18 @@ public class AccountService {
         }
 
         return AccountDto.fromEntity(account);
+    }
+
+    // 사용자 정보 수정
+    public AccountDto updateAccount(Long id, AccountDto dto) {
+        Account target = accountRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        target.setName(dto.getName());
+        target.setEmail(dto.getEmail());
+        target.setBusinessNumber(dto.getBusinessNumber());
+
+        return AccountDto.fromEntity(accountRepo.save(target));
     }
 
     // 아르바이트 요청
@@ -58,6 +69,13 @@ public class AccountService {
         if (!authFacade.getAuth().getName().equals(account.getUsername())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
+        // 유저의 권한이 INACTIVE인 경우 제외
+        if (isAuthority(account.getAuthority())) {
+            log.info("이메일 인증이 필요합니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         newAccountShop.setShop(Shop.builder()
                 .id(shop.getId())
                 .name(shop.getName())
@@ -115,7 +133,12 @@ public class AccountService {
             accountShopRepo.delete(target);
             return "등록 거절";
         }
+    }
 
+    // 권한 체크
+    private boolean isAuthority(Authority authority) {
+        // 비활성 유저인 경우 true
+        return authority.equals(Authority.ROLE_INACTIVE_USER);
     }
 
     // 사용자 불러오기
