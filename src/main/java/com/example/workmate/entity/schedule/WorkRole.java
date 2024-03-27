@@ -1,4 +1,4 @@
-package com.example.workmate.entity;
+package com.example.workmate.entity.schedule;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

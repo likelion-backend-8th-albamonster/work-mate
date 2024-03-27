@@ -1,6 +1,6 @@
-package com.example.workmate.entity;
+package com.example.workmate.entity.schedule;
+import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
-import com.example.workmate.entity.account.Authority;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;

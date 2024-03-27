@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <title>근무 리스트</title>
+</head>
+<body>
+<a th:href="@{/schedule/{shopId}(shopId = ${shopId})}">월 별 근무표로 돌아가기</a>
+<h1>기간 근무표</h1>
+<table style="border-style : none; width:20%; margin-left: 40%; margin-right: 45%; margin-top: 10%; " >
+    <td th:if="${schedules.isEmpty()}">
+        해당 기간 근무가 없습니다.
+    </td>
+    <th:block th:unless="${schedules.isEmpty()}" th:each="listSchedule : ${listSchedules}">
+        <td th:text="${#temporals.month(listSchedule)} + '월 ' + ${#temporals.day(listSchedules)} + '일 근무'">
+            <th:block th:each="schedule : ${schedules}">
+                <th:block th:if="${#temporals.day(schedule.workStartTime)} eq ${#temporals.day(listSchedule)}">
+                    <p th:text="${schedule.name} ' : ' ${#temporals.hour(schedule.workStartTime)}"></p>
+                </th:block>
+            </th:block>
+        </td>
+    </th:block>
+</table>
+</body>
+</html>

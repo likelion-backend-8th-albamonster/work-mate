@@ -1,6 +1,6 @@
-package com.example.workmate.repo;
+package com.example.workmate.repo.schedule;
 
-import com.example.workmate.entity.WorkTime;
+import com.example.workmate.entity.schedule.WorkTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +18,9 @@ public interface WorkTimeRepo extends JpaRepository<WorkTime, Long> {
     // ex) 27일까지 검색했는데, 27일에 시작해서 28일이 넘어서 끝나는 심야알바같은 경우.
     List<WorkTime> findAllByShop_IdAndWorkStartTimeBetweenOrderByWorkStartTimeAsc(
             Long ShopId, LocalDateTime start, LocalDateTime end
+    );
+    List<WorkTime> findAllByAccount_IdAndShop_IdAndWorkStartTimeBetweenOrderByWorkStartTimeAsc(
+            Long accountId, Long ShopId, LocalDateTime start, LocalDateTime end
     );
     Optional<WorkTime> findByAccount_Id(Long accountId);
     Page<WorkTime> findAllByShop_Id(Long shopId, Pageable pageable);

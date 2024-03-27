@@ -3,14 +3,14 @@ package com.example.workmate.service.schedule;
 
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
-import com.example.workmate.entity.WorkRole;
-import com.example.workmate.entity.WorkTime;
+import com.example.workmate.entity.schedule.WorkRole;
+import com.example.workmate.entity.schedule.WorkTime;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
-import com.example.workmate.repo.WorkTimeRepo;
+import com.example.workmate.repo.schedule.WorkTimeRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,9 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 

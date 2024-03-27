@@ -1,18 +1,12 @@
 package com.example.workmate.component;
 
-import com.example.workmate.dto.WorkTimeDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
-import com.example.workmate.entity.WorkTime;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.temporal.WeekFields;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 @Component
@@ -58,5 +52,16 @@ public class ScheduleUtil {
         }
         log.info(days.toString());
         return days;
+    }
+
+    public List<LocalDate> listSchedule(LocalDate startTime, LocalDate endTime){
+        LocalDate date = LocalDate.ofEpochDay(endTime.toEpochDay() - startTime.toEpochDay());
+        int intDate = date.getDayOfYear();
+
+        List<LocalDate> listSchedule = new ArrayList<>();
+        for (int i = 0; i < intDate; i++) {
+            listSchedule.add(date.plusDays(i));
+        }
+        return listSchedule;
     }
 }

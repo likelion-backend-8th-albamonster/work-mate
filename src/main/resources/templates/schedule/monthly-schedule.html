@@ -26,22 +26,25 @@
     </style>
 </head>
 <body>
-    <%
-    request.setAttribute("dateType", "")
-    %>
+
 <h1>근무표</h1>
 
-<a class="worker" th:href="@{/schedule/{shopId}/change(shopId = ${schedules.get(0).shopId})}">근무표 변경신청하기</a>
+<a class="worker" th:href="@{/schedule/{shopId}/change(shopId = ${shopId})}">근무표 변경신청하기</a>
 <table style="border-style : none; width:20%; margin-left: 40%; margin-right: 45%; margin-top: 10%; " >
-    <td style="border: none;">
-        <form action="/board/create_article" method="get">
-            <label>시작날짜</label>
-        </form>
-    </td>
     <td style="border: none;" th:text="${#temporals.month(schedules.get(0).workStartTime)} + ' 월'">
     </td>
     <td style="border: none;">
-        다음 달
+    </td>
+    <td style="border: none;">
+        <form th:action="@{schedule/find-schedule/{shopId}(shopId = ${shopId})}" method="get">
+            <label>시작 날짜</label>
+            <input type="date" name="startDate"
+                   th:value="${#temporals.createNow()}" />
+            <label>끝 날짜</label>
+            <input type="date" name="endDate"
+                   th:value="${#temporals.createNow()}" />
+            <input type="submit" value = "검색하기">
+        </form>
     </td>
 </table>
 <table style="width:70%; margin-left: 15%; margin-right: 15%;">

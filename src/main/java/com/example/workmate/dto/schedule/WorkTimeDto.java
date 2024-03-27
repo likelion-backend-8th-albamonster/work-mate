@@ -1,7 +1,7 @@
-package com.example.workmate.dto;
+package com.example.workmate.dto.schedule;
 
-import com.example.workmate.entity.WorkRole;
-import com.example.workmate.entity.WorkTime;
+import com.example.workmate.entity.schedule.WorkRole;
+import com.example.workmate.entity.schedule.WorkTime;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
