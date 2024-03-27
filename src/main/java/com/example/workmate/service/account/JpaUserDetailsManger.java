@@ -81,6 +81,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
 
     @Override
     public void updateUser(UserDetails user) {
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @Override

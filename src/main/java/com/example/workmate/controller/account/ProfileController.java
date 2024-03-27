@@ -28,6 +28,12 @@ public class ProfileController {
        return service.readOneAccount(id);
     }
 
+    // 정보 업데이트
+    @PostMapping("/update")
+    public AccountDto updateAccount(@PathVariable("id") Long id, AccountDto dto) {
+        return service.updateAccount(id, dto);
+    }
+
     // 이메일 코드를 보낸다.
     @PostMapping("/email-check")
     public String checkEmail(
