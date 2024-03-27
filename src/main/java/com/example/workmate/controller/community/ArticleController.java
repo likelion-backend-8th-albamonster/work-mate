@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 @Slf4j
 @Controller
 @RequestMapping("{shopId}/community")
@@ -50,37 +51,22 @@ public class ArticleController {
     // 게시글 작성 폼 제출
     @PostMapping("/article/create")
     public String create(
-            @ModelAttribute
-            ArticleDto articleDto,
             @PathVariable("shopId")
             Long shopId,
+            @RequestParam
+            Board board,
+            @ModelAttribute
+            ArticleDto articleDto,
             RedirectAttributes redirectAttributes,
-            HttpSession session,
             Model model
     ) {
-        // 세션에서 폼 데이터를 가져옴
-        Board board = (Board) session.getAttribute("board");
-        String title = (String) session.getAttribute("title");
-        String content = (String) session.getAttribute("content");
-        String password = (String) session.getAttribute("password");
-
-        // 세션에서 가져온 데이터로 articleDto 업데이트
-        articleDto.setBoard(board);
-        articleDto.setTitle(title);
-        articleDto.setContent(content);
-        articleDto.setPassword(password);
-
         Long newId = articleService.create(articleDto).getShopArticleId();
         model.addAttribute("boards", Board.values());
         redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
-
-        // 세션에서 임시 저장된 폼 데이터 제거
-        session.removeAttribute("board");
-        session.removeAttribute("title");
-        session.removeAttribute("content");
-        session.removeAttribute("password");
-
-        return String.format("redirect:/%s/community/%s/%d", shopId, articleDto.getBoard().name(), newId);
+        if (board == Board.SECRET) {
+            return  String.format("redirect:/%d/community/%s", shopId, articleDto.getBoard().name());
+        }
+        return String.format("redirect:/%d/community/%s/%d", shopId, articleDto.getBoard().name(), newId);
     }
 
     //전체 게시글 보기
@@ -151,6 +137,7 @@ public class ArticleController {
             Board board,
             @PathVariable("shopArticleId")
             Long shopArticleId,
+            HttpSession httpSession,
             Model model
     ) {
         ArticleDto article = articleService.readOne(shopId, shopArticleId);
@@ -160,9 +147,13 @@ public class ArticleController {
         model.addAttribute("board", board);
         model.addAttribute("article", article);
         model.addAttribute("shopArticleId", shopArticleId);
-        if (board == Board.SECRET) {
+
+        // 세션에서 접근 권한 확인
+        Boolean isAuthorized = (Boolean) httpSession.getAttribute(shopArticleId.toString());
+        if (board == Board.SECRET && (isAuthorized == null || !isAuthorized)) {
             return "commu-secret-password";
         }
+        httpSession.removeAttribute(shopArticleId.toString());
         return "commu-article-read";
     }
 
@@ -235,55 +226,30 @@ public class ArticleController {
         return "redirect:/" + shopId + "/community";
     }
 
-    // 일반 게시판 / 비밀 게시판 구분
-    @PostMapping("/article/confirm")
-    public String confirm(
-            @PathVariable("shopId")
-            Long shopId,
-            @RequestParam("board")
-            Board board,
-            @RequestParam("title")
-            String title,
-            @RequestParam("content")
-            String content,
-            HttpSession session,
-            RedirectAttributes redirectAttributes
-    ) {
-        // 폼 데이터를 세션에 임시 저장
-        session.setAttribute("board", board.name());
-        session.setAttribute("title", title);
-        session.setAttribute("content", content);
-
-        // 비밀게시판이면 비밀번호 입력 페이지로 리다이렉션
-        if ("SECRET".equals(board.name())) {
-            return String.format("redirect:/%s/community/article/passwordForm", shopId);
-        }
-        // 비밀게시판이 아니면 바로 게시글 생성 로직으로 이동
-        redirectAttributes.addFlashAttribute("board", board.name());
-        redirectAttributes.addFlashAttribute("title", title);
-        redirectAttributes.addFlashAttribute("content", content);
-        return String.format("redirect:/%s/community/article/create", shopId);
-    }
-
-    // 비밀번호 입력 폼 불러오기
-    @GetMapping("/article/passwordForm")
-    public String passwordForm() {
-        return "commu-secret-password";
-    }
-
     // 비밀번호 입력 폼 제출
-    @PostMapping("/article/password")
+    @PostMapping("{board}/{shopArticleId}/password")
     public String password(
             @PathVariable("shopId")
             Long shopId,
+            @PathVariable("board")
+            Board board,
+            @PathVariable("shopArticleId")
+            Long shopArticleId,
             @RequestParam("password")
             String password,
-            HttpSession session,
-            RedirectAttributes redirectAttributes
+            HttpSession httpSession,
+            Model model
     ) {
-        session.setAttribute("password", password);
-        redirectAttributes.addFlashAttribute("password", password);
-        return String.format("redirect:/%s/community/article/create", shopId);
+        model.addAttribute("shopId", shopId);
+        model.addAttribute("shopArticleId", shopArticleId);
+        model.addAttribute("board", board);
+        if(!articleService.checkPassword(shopArticleId, shopId, password)) {
+            throw new IllegalStateException("권한이 없습니다.");
+        }
+
+        // 비밀번호 일치시 세션에 접근 권한 저장
+        httpSession.setAttribute(shopArticleId.toString(), true);
+        return String.format("redirect:/%d/community/%s/%d", shopId, board.name(), shopArticleId);
     }
 }
 
