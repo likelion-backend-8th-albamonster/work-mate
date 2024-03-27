@@ -1,7 +1,6 @@
 package com.example.workmate.controller.account;
 
 import com.example.workmate.dto.account.AccountDto;
-import com.example.workmate.entity.account.Account;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
@@ -59,12 +58,6 @@ public class ProfileController {
         }
 
         return mailService.checkCode(accountDto.getUsername(), code);
-    }
-
-    // 활성 유저로 전환
-    @PostMapping("/upgrade")
-    public AccountDto upgrade(@PathVariable("id") Long id) {
-        return service.upgrade(id);
     }
 
     // shop에 아르바이트 신청

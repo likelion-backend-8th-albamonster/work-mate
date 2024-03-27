@@ -12,7 +12,6 @@ import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.sql.ast.tree.from.TableAliasResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,23 +41,6 @@ public class AccountService {
         }
 
         return AccountDto.fromEntity(account);
-    }
-
-    // 메일 인증 후 활성 유저로 전환
-    public AccountDto upgrade(Long accountId) {
-        Account target = getAccount(accountId);
-
-        // 메일 인증이 되어있고, 사업자 번호가 있는 계정일 경우
-        if (target.isMailAuth() && !target.getBusinessNumber().isEmpty()) {
-            target.setAuthority(Authority.ROLE_BUSINESS_USER);
-            accountRepo.save(target);
-        }
-        if (target.isMailAuth()) {
-            target.setAuthority(Authority.ROLE_USER);
-            accountRepo.save(target);
-        }
-
-        return AccountDto.fromEntity(target);
     }
 
     // 아르바이트 요청
