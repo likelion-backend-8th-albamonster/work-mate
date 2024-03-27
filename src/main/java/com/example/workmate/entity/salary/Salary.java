@@ -1,16 +1,22 @@
-package com.example.workmate.entity.schedule;
+package com.example.workmate.entity.salary;
 
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.schedule.WorkTime;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDate;
+
+@Slf4j
+@Entity
+@ToString
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity
-public class ChangeRequest {
+public class Salary {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,21 +29,16 @@ public class ChangeRequest {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    //바꿀 사람의 근무시간
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workTime_id")
-    private WorkTime workTime;
-
-    private String cancelReason;
+    private LocalDate salaryDate;
+    private Integer totalSalary;
 
     @Setter
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Status status = Status.OFFERED;
+    private Status status = Status.BEFORE;
 
     public enum Status {
-        OFFERED,
-        DECLINED,
-        CONFIRMED
+        BEFORE,
+        DONE
     }
 }

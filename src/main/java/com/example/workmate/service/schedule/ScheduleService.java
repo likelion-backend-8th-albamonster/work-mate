@@ -1,12 +1,12 @@
 package com.example.workmate.service.schedule;
 
 import com.example.workmate.component.ScheduleUtil;
-import com.example.workmate.dto.WorkTimeDto;
+import com.example.workmate.dto.schedule.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
-import com.example.workmate.entity.WorkTime;
+import com.example.workmate.entity.schedule.WorkTime;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.schedule.ChangeRequest;
@@ -14,7 +14,7 @@ import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
-import com.example.workmate.repo.WorkTimeRepo;
+import com.example.workmate.repo.schedule.WorkTimeRepo;
 import com.example.workmate.repo.schedule.ChangeRequestRepo;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -156,14 +157,14 @@ public class ScheduleService {
     // 처음 근무표 확인으로 들어왔을 때 정한 기간의 근무표를 보기
     public List<WorkTimeDto> viewPeriod(
             Long shopId,
-            ScheduleDto start,
-            ScheduleDto end
+            LocalDate start,
+            LocalDate end
     ){
-        checkMember(shopId);
+        //checkMember(shopId);
 
         // 시작일과 마지막날 구하기
-        LocalDateTime startDay = scheduleUtil.getDay(false, start).atStartOfDay();
-        LocalDateTime endDay = scheduleUtil.getDay(false, end).atTime(LocalTime.MAX);
+        LocalDateTime startDay = start.atStartOfDay();
+        LocalDateTime endDay = end.atTime(LocalTime.MAX);
         List<WorkTime> workTimes = workTimeRepo
                 .findAllByShop_IdAndWorkStartTimeBetweenOrderByWorkStartTimeAsc(
                         shopId, startDay, endDay
