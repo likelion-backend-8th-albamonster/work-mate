@@ -76,14 +76,23 @@ public class AttendanceRepoDsl {
                 .innerJoin(qAttendance.shop, qShop)
                 .where(qAttendance.account.id.eq(accountId))
                 .offset(pageable.getOffset())//페이지번호
-                //.limit(pageable.getPageSize())//페이지사이즈
+                .limit(pageable.getPageSize())//페이지사이즈
                 .fetch();
 
+        //총 데이터 개수
+        Long attendanceLogDtoListSize =
+                queryFactory.select(
+                                    qAttendance.count()
+                                )
+                        .from(qAttendance)
+                        .innerJoin(qAttendance.shop, qShop)
+                        .where(qAttendance.account.id.eq(accountId))
+                        .fetchOne();
 
         return new PageImpl<>(
                 attendanceLogDtoList,
                 pageable,
-                attendanceLogDtoList.size()
+                attendanceLogDtoListSize
         );
     }
 
@@ -110,14 +119,23 @@ public class AttendanceRepoDsl {
                         .innerJoin(qAttendance.shop, qShop)
                         .where(qAttendance.shop.id.in(accountShopList))
                         .offset(pageable.getOffset())//페이지번호
-                        //.limit(pageable.getPageSize())//페이지사이즈
+                        .limit(pageable.getPageSize())//페이지사이즈
                         .fetch();
 
+        Long attendanceLogDtoListSize =
+                queryFactory.select(
+                        qAttendance.count()
+                                )
+                        .from(qAttendance)
+                        .innerJoin(qAttendance.shop, qShop)
+                        .where(qAttendance.shop.id.in(accountShopList))
+                        .fetchOne();
 
         return new PageImpl<>(
                 attendanceLogDtoList,
                 pageable,
-                attendanceLogDtoList.size()
+                attendanceLogDtoListSize
+
         );
     }
 
@@ -126,8 +144,8 @@ public class AttendanceRepoDsl {
     public Page<AttendanceLogDto> readUserOneShopAttendanceLog(Long accountId, Long shopId, Pageable pageable, Authority authority){
         QAttendance qAttendance = new QAttendance("attendance");
         QShop qShop = new QShop("shop");
-        List<AttendanceLogDto> attendanceLogDtoList
-                = new ArrayList<>();
+        List<AttendanceLogDto> attendanceLogDtoList = new ArrayList<>();
+        Long attendanceLogDtoListSize = 0L;
         //관리자
         if (authority != Authority.ROLE_USER){
             // 쿼리의 결과를 DTO 클래스로 매핑해서 가져오기
@@ -149,8 +167,21 @@ public class AttendanceRepoDsl {
                                     qAttendance.shop.id.eq(shopId)
                             )
                             .offset(pageable.getOffset())//페이지번호
-                            //.limit(pageable.getPageSize())//페이지사이즈
+                            .limit(pageable.getPageSize())//페이지사이즈
                             .fetch();
+
+            attendanceLogDtoListSize =
+                    queryFactory.select(
+                                        qAttendance.count()
+                                    )
+                            .from(qAttendance)
+                            .innerJoin(qAttendance.shop, qShop)
+                            .where(
+                                    qAttendance.shop.id.eq(shopId)
+                            )
+                            .offset(pageable.getOffset())//페이지번호
+                            .limit(pageable.getPageSize())//페이지사이즈
+                            .fetchOne();
         } 
         //일반사용자
         else {
@@ -174,14 +205,28 @@ public class AttendanceRepoDsl {
                                     qAttendance.shop.id.eq(shopId)
                             )
                             .offset(pageable.getOffset())//페이지번호
-                            //.limit(pageable.getPageSize())//페이지사이즈
+                            .limit(pageable.getPageSize())//페이지사이즈
                             .fetch();
+
+            attendanceLogDtoListSize =
+                    queryFactory.select(
+                                qAttendance.count()
+                            )
+                            .from(qAttendance)
+                            .innerJoin(qAttendance.shop, qShop)
+                            .where(
+                                    qAttendance.account.id.eq(accountId),
+                                    qAttendance.shop.id.eq(shopId)
+                            )
+                            .offset(pageable.getOffset())//페이지번호
+                            .limit(pageable.getPageSize())//페이지사이즈
+                            .fetchOne();
         }
 
         return new PageImpl<>(
                 attendanceLogDtoList,
                 pageable,
-                attendanceLogDtoList.size()
+                attendanceLogDtoListSize
         );
     }
     //한 매장의 모든 출근 정보
@@ -190,6 +235,7 @@ public class AttendanceRepoDsl {
         QAttendance qAttendance = new QAttendance("attendance");
         QShop qShop = new QShop("shop");
         List<Long> asdf = new ArrayList<>();
+        Long attendanceLogDtoListSize = 0L;
         // 쿼리의 결과를 DTO 클래스로 매핑해서 가져오기
         List<AttendanceLogDto> attendanceLogDtoList =
                 queryFactory.select(
@@ -207,14 +253,23 @@ public class AttendanceRepoDsl {
                         .innerJoin(qAttendance.shop, qShop)
                         .where(qAttendance.shop.id.eq(shopId))
                         .offset(pageable.getOffset())//페이지번호
-                        //.limit(pageable.getPageSize())//페이지사이즈
+                        .limit(pageable.getPageSize())//페이지사이즈
                         .fetch();
 
-
+        attendanceLogDtoListSize =
+                queryFactory.select(
+                            qAttendance.count()
+                        )
+                        .from(qAttendance)
+                        .innerJoin(qAttendance.shop, qShop)
+                        .where(qAttendance.shop.id.eq(shopId))
+                        .offset(pageable.getOffset())//페이지번호
+                        .limit(pageable.getPageSize())//페이지사이즈
+                        .fetchOne();
         return new PageImpl<>(
                 attendanceLogDtoList,
                 pageable,
-                attendanceLogDtoList.size()
+                attendanceLogDtoListSize
         );
     }
 }
