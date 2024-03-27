@@ -1,12 +1,8 @@
 package com.example.workmate.controller.account;
 
-import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.facade.AuthenticationFacade;
-import com.example.workmate.jwt.JwtTokenUtils;
-import com.example.workmate.jwt.dto.JwtResponseDto;
-import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,10 +68,8 @@ public class AccountController {
                     .password(passwordEncoder.encode(password))
                     .name(name)
                     .email(email)
-                    .authority(Authority.ROLE_USER)
+                    .authority(Authority.ROLE_INACTIVE_USER)
                     .build());
-
-            mailService.send(username, email);
         }
         return "redirect:/account/login";
     }
@@ -132,7 +126,7 @@ public class AccountController {
                     .name(name)
                     .email(email)
                     .businessNumber(businessNumber)
-                    .authority(Authority.ROLE_BUSINESS_USER)
+                    .authority(Authority.ROLE_INACTIVE_USER)
                     .build());
         }
         return "redirect:/account/login";

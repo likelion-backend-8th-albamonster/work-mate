@@ -23,6 +23,7 @@ public class AccountDto {
     @Setter
     private Authority authority;
     private List<Long> accountShopsId;
+    private boolean mailAuth;
 
     public static AccountDto fromEntity(Account account) {
         return AccountDto.builder()
@@ -33,6 +34,7 @@ public class AccountDto {
                 .email(account.getEmail())
                 .businessNumber(account.getBusinessNumber())
                 .accountShopsId(account.getAccountShops().stream().map(AccountShop::getId).toList())
+                .mailAuth(account.isMailAuth())
                 .authority(account.getAuthority())
                 .build();
     }

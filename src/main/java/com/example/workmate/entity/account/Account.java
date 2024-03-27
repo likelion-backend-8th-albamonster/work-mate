@@ -25,11 +25,10 @@ public class Account {
     @Column(nullable = false)
     private String email;       // 이메일
     private String businessNumber;  // 사업자 등록번호
+    @Setter
     @Enumerated(EnumType.STRING)
     private Authority authority;    // 권한
-
     @Setter
-
     private boolean mailAuth;   // 메일 인증 여부, false면 아직. true면 받음
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
