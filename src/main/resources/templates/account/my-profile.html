@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -13,7 +13,7 @@
 <div id="profile">
     <!-- 프로필 정보가 여기에 표시됩니다 -->
 </div>
-
+<a href="">로그아웃</a>
 
 <script>
     $(document).ready(function () {
@@ -34,11 +34,43 @@
             contentType: "application/json",
             success: function (account) {
                 console.log(token);
-                $('#profile').html(`
-                    <h2>${account.name}</h2>
-                    <p>ID: ${account.username}</p>
-                    <p>Email: ${account.email}</p>
-                `);
+
+                let shopPromises = [];
+
+                // 각 accountShop의 id를 이용하여 실제 Shop 데이터를 불러오는 Promise를 생성하여 배열에 추가
+                account.accountShopsId.forEach(id => {
+                    let promise = $.ajax({
+                        type: "GET",
+                        url: `/shop/${id}`, // 해당 URL은 각 Shop의 정보를 반환하는 API 엔드포인트여야 합니다.
+                        headers: headers,
+                        contentType: "application/json"
+                    });
+                    shopPromises.push(promise);
+                });
+
+                // 모든 Promise를 병렬로 실행하고, 모든 Shop 데이터를 가져온 후에 아래의 코드를 실행
+                Promise.all(shopPromises)
+                    .then(shops => {
+                        let shopList = shops.map(shop => `<li>${shop.name}</li>`).join('');
+
+                        // 비어있는 경우
+                        if (shopList === '') {
+                            shopList = '<p>아르바이트 중인 매장이 없습니다.</p>';
+                        }
+
+                        $('#profile').html(`
+                        <h2>${account.name}</h2>
+                        <p>ID: ${account.username}</p>
+                        <p>Email: ${account.email}</p>
+                        <p>아르바이트</p>
+                        <ul>
+                            ${shopList}
+                        </ul>
+                    `);
+                    })
+                    .catch(error => {
+                        console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
+                    });
             },
             error: function (xhr, status, error) {
                 console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
@@ -46,6 +78,5 @@
         });
     });
 </script>
-
 </body>
 </html>
