@@ -43,15 +43,17 @@
             }
 
             const formData = {
-                name: $('#shop-name').val() // 입력 필드에서 매장 이름을 가져옴
+                name: $('input[name="shop-name"]').val() // 입력 필드에서 매장 이름을 가져옴
             };
+
+            console.log(formData);
 
             $.ajax({
                 type: "POST",
                 url: "/profile/submit",
                 headers: headers,
-                contentType: "application/json",
-                data: JSON.stringify(formData),
+                contentType: "application/json", // Content-Type을 application/json으로 설정
+                data: JSON.stringify(formData), // JSON 형식의 데이터 전송
                 success: function (data) {
                     alert("요청을 보냈습니다.");
                     console.log("success: ", data);

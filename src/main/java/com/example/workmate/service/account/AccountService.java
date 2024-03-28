@@ -92,6 +92,10 @@ public class AccountService {
                 .email(account.getEmail())
                 .build());
 
+        if (accountShopRepo.existsByShop_IdAndAccount_Id(shop.getId(), account.getId())) {
+            log.error("해당 매장에 이미 아르바이트 요청을 보냈습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
         return AccountShopDto.fromEntity(accountShopRepo.save(newAccountShop));
     }
 
