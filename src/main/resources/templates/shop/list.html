@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <title>Shop List</title>
 </head>
 <body>
@@ -14,26 +15,53 @@
 
 <!-- 매장이 있는 경우 -->
 <div id="shops" th:unless="${shops.isEmpty()}" th:each="shop : ${shops}">
-    <a th:href="@{/shop/{id}(id=${shop.id})}"><h5 th:text="${shop.name}"></h5></a>
+        <div>
+            <a th:href="@{/shop/{id}(id=${shop.id})}"><h3 th:text="${shop.name}"></h3></a>
+            <p>아르바이트 등록을 원한다면, 매장 이름을 정확히 입력하세요.</p>
+            <form action="/profile/submit" method="post">
+            <input id="shop-name" name="shop-name" type="text" placeholder="매장 이름">
+            <button id="shop-submit" type="submit">
+                <label for="shop-name">제출</label>
+            </button>
+            </form>
+        </div>
+    <hr>
 </div>
-
-<!--<script>
+<script>
+    // 제출 버튼 클릭했을 때 submit
     $(document).ready(function (){
-        // 로그인 페이지에서 저장한 토큰을 가져옴
-        const token = localStorage.getItem("jwtToken");
-        const headers = {};
+        $('#shop-submit').click(function(e) {
+            e.preventDefault(); // 기본 제출 이벤트를 막음
 
-        // 토큰이 있으면 헤더에 추가
-        if (token) {
-            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
-        }
+            // 로그인 페이지에서 저장한 토큰을 가져옴
+            const token = localStorage.getItem("jwtToken");
+            const headers = {};
 
-        $.ajax({
-            type:"GET",
-            url:"/"
-        })
-    })
-</script>-->
+            // 토큰이 있으면 헤더에 추가
+            if (token) {
+                headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+            }
 
+            const formData = {
+                name: $('#shop-name').val() // 입력 필드에서 매장 이름을 가져옴
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/profile/submit",
+                headers: headers,
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (data) {
+                    alert("요청을 보냈습니다.");
+                    console.log("success: ", data);
+                },
+                error: function (xhr, status, error) {
+                    console.log("아르바이트 등록 실패", xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

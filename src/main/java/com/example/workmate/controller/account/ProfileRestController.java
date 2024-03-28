@@ -74,10 +74,8 @@ public class ProfileRestController {
 
     // shop에 아르바이트 신청
     @PostMapping("/submit")
-    public String submit(
-            @RequestParam("name") String name
-    ) {
-        return String.format("Status: %s",service.submit(name).toString());
+    public AccountShopDto submit(@RequestBody ShopDto dto) {
+        return service.submit(dto.getName());
     }
 
     @PostMapping("/accept/{accountShopId}")

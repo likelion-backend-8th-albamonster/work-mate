@@ -2,7 +2,6 @@ package com.example.workmate.service.account;
 
 import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.account.AccountShopDto;
-import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
@@ -58,7 +57,7 @@ public class AccountService {
     }
 
     // 아르바이트 요청
-    public AccountStatus submit(String name) {
+    public AccountShopDto submit(String name) {
         AccountShop newAccountShop = new AccountShop();
 
         // 아르바이트를 요청할 사용자 정보, 매장 정보 불러오기
@@ -93,9 +92,7 @@ public class AccountService {
                 .email(account.getEmail())
                 .build());
 
-        accountShopRepo.save(newAccountShop);
-
-        return newAccountShop.getStatus();
+        return AccountShopDto.fromEntity(accountShopRepo.save(newAccountShop));
     }
 
     // Shop에서 아르바이트생으로 등록
