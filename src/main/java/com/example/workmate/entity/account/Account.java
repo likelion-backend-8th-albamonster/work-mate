@@ -20,16 +20,18 @@ public class Account {
     private String username;    // 유저 아이디
     @Column(nullable = false)
     private String password;    // 비밀번호
+    @Setter
     @Column(nullable = false)
     private String name;        // 유저 이름
+    @Setter
     @Column(nullable = false)
     private String email;       // 이메일
+    @Setter
     private String businessNumber;  // 사업자 등록번호
+    @Setter
     @Enumerated(EnumType.STRING)
     private Authority authority;    // 권한
-
     @Setter
-
     private boolean mailAuth;   // 메일 인증 여부, false면 아직. true면 받음
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

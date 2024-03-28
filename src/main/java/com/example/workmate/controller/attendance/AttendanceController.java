@@ -58,7 +58,6 @@ public class AttendanceController {
                         ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
                                 "매장 정보를 확인해주세요")));
 
-        model.addAttribute("userIp", "194.114.136.73");
         //오늘 날짜에 이미 기록된 출근이 있는지 확인
         boolean isExist = attendanceService.isExistTodayCheckIn(accountId, shopId);
         model.addAttribute("isExist", isExist);
@@ -236,7 +235,7 @@ public class AttendanceController {
             Long shopId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "5", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "2", required = false)
             Integer pageSize,
             Model model
     ){
@@ -261,6 +260,7 @@ public class AttendanceController {
             attendanceLogList
                     = attendanceService.showLog(pageNumber,pageSize, accountId, shopId, account.getAuthority());
         }
+
         //사용자
         model.addAttribute("account", account);
         //출퇴근상태
@@ -270,6 +270,8 @@ public class AttendanceController {
         //매장명
         model.addAttribute("shopList",
                 attendanceService.readOneAccountShopList(accountId));
+        //shop id
+        model.addAttribute("shopId", shopId);
         //사용자 권한
         model.addAttribute("auth", account.getAuthority());
         return "attendance/attendanceLog";
