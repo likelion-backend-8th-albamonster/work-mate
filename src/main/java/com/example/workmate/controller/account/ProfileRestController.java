@@ -35,9 +35,8 @@ public class ProfileRestController {
     }
 
     // 이메일 코드를 보낸다.
-    @PostMapping("/{id}/email-check")
+    @PostMapping("email-check")
     public String checkEmail(
-            @PathVariable("id") Long id,
             @RequestParam("username") String username,
             @RequestParam("email") String email
     ) {
@@ -46,9 +45,8 @@ public class ProfileRestController {
     }
 
     // 이메일 코드 일치하는지 체크
-    @PostMapping("/{id}/check-code")
+    @PostMapping("/check-code")
     public String checkCode(
-            @PathVariable("id") Long id,
             @RequestParam("password") String password,
             @RequestParam("code") String code
     ) {
@@ -67,21 +65,19 @@ public class ProfileRestController {
     }
 
     // shop에 아르바이트 신청
-    @PostMapping("/{id}/submit")
+    @PostMapping("/submit")
     public String submit(
-            @PathVariable("id") Long id,
             @RequestParam("name") String name
     ) {
-        return String.format("%d Status: %s", id, service.submit(id,name).toString());
+        return String.format("Status: %s",service.submit(name).toString());
     }
 
-    @PostMapping("/{id}/accept/{accountShopId}")
+    @PostMapping("/accept/{accountShopId}")
     public String accept(
-            @PathVariable("id") Long id,
             @PathVariable("accountShopId") Long accountShopId,
             @RequestParam("flag") boolean flag
     ) {
-        return String.format("%d Status: %s", id, service.accept(id, accountShopId, flag));
+        return String.format("Status: %s", service.accept(accountShopId, flag));
     }
 }
 

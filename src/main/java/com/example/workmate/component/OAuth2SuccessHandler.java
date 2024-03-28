@@ -1,23 +1,20 @@
 package com.example.workmate.component;
 
-import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.jwt.JwtTokenUtils;
-import com.example.workmate.repo.AccountRepo;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
@@ -33,7 +30,6 @@ public class OAuth2SuccessHandler
     private final JwtTokenUtils tokenUtils;
     // 사용자 정보 등록을 위해 UserDetailsManager
     private final UserDetailsManager userDetailsManager;
-    private final AccountRepo accountRepo;
 
     @Override
     public void onAuthenticationSuccess(
@@ -68,8 +64,15 @@ public class OAuth2SuccessHandler
         UserDetails details
                 = userDetailsManager.loadUserByUsername(username);
         // JWT 생성
-        String jwt = tokenUtils.generateToken(details);
-        log.info("Token: {}", jwt);
+        String token = tokenUtils.generateToken(details);
+        log.info("Token: {}", token);
+
+/*
+        Cookie cookie = new Cookie("jwt", token);
+        cookie.setHttpOnly(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
+*/
 
         // 어디로 리다이렉트 할지 지정
         String targetUrl = "http://localhost:8080/my-profile";

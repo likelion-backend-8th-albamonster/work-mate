@@ -55,11 +55,11 @@ public class AccountService {
     }
 
     // 아르바이트 요청
-    public AccountStatus submit(Long accountId, String name) {
+    public AccountStatus submit(String name) {
         AccountShop newAccountShop = new AccountShop();
 
         // 아르바이트를 요청할 사용자 정보, 매장 정보 불러오기
-        Account account = getAccount(accountId);
+        Account account = authFacade.getAccount();
         Shop shop = getShopByName(name);
 
         log.info("auth user: {}", authFacade.getAuth().getName());
@@ -96,8 +96,8 @@ public class AccountService {
     }
 
     // Shop에서 아르바이트생으로 등록
-    public String accept(Long accountId, Long accountShopId, boolean flag) {
-        Account account = getAccount(accountId);
+    public String accept(Long accountShopId, boolean flag) {
+        Account account = authFacade.getAccount();
         AccountShop target = getAccountShop(accountShopId);
         Shop shop = getShop(target.getShop().getId());
 
@@ -139,17 +139,6 @@ public class AccountService {
     private boolean isAuthority(Authority authority) {
         // 비활성 유저인 경우 true
         return authority.equals(Authority.ROLE_INACTIVE_USER);
-    }
-
-    // 사용자 불러오기
-    private Account getAccount(Long id) {
-        Optional<Account> optionalAccount = accountRepo.findById(id);
-        if (optionalAccount.isEmpty()) {
-            log.error("사용자를 찾을 수 없습니다.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        return optionalAccount.get();
     }
 
     // 이름으로 매장 불러오기

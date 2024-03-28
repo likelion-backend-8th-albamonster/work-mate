@@ -25,11 +25,11 @@ public class AuthenticationFacade {
 
     public Account getAccount() {
         Authentication authentication = getAuth();
-        if (authentication.getPrincipal() instanceof CustomAccountDetails customAccountDetails) {
+        if (authentication.getPrincipal() instanceof CustomAccountDetails) {
+            CustomAccountDetails customAccountDetails = (CustomAccountDetails) authentication.getPrincipal();
             return accountRepo.findByUsername(customAccountDetails.getUsername())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        }
-        else {
+        } else {
             throw new RuntimeException("Fail TypeCasting");
         }
     }
