@@ -14,6 +14,9 @@
     <!-- 프로필 정보가 여기에 표시됩니다 -->
 </div>
 
+<hr>
+<a href="/shop">아르바이트 매장 추가하기</a>
+<hr>
 <a href="/account/logout">로그아웃</a>
 <script>
     $(document).ready(function () {
@@ -58,7 +61,7 @@
 
                         // 비어있는 경우
                         if (shopList === '') {
-                            shopList = '<p>아르바이트 중인 매장이 없습니다.</p>';
+                            shopList += '<p>아르바이트 중인 매장이 없습니다.</p>';
                         }
 
                         $('#profile').html(`

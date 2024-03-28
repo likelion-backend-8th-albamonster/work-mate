@@ -4,51 +4,76 @@ import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.service.ShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Slf4j
-@RestController
+@Controller
 @RequestMapping("/shop")
 @RequiredArgsConstructor
 public class ShopController {
-    private final ShopService service;
+    private final ShopService shopService;
+
+    // CREATE Shop Form
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("shop", model);
+        return "shop/create";
+    }
 
     // CREATE Shop
     @PostMapping("/create")
-    public ShopDto createShop(@RequestBody ShopDto dto) {
-        return service.createShop(dto);
+    public String createShop(@ModelAttribute Model model) {
+        shopService.createShop((ShopDto) model);
+        return "redirect:/shop";
     }
 
     // READ All Shop
-    @GetMapping("/read-all")
-    public List<ShopDto> readAllShop() {
-        return service.readAllShop();
+    @GetMapping
+    public String readAllShop(Model model) {
+        List<ShopDto> shops = shopService.readAllShop();
+        model.addAttribute("shops", shops);
+        return "shop/list";
     }
 
     // READ ONE Shop By ID
     @GetMapping("/{id}")
-    public ShopDto readOneShop(@PathVariable("id") Long id) {
-        return service.readOneShop(id);
+    public String readOneShop(@PathVariable("id") Long id, Model model) {
+        ShopDto shop = shopService.readOneShop(id);
+        model.addAttribute("shop", shop);
+        return "shop/detail";
     }
 
     // READ ONE Shop By Name
-    @GetMapping("/read-one")
-    public ShopDto readOneShopByName(@RequestParam("name") String name) {
-        return service.readOneShopByName(name);
+    @GetMapping("/search")
+    public String readOneShopByName(@RequestParam("name") String name, Model model) {
+        ShopDto shop = shopService.readOneShopByName(name);
+        model.addAttribute("shop", shop);
+        return "shop/detail";
+    }
+
+    // UPDATE Shop Form
+    @GetMapping("/{id}/update")
+    public String showUpdateForm(@PathVariable("id") Long id, Model model) {
+        ShopDto shop = shopService.readOneShop(id);
+        model.addAttribute("shop", shop);
+        return "shop/update";
     }
 
     // UPDATE Shop
     @PostMapping("/{id}/update")
-    public ShopDto updateShop(@PathVariable("id") Long id,@RequestBody ShopDto dto) {
-        return service.updateShop(id, dto);
+    public String updateShop(@PathVariable("id") Long id, @ModelAttribute ShopDto dto) {
+        shopService.updateShop(id, dto);
+        return "redirect:/shop";
     }
 
     // DELETE Shop
-    @DeleteMapping("/{id}/delete")
+    @PostMapping("/{id}/delete")
     public String deleteShop(@PathVariable("id") Long id) {
-        service.deleteShop(id);
-        return "delete shop";
+        shopService.deleteShop(id);
+        return "redirect:/shop";
     }
 }

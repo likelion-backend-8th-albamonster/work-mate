@@ -67,12 +67,10 @@ public class OAuth2SuccessHandler
         String token = tokenUtils.generateToken(details);
         log.info("Token: {}", token);
 
-/*
-        Cookie cookie = new Cookie("jwt", token);
+        Cookie cookie = new Cookie("jwtToken", token);
         cookie.setHttpOnly(false);
         cookie.setPath("/");
         response.addCookie(cookie);
-*/
 
         // 어디로 리다이렉트 할지 지정
         String targetUrl = "http://localhost:8080/my-profile";
