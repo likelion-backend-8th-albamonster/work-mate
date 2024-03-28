@@ -3,17 +3,13 @@ package com.example.workmate.controller.account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.facade.AuthenticationFacade;
-import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Controller
@@ -23,7 +19,6 @@ public class AccountController {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationFacade authFacade;
-    private final MailService mailService;
 
     @GetMapping("/home")
     public String home() {
@@ -72,31 +67,6 @@ public class AccountController {
                     .build());
         }
         return "redirect:/account/login";
-    }
-
-    @PostMapping("check-code")
-    public String checkCode(
-            @RequestParam("username")
-            String username,
-            @RequestParam("password")
-            String password,
-            @RequestParam("code")
-            String code
-    ){
-        if (!manager.userExists(username)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        UserDetails userDetails = manager.loadUserByUsername(username);
-        log.info("username: {}", userDetails.getUsername());
-        log.info("password: {}", userDetails.getPassword());
-
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            log.error("비밀번호가 일치하지 않습니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        return mailService.checkCode(username, code);
     }
 
     @GetMapping("/business-register")

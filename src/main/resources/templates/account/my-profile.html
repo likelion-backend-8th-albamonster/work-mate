@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Profile</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<h1>마이페이지</h1>
+<div id="profile">
+    <!-- 프로필 정보가 여기에 표시됩니다 -->
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // 로그인 페이지에서 저장한 토큰을 가져옴
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        // 서버에 토큰을 전달하여 프로필 정보 요청
+        $.ajax({
+            type: "GET",
+            url: "/profile",
+            headers: headers,
+            contentType: "application/json",
+            success: function (account) {
+                console.log(token);
+                $('#profile').html(`
+                    <h2>${account.name}</h2>
+                    <p>ID: ${account.username}</p>
+                    <p>Email: ${account.email}</p>
+                `);
+            },
+            error: function (xhr, status, error) {
+                console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

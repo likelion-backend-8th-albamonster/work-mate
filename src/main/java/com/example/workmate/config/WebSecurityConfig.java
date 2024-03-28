@@ -1,6 +1,7 @@
 package com.example.workmate.config;
 
 import com.example.workmate.component.OAuth2SuccessHandler;
+import com.example.workmate.entity.account.Authority;
 import com.example.workmate.jwt.JwtTokenFilter;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.service.account.OAuth2UserServiceImpl;
@@ -28,7 +29,9 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .requestMatchers(
+                                .anyRequest()
+                                .permitAll()
+     /*                           .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
                                         "/account/home",
@@ -49,12 +52,14 @@ public class WebSecurityConfig {
                                 .anonymous()
 
                                 // 권한 설정 필요
-                                .requestMatchers("/profile/{id}/**")
-                                .authenticated()
+                                .requestMatchers(
+                                        "/profile/**",
+                                        "/my-profile/**")
+                                .hasAnyAuthority(Authority.ROLE_ADMIN.name(), Authority.ROLE_USER.name(), Authority.ROLE_INACTIVE_USER.name(), Authority.ROLE_BUSINESS_USER.name())
 
                                 // 매장 생성 테스트용
                                 .requestMatchers("/shop/**")
-                                .permitAll()
+                                .permitAll()*/
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
@@ -63,9 +68,9 @@ public class WebSecurityConfig {
                                 .userService(oAuth2UserService))
 
                 )
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+//                .sessionManagement(sessionManagement ->
+//                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                )
                 .addFilterBefore(new JwtTokenFilter(jwtTokenUtils, manager),
                         AuthorizationFilter.class)
         ;
