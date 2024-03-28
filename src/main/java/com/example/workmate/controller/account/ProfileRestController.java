@@ -14,9 +14,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @RestController
-@RequestMapping("/profile/{id}")
+@RequestMapping("/profile")
 @RequiredArgsConstructor
-public class ProfileController {
+public class ProfileRestController {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
     private final AccountService service;
@@ -24,18 +24,18 @@ public class ProfileController {
 
     // profile 정보 가져오기
     @GetMapping
-    public AccountDto readOneAccount(@PathVariable("id") Long id) {
-       return service.readOneAccount(id);
+    public AccountDto readOneAccount() {
+       return service.readOneAccount();
     }
 
     // 정보 업데이트
-    @PostMapping("/update")
+    @PostMapping("/{id}/update")
     public AccountDto updateAccount(@PathVariable("id") Long id, AccountDto dto) {
         return service.updateAccount(id, dto);
     }
 
     // 이메일 코드를 보낸다.
-    @PostMapping("/email-check")
+    @PostMapping("/{id}/email-check")
     public String checkEmail(
             @PathVariable("id") Long id,
             @RequestParam("username") String username,
@@ -46,13 +46,13 @@ public class ProfileController {
     }
 
     // 이메일 코드 일치하는지 체크
-    @PostMapping("/check-code")
+    @PostMapping("/{id}/check-code")
     public String checkCode(
             @PathVariable("id") Long id,
             @RequestParam("password") String password,
             @RequestParam("code") String code
     ) {
-        AccountDto accountDto = service.readOneAccount(id);
+        AccountDto accountDto = service.readOneAccount();
 
         UserDetails userDetails = manager.loadUserByUsername(accountDto.getUsername());
         log.info("username: {}", userDetails.getUsername());
@@ -67,7 +67,7 @@ public class ProfileController {
     }
 
     // shop에 아르바이트 신청
-    @PostMapping("/submit")
+    @PostMapping("/{id}/submit")
     public String submit(
             @PathVariable("id") Long id,
             @RequestParam("name") String name
@@ -75,7 +75,7 @@ public class ProfileController {
         return String.format("%d Status: %s", id, service.submit(id,name).toString());
     }
 
-    @PostMapping("/accept/{accountShopId}")
+    @PostMapping("/{id}/accept/{accountShopId}")
     public String accept(
             @PathVariable("id") Long id,
             @PathVariable("accountShopId") Long accountShopId,

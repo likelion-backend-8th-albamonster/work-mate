@@ -28,8 +28,8 @@ public class AccountService {
     private final AuthenticationFacade authFacade;
 
     // 유저 정보 가져오기
-    public AccountDto readOneAccount(Long id) {
-        Account account = getAccount(id);
+    public AccountDto readOneAccount() {
+        Account account = authFacade.getAccount();
 
         log.info("auth user: {}", authFacade.getAuth().getName());
         log.info("page username: {}", account.getUsername());
