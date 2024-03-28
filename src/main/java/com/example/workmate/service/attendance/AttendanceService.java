@@ -199,8 +199,82 @@ public class AttendanceService {
         return attendanceLogDtoPage;
     }
 
+    //한 사용자의 모든 출퇴근 검색 기록
+    public Page<AttendanceLogDto> showLogAllForSearch(
+            Integer pageNumber,
+            Integer pageSize,
+            Long accountId,
+            Authority authority
+    ){
+        Pageable pageable = PageRequest.of(pageNumber,pageSize,
+                Sort.by("id").descending());
+
+        Page<AttendanceLogDto> attendanceLogDtoPage;
+        //권한 확인
+        //관리자라면
+        if (authority != Authority.ROLE_USER){
+            //한 계정에 대한 모든 accountShop 데이터 가져오기
+            Optional<List<AccountShop>> optionalAccountShopList
+                    = accountShopRepo.findAllByAccount_id(accountId);
+            //데이터 존재 시
+            if (optionalAccountShopList.isPresent()){
+                List<AccountShop> accountShopList
+                        = optionalAccountShopList.orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요")
+                );
+                List<Long> accountShopIdList = new ArrayList<>();
+                //id 추출
+                for(AccountShop accountShop : accountShopList){
+                    accountShopIdList.add(accountShop.getShop().getId());
+                }
+                //데이터 가져오기(관리자용)
+                attendanceLogDtoPage
+                        = attendanceRepoDsl.readUserAttendanceLogForAdmin(accountShopIdList, pageable);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요");
+            }
+
+
+        } else {
+            //일반 사용자라면
+            attendanceLogDtoPage
+                    = attendanceRepoDsl.readUserAttendanceLog(accountId, pageable);
+        }
+
+        return attendanceLogDtoPage;
+    }
+
     //출퇴근
     public Page<AttendanceLogDto> showLog(
+            Integer pageNumber,
+            Integer pageSize,
+            Long accountId,
+            Long shopId,
+            Authority authority
+    ){
+        //사용자 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+        //매장 확인
+        Shop shop = shopRepo.findById(shopId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "매장 정보를 확인해주세요")
+                );
+
+        Pageable pageable = PageRequest.of(pageNumber,pageSize,
+                Sort.by("id").descending());
+
+        //한 계정의 한 매장에 대한 것만 가져온다.
+        Page<AttendanceLogDto> attendanceLogDtoPage
+                = attendanceRepoDsl.readUserOneShopAttendanceLog(accountId, shopId, pageable, authority);
+
+        return attendanceLogDtoPage;
+    }
+
+    //출퇴근 검색기록
+    public Page<AttendanceLogDto> showLogForSearch(
             Integer pageNumber,
             Integer pageSize,
             Long accountId,
@@ -335,7 +409,36 @@ public class AttendanceService {
         return AttendanceDto.fromEntity(attendance);
     }
 
-    //TODO 검색기능
 
+    //검색기능
+    public Page<AttendanceLogDto> showLogSearch(
+            Long accountId,
+            Long shopId,
+            Integer pageNumber,
+            Integer pageSize,
+            String searchDuration,
+            String searchWord,
+            String searchType,
+            Account account
+    ){
+        Page<AttendanceLogDto> attendanceLogList;
+        //매장 id가 주어지지 않을 때
+        if (shopId == 0){
+            //한 유저의 모든 매장 출근 검색 데이터 가져오기
+            //service와 dsl 작성
+            //searchDuration, searchWord, searchType 필수로 넘기기
+            attendanceLogList
+                    = showLogAllForSearch(pageNumber,pageSize, accountId, account.getAuthority());
+        }
+        //매장 id가 주어지고, 아르바이트생일 때
+        else {
+            //한 유저의 한 매장 출근 검색 데이터 가져오기
+            //service와 dsl 작성
+            //searchDuration, searchWord, searchType 필수로 넘기기
+            attendanceLogList
+                    = showLogForSearch(pageNumber,pageSize, accountId, shopId, account.getAuthority());
+        }
+        return attendanceLogList;
+    }
 
 }

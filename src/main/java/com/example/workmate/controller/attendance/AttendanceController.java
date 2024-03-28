@@ -277,14 +277,64 @@ public class AttendanceController {
         return "attendance/attendanceLog";
     }
 
+    //출퇴근 기록 검색 페이지
+    //pagenation
+    @PostMapping("/showLog/search/{accountId}")
+    public String showLogSearch(
+            @PathVariable("accountId")
+            Long accountId,
+            @RequestParam(value = "shopId", defaultValue = "0", required = false)
+            Long shopId,
+            @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
+            Integer pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = "2", required = false)
+            Integer pageSize,
+            @RequestParam(value = "searchDuration", defaultValue = "", required = true)
+            String searchDuration,
+            @RequestParam(value = "searchWord", defaultValue = "", required = true)
+            String searchWord,
+            @RequestParam(value = "searchType", defaultValue = "", required = true)
+            String searchType,
+            Model model
+    ){
+        //해당매장에 다니는 사람인지 체크
+        //scheduleService.checkMember(shopId);
+        //사용자정보 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+
+        //검색 서비스
+        Page<AttendanceLogDto> attendanceLogList
+                = attendanceService.showLogSearch(
+                        accountId,shopId,pageNumber,pageSize,
+                        searchDuration,searchWord,searchType, account);
+
+        //사용자
+        model.addAttribute("account", account);
+        //출퇴근상태
+        model.addAttribute("statusList", Status.values());
+        //출근기록
+        model.addAttribute("attendanceLogList", attendanceLogList);
+        //매장명
+        model.addAttribute("shopList",
+                attendanceService.readOneAccountShopList(accountId));
+        //shop id
+        model.addAttribute("shopId", shopId);
+        //사용자 권한
+        model.addAttribute("auth", account.getAuthority());
+        return String.format("redirect:/attendance/showLog/%d", accountId);
+    }
+
     //출퇴근 수정(관리자)
     //모든 아르바이트생의 출퇴근 기록 수정 가능
     //Status를 수정하여, 정상출근 / 지각 / 조퇴 상태 변경
-    @PostMapping("/update/{accountId}/{shopId}")
+    @PostMapping("/update/{accountId}")
     public String update(
             @PathVariable("accountId")
             Long accountId,
-            @PathVariable("shopId")
+            @RequestParam("shopId")
             Long shopId,
             @RequestParam("attendanceId")
             Long attendanceId,
@@ -324,7 +374,7 @@ public class AttendanceController {
         //일괄 update
         //attendanceService.updateLogAll(shopId,updateDto);
         redirectAttributes.addFlashAttribute("msg", "수정되었습니다! 클릭한번에 알바생의 일급 삭제! ^0^");
-        return String.format("redirect:/attendance/showLog/%d/%d", accountId,shopId);
+        return String.format("redirect:/attendance/showLog/%d", accountId);
 
     }
 }
