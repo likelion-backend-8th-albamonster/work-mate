@@ -1,6 +1,7 @@
 package com.example.workmate.controller.community;
 
 import com.example.workmate.dto.community.ArticleDto;
+import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.entity.community.Article;
 import com.example.workmate.entity.community.Board;
 import com.example.workmate.repo.community.ArticleRepo;
@@ -13,9 +14,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
@@ -45,7 +51,7 @@ public class ArticleController {
         model.addAttribute("boards", Board.values());
         model.addAttribute("selectedBoard", selectedBoard);
 
-        return "commu-article-new";
+        return "community/commu-article-new";
     }
 
     // 게시글 작성 폼 제출
@@ -94,7 +100,7 @@ public class ArticleController {
         model.addAttribute("articles", articles);
         model.addAttribute("selectedBoard", null);
         model.addAttribute("noticeArticles", noticeArticles);
-        return "commu-article-main";
+        return "community/commu-article-main";
     }
 
     //BOARD별 보기
@@ -125,7 +131,7 @@ public class ArticleController {
         model.addAttribute("articles", articles);
         model.addAttribute("noticeArticles", noticeArticles);
 
-        return "commu-article-main";
+        return "community/commu-article-main";
     }
 
     //게시글 하나 보기
@@ -151,10 +157,10 @@ public class ArticleController {
         // 세션에서 접근 권한 확인
         Boolean isAuthorized = (Boolean) httpSession.getAttribute(shopArticleId.toString());
         if (board == Board.SECRET && (isAuthorized == null || !isAuthorized)) {
-            return "commu-secret-password";
+            return "community/commu-secret-password";
         }
         httpSession.removeAttribute(shopArticleId.toString());
-        return "commu-article-read";
+        return "community/commu-article-read";
     }
 
     //게시글 수정 페이지로 이동
@@ -183,9 +189,9 @@ public class ArticleController {
             model.addAttribute("shopArticleId", shopArticleId);
         } else {
             model.addAttribute("errorMessage", "게시글이 없습니다");
-            return "redirect:/error-page";
+            return "redirect:community/error-page";
         }
-        return "commu-article-edit";
+        return "community/commu-article-edit";
     }
 
     // 게시글 수정 처리

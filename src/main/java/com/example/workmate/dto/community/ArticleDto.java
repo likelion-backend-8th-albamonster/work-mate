@@ -43,7 +43,7 @@ public class ArticleDto {
                 .board(entity.getBoard())
                 .comments(commentDtos)
                 .accountId(entity.getAccount() != null ? entity.getAccount().getId() : null) //임시
-                .accountName(entity.getAccount() != null ? entity.getAccount().getUsername() : "익명") //임시
+                .accountName(entity.getAccount() != null ? entity.getAccount().getName() : "익명") //임시
                 .shopId(entity.getShop().getId())
                 .password(entity.getPassword())
                 .articleWriteTime(entity.getArticleWriteTime())

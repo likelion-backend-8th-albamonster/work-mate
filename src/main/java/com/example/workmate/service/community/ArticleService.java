@@ -3,8 +3,10 @@ package com.example.workmate.service.community;
 import com.example.workmate.dto.community.ArticleDto;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.entity.community.Article;
 import com.example.workmate.entity.community.Board;
+import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.repo.community.ArticleRepo;
@@ -13,7 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +31,20 @@ public class ArticleService {
     private final ArticleRepo articleRepo;
     private final ShopRepo shopRepo;
     private final AccountRepo accountRepo;
+    private final AuthenticationFacade authFacade;
+    private final UserDetailsManager userDetailsManager;
+
+    // 사용자 인증 정보 불러오기
+    public Long getAccountId() {
+        String username = authFacade.getAuth().getName();
+        UserDetails details
+                = userDetailsManager.loadUserByUsername(username);
+        accountRepo.findByUsername(username);
+        Account account = accountRepo.findByUsername(details.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return account.getId();
+    }
+
 
     // 게시글 작성
     public ArticleDto create(
@@ -32,7 +53,10 @@ public class ArticleService {
         Shop shop = shopRepo.findById(articleDto.getShopId())
                 .orElseThrow();
 
-        Account account = null; // 테스트용
+        Long accountId = getAccountId();
+
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(() -> new IllegalStateException("계정 정보를 찾을 수 없습니다."));
         if (articleDto.getAccountId() != null) {
             account = accountRepo.findById(articleDto.getAccountId())
                     .orElseThrow();
