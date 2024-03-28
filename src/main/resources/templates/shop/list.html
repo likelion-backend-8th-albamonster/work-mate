@@ -7,7 +7,8 @@
 </head>
 <body>
 <h1>아르바이트 가능 매장</h1>
-
+<a href="/shop/create">매장 등록하기</a>
+<hr>
 <!-- 아르바이트 가능 매장이 없는 경우 -->
 <div th:if="${shops.isEmpty()}">
     <p>아르바이트 가능한 매장이 없습니다.</p>
@@ -27,6 +28,7 @@
         </div>
     <hr>
 </div>
+<a href="/my-profile">Back</a>
 <script>
     // 제출 버튼 클릭했을 때 submit
     $(document).ready(function (){

@@ -2,6 +2,8 @@ package com.example.workmate.service;
 
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.Shop;
+import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.account.Authority;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.ShopRepo;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,14 @@ public class ShopService {
 
     // CREATE Shop
     public ShopDto createShop(ShopDto dto) {
+        Account account = authenticationFacade.getAccount();
+        log.info("account: {}", account.getUsername());
+
+        if (checkAuthority(account)) {
+            log.error("권한이 없습니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         Shop newShop = Shop.builder()
                 .name(dto.getName())
                 .address(dto.getAddress())
@@ -69,5 +79,12 @@ public class ShopService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         shopRepo.delete(target);
+    }
+
+    // Check Authority
+    public boolean checkAuthority(Account account) {
+        // 비활성유저거나 일반 유저일 경우 true
+        return account.getAuthority().equals(Authority.ROLE_INACTIVE_USER)
+                || account.getAuthority().equals(Authority.ROLE_USER);
     }
 }

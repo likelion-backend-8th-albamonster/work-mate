@@ -24,13 +24,6 @@ public class ShopController {
         return "shop/create";
     }
 
-    // CREATE Shop
-    @PostMapping("/create")
-    public String createShop(@ModelAttribute Model model) {
-        shopService.createShop((ShopDto) model);
-        return "redirect:/shop";
-    }
-
     // READ All Shop
     @GetMapping
     public String readAllShop(Model model) {
