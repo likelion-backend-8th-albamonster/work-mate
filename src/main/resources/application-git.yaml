@@ -36,7 +36,7 @@ spring:
         registration:
           naver:
             client-id: DNQ5JTGwdG1r8NIma66c
-            client-secret: <client-secret>
+            client-secret: p1aXVhtiEB
             redirect-uri: http://localhost:8080/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post

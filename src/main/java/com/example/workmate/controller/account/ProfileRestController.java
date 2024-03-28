@@ -1,6 +1,8 @@
 package com.example.workmate.controller.account;
 
 import com.example.workmate.dto.account.AccountDto;
+import com.example.workmate.dto.account.AccountShopDto;
+import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,12 @@ public class ProfileRestController {
        return service.readOneAccount();
     }
 
+    @GetMapping("/{id}")
+    public String readOneAccountShop(@PathVariable("id") Long id) {
+        AccountShopDto accountShopDto = AccountShopDto.fromEntity(service.getAccountShop(id));
+        return service.ShopName(accountShopDto.getId());
+    }
+
     // 정보 업데이트
     @PostMapping("/{id}/update")
     public AccountDto updateAccount(@PathVariable("id") Long id, AccountDto dto) {
@@ -35,7 +43,7 @@ public class ProfileRestController {
     }
 
     // 이메일 코드를 보낸다.
-    @PostMapping("email-check")
+    @PostMapping("/email-check")
     public String checkEmail(
             @RequestParam("username") String username,
             @RequestParam("email") String email

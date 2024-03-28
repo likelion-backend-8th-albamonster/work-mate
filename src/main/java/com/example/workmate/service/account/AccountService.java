@@ -1,6 +1,8 @@
 package com.example.workmate.service.account;
 
 import com.example.workmate.dto.account.AccountDto;
+import com.example.workmate.dto.account.AccountShopDto;
+import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -162,12 +165,21 @@ public class AccountService {
     }
 
     // AccountShop 불러오기
-    private AccountShop getAccountShop(Long id) {
+    public AccountShop getAccountShop(Long id) {
         Optional<AccountShop> optionalAccountShop = accountShopRepo.findById(id);
         if (optionalAccountShop.isEmpty()) {
             log.error("요청을 찾을 수 없습니다.");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return optionalAccountShop.get();
+    }
+
+    // AccountShop의 Shop불러오기
+    public String ShopName(Long id) {
+        AccountShop accountShop = getAccountShop(id);
+        String shopName = accountShop.getShop().getName();
+        log.info("shop: {}", shopName);
+
+        return shopName;
     }
 }

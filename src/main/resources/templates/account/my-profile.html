@@ -41,17 +41,20 @@
                 account.accountShopsId.forEach(id => {
                     let promise = $.ajax({
                         type: "GET",
-                        url: `/shop/${id}`, // 해당 URL은 각 Shop의 정보를 반환하는 API 엔드포인트여야 합니다.
+                        url: `/profile/${id}`, // 해당 URL은 각 Shop의 정보를 반환하는 API 엔드포인트여야 합니다.
                         headers: headers,
                         contentType: "application/json"
                     });
                     shopPromises.push(promise);
                 });
 
-                // 모든 Promise를 병렬로 실행하고, 모든 Shop 데이터를 가져온 후에 아래의 코드를 실행
                 Promise.all(shopPromises)
                     .then(shops => {
-                        let shopList = shops.map(shop => `<li>${shop.name}</li>`).join('');
+                        let shopList = '';
+
+                        shops.forEach(shop => {
+                            shopList += `<li>${shop}</li>`;
+                        });
 
                         // 비어있는 경우
                         if (shopList === '') {
@@ -59,14 +62,14 @@
                         }
 
                         $('#profile').html(`
-                        <h2>${account.name}</h2>
-                        <p>ID: ${account.username}</p>
-                        <p>Email: ${account.email}</p>
-                        <p>아르바이트</p>
-                        <ul>
-                            ${shopList}
-                        </ul>
-                    `);
+                            <h2>${account.name}</h2>
+                            <p>ID: ${account.username}</p>
+                            <p>Email: ${account.email}</p>
+                            <p>아르바이트</p>
+                            <ul>
+                                ${shopList}
+                            </ul>
+                        `);
                     })
                     .catch(error => {
                         console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
