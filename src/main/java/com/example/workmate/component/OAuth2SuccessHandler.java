@@ -71,13 +71,8 @@ public class OAuth2SuccessHandler
         String jwt = tokenUtils.generateToken(details);
         log.info("Token: {}", jwt);
 
-        // Account DB에서 계정 가져옴
-        Account account = accountRepo.findByUsername(details.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("account ID: {}", account.getId());
-
         // 어디로 리다이렉트 할지 지정
-        String targetUrl = String.format("http://localhost:8080/profile/%d", account.getId());
+        String targetUrl = "http://localhost:8080/my-profile";
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
