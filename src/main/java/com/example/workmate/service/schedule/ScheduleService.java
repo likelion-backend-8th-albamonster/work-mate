@@ -162,6 +162,7 @@ public class ScheduleService {
     ){
         //checkMember(shopId);
 
+        log.info("viewPeriod");
         // 시작일과 마지막날 구하기
         LocalDateTime startDay = start.atStartOfDay();
         LocalDateTime endDay = end.atTime(LocalTime.MAX);
