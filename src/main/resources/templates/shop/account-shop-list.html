@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>아르바이트 명단 확인</title>
+</head>
+<body>
+<h1>아르바이트 명단</h1>
+<hr>
+<div id="shop-account">
+
+</div>
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+    $(document).ready(function (){
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        console.log(token);
+
+        // 현재 페이지의 URL 가져오기
+        const currentPageUrl = window.location.href;
+        // 현재 페이지의 URL에서 {id} 추출
+        const shopId = extractShopIdFromUrl(currentPageUrl);
+
+        $.ajax({
+            type:"GET",
+            url: "/api/shop/" + shopId + "/shop-account", // 수정된 부분
+            headers: headers,
+            success: function (data) {
+                console.log(data); // 성공했을 때 데이터 처리
+
+                Object.entries(data).forEach(([name, status]) => {
+                    $('#shop-account').append(`<p>${name}: ${status}</p>`);
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error(error); // 에러 처리
+            }
+        });
+
+        // URL에서 {id} 추출하는 함수
+        function extractShopIdFromUrl(url) {
+            // URL에서 /shop/ 다음에 오는 부분을 추출하여 반환
+            const idIndex = url.indexOf("/shop/") + "/shop/".length;
+            const idSubstring = url.substring(idIndex);
+            const id = idSubstring.split("/")[0];
+            return id;
+        }
+    });
+</script>
+</html>

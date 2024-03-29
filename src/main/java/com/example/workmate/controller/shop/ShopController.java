@@ -69,4 +69,11 @@ public class ShopController {
         shopService.deleteShop(id);
         return "redirect:/shop";
     }
+
+    // 아르바이트 요청 명단 불러오기
+    @GetMapping("/{id}/shop-account")
+    public String getAccountByAccountShop(@PathVariable("id") Long id) {
+        shopService.getAccountByAccountShop(id);
+        return "shop/account-shop-list";
+    }
 }
