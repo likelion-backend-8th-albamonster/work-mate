@@ -204,12 +204,32 @@ public class AttendanceService {
             Integer pageNumber,
             Integer pageSize,
             Long accountId,
-            Authority authority
+            Authority authority,
+            String searchDuration,
+            String searchWord,
+            String searchType
     ){
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
                 Sort.by("id").descending());
 
         Page<AttendanceLogDto> attendanceLogDtoPage;
+
+        //기간 확인
+        LocalDateTime thisTime = LocalDateTime.now();
+        LocalDateTime searchTime;
+
+        if ("allDay".equals(searchDuration)){
+            searchTime = null;
+        } else if("oneMonth".equals(searchDuration)){
+            searchTime = thisTime.minusMonths(1);
+        }else if("oneWeek".equals(searchDuration)){
+            searchTime = thisTime.minusWeeks(1);
+        }else if("oneDay".equals(searchDuration)){
+            searchTime = thisTime.minusDays(1);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "검색기간을 확인해주세요");
+        }
+
         //권한 확인
         //관리자라면
         if (authority != Authority.ROLE_USER){
@@ -229,7 +249,11 @@ public class AttendanceService {
                 }
                 //데이터 가져오기(관리자용)
                 attendanceLogDtoPage
-                        = attendanceRepoDsl.readUserAttendanceLogForAdmin(accountShopIdList, pageable);
+                        = attendanceRepoDsl
+                            .readUserAttendanceLogForAdminForSearch(
+                                    accountShopIdList, pageable,
+                                    thisTime, searchTime,
+                                    searchWord, searchType);
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "계정과 매장 정보를 확인해주세요");
             }
@@ -238,7 +262,11 @@ public class AttendanceService {
         } else {
             //일반 사용자라면
             attendanceLogDtoPage
-                    = attendanceRepoDsl.readUserAttendanceLog(accountId, pageable);
+                    = attendanceRepoDsl
+                        .readUserAttendanceLogForSearch(
+                                accountId, pageable,
+                                thisTime, searchTime,
+                                searchWord, searchType);
         }
 
         return attendanceLogDtoPage;
@@ -279,7 +307,10 @@ public class AttendanceService {
             Integer pageSize,
             Long accountId,
             Long shopId,
-            Authority authority
+            Authority authority,
+            String searchDuration,
+            String searchWord,
+            String searchType
     ){
         //사용자 확인
         Account account = accountRepo.findById(accountId)
@@ -413,7 +444,6 @@ public class AttendanceService {
     //검색기능
     public Page<AttendanceLogDto> showLogSearch(
             Long accountId,
-            Long shopId,
             Integer pageNumber,
             Integer pageSize,
             String searchDuration,
@@ -422,22 +452,13 @@ public class AttendanceService {
             Account account
     ){
         Page<AttendanceLogDto> attendanceLogList;
-        //매장 id가 주어지지 않을 때
-        if (shopId == 0){
-            //한 유저의 모든 매장 출근 검색 데이터 가져오기
-            //service와 dsl 작성
-            //searchDuration, searchWord, searchType 필수로 넘기기
-            attendanceLogList
-                    = showLogAllForSearch(pageNumber,pageSize, accountId, account.getAuthority());
-        }
-        //매장 id가 주어지고, 아르바이트생일 때
-        else {
-            //한 유저의 한 매장 출근 검색 데이터 가져오기
-            //service와 dsl 작성
-            //searchDuration, searchWord, searchType 필수로 넘기기
-            attendanceLogList
-                    = showLogForSearch(pageNumber,pageSize, accountId, shopId, account.getAuthority());
-        }
+        //한 유저의 모든 매장 출근 검색 데이터 가져오기
+        attendanceLogList
+                = showLogAllForSearch(
+                        pageNumber,pageSize,
+                        accountId, account.getAuthority(),
+                        searchDuration,searchWord,searchType);
+
         return attendanceLogList;
     }
 
