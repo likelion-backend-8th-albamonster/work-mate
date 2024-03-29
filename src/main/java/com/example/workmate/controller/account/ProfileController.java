@@ -9,4 +9,9 @@ public class ProfileController {
     public String myProfile() {
         return "account/my-profile";
     }
+
+    @GetMapping("/email-check")
+    public String emailCheck() {
+        return "account/check-email";
+    }
 }

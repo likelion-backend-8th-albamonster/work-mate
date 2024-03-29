@@ -44,12 +44,11 @@ public class ProfileRestController {
 
     // 이메일 코드를 보낸다.
     @PostMapping("/email-check")
-    public String checkEmail(
+    public void checkEmail(
             @RequestParam("username") String username,
             @RequestParam("email") String email
     ) {
         mailService.send(username, email);
-        return "send code";
     }
 
     // 이메일 코드 일치하는지 체크

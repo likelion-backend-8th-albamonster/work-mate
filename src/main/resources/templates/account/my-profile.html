@@ -13,7 +13,7 @@
 <div id="profile">
     <!-- 프로필 정보가 여기에 표시됩니다 -->
 </div>
-
+<a href="/email-check">이메일 확인하기</a>
 <hr>
 <a href="/shop">아르바이트 매장 추가하기</a>
 <hr>
@@ -54,7 +54,6 @@
                 Promise.all(shopPromises)
                     .then(shops => {
                         let shopList = '';
-
                         shops.forEach(shop => {
                             shopList += `<li>${shop}</li>`;
                         });
@@ -65,7 +64,7 @@
                         }
 
                         $('#profile').html(`
-                            <h2>${account.name}</h2>
+                            <h2>${account.name}님 반갑습니다.</h2>
                             <p>ID: ${account.username}</p>
                             <p>Email: ${account.email}</p>
                             <p>아르바이트</p>
