@@ -19,7 +19,7 @@
 </div>
 <div>
     <form th:action="@{/attendance/showLog/search/{accountId}(accountId=${account.getId()})}" method="get">
-        <select id="searchDuration" name="searchType">
+        <select id="searchDuration" name="searchDuration">
             <th:div>
                 <option value="allDay" name="allDay" selected="selected">전체기간</option>
                 <option value="oneDay" name="oneDay">하루</option>
