@@ -57,6 +57,7 @@ public class OAuth2SuccessHandler
                     .email(email)
                     .password(providerId)
                     .authority(Authority.ROLE_USER)
+                    .mailAuth(true)
                     .build());
         }
 

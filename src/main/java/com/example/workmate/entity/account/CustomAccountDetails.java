@@ -22,6 +22,7 @@ public class CustomAccountDetails implements UserDetails {
     private String name;
     private String email;
     private String businessNumber;
+    private boolean mailAuth;
     private Authority authority;
 
     @Override
