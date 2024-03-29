@@ -30,6 +30,8 @@
             headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
         }
 
+        console.log(token)
+
         $("#submit-btn").click(function() {
             const shopName = $("#shop-name").val();
             const shopAddress = $("#shop-address").val();
@@ -45,7 +47,7 @@
                 headers: headers,
                 contentType: "application/json",
                 data: JSON.stringify(requestData),
-                success: function (shop, account) {
+                success: function (shop) {
                     console.log("매장이 성공적으로 생성되었습니다:", shop);
                     // 생성된 매장 정보를 처리하거나 표시하는 작업을 수행할 수 있습니다.
                     alert("매장이 등록되었습니다.")
