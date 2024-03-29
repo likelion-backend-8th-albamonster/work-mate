@@ -19,6 +19,12 @@
 
 <body class="p-3">
 <div class="container mt-3 mb-5">
+  <!-- 선택한 게시판 이름 -->
+  <div class="d-flex align-items-center">
+    <h1 class="me-3" th:if="${board == null}">전체 게시글</h1>
+    <h1 class="me-3" th:unless="${board == null}" th:text="${board.board}">게시판 이름</h1>
+  </div>
+  <hr>
   <!-- 게시글 수정 폼 안내 -->
   <div class="d-flex align-items-center">
     <h1 class="me-3">게시글 수정</h1>
