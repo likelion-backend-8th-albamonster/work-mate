@@ -44,8 +44,7 @@ public class OAuth2SuccessHandler
         // 넘겨받은 정보를 바탕으로 사용자 정보를 준비
         String email = oAuth2User.getAttribute("email");
         String name = oAuth2User.getAttribute("name");
-        String provider = oAuth2User.getAttribute("provider");
-        String username = String.format("{%s}%s", provider, email);
+        String username = String.format("%s", email);
         String providerId = oAuth2User.getAttribute("id");
 
         // 처음으로 이 소셜 로그인으로 로그인을 시도했다.

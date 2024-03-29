@@ -24,6 +24,8 @@
         const token = localStorage.getItem("jwtToken");
         const headers = {};
 
+        // console.log(`token = ${token}`);
+
         // 토큰이 있으면 헤더에 추가
         if (token) {
             headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
@@ -32,12 +34,12 @@
         // 서버에 토큰을 전달하여 프로필 정보 요청
         $.ajax({
             type: "GET",
-            url: "/profile",
+            url: `/profile`,
             headers: headers,
             contentType: "application/json",
             success: function (account) {
                 console.log(token);
-
+                console.log(account);
                 let shopPromises = [];
 
                 // 각 accountShop의 id를 이용하여 실제 Shop 데이터를 불러오는 Promise를 생성하여 배열에 추가

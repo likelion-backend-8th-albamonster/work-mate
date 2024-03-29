@@ -8,9 +8,11 @@ import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.facade.AuthenticationFacade;
+import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
