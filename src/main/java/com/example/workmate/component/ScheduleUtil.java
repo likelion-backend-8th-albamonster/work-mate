@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -18,7 +19,7 @@ public class ScheduleUtil {
         if((dto.getDay() == 0)){
             LocalDate localDate = LocalDate.of(dto.getYear(), dto.getMonth(), 1);
             YearMonth month = YearMonth.from(localDate);
-            if (flag == true)
+            if (flag)
                 return localDate;
             return month.atEndOfMonth();
         }
@@ -31,6 +32,7 @@ public class ScheduleUtil {
         return (localDate.getDayOfWeek().getValue())%7;
     }
 
+    // 캘린더 한달 칸 수 만들어주기
     public List<Integer> makeCalender(ScheduleDto dto){
         LocalDate localDate = LocalDate.of(dto.getYear(), dto.getMonth(), 1);
         YearMonth month = YearMonth.from(localDate);
@@ -54,13 +56,15 @@ public class ScheduleUtil {
         return days;
     }
 
-    public List<LocalDate> listSchedule(LocalDate startTime, LocalDate endTime){
-        LocalDate date = LocalDate.ofEpochDay(endTime.toEpochDay() - startTime.toEpochDay());
+    public List<LocalDate> listSchedule(LocalDate startDate, LocalDate endDate){
+        LocalDate date = LocalDate.ofEpochDay(endDate.toEpochDay() - startDate.toEpochDay());
         int intDate = date.getDayOfYear();
 
+        log.info("intDate: {}",intDate);
         List<LocalDate> listSchedule = new ArrayList<>();
         for (int i = 0; i < intDate; i++) {
-            listSchedule.add(date.plusDays(i));
+            listSchedule.add(startDate.plusDays(i));
+            log.info(listSchedule.get(i).toString());
         }
         return listSchedule;
     }
