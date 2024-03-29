@@ -39,11 +39,11 @@ public interface ArticleRepo extends JpaRepository<Article, Long> {
     @Query(
             "SELECT a " +
                     "FROM Article a " +
-                    "WHERE (:type = 'title' AND a.title LIKE %:keyword%) " +
-                    "OR (:type = 'content' AND a.content LIKE %:keyword%) " +
+                    "WHERE ((:type = 'title' AND a.title LIKE %:keyword%) " +
+                    "OR (:type = 'content' AND a.content LIKE %:keyword%)) " +
                     "AND a.board = :board"
     )
-    Page<Article> findByKeyewordContainingAndBoard(
+    Page<Article> findByKeywordContainingAndBoard(
             @Param("type") String type,
             @Param("keyword") String keyword,
             @Param("board") Board board,

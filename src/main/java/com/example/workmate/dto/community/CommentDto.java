@@ -25,8 +25,8 @@ public class CommentDto {
                 .content(entity.getContent())
                 .articleId(entity.getArticle().getId())
                 .shopArticleId(entity.getArticle().getShopArticleId())
-                .accountId(entity.getAccount() != null ? entity.getAccount().getId() : null)
-                .accountName(entity.getAccount() != null ? entity.getAccount().getUsername() : null)
+                .accountId(entity.getAccount().getId())
+                .accountName(entity.getAccount().getName())
                 .commentWriteTime(entity.getCommentWriteTime())
                 .build();
     }

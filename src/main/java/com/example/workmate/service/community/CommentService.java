@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -19,19 +21,23 @@ public class CommentService {
     private final ArticleRepo articleRepo;
     private final CommentRepo commentRepo;
     private final AccountRepo accountRepo;
+    private final ArticleService articleService;
 
     public CommentDto create(
             Long shopId,
             Long shopArticleId,
             CommentDto commentDto
     ) {
+        // 게시글 가져오기
         Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
                 .orElseThrow();
-        Account account = null;
-        if (commentDto.getAccountId() != null) {
-            account = accountRepo.findById(commentDto.getAccountId())
-                    .orElseThrow();
-        }
+
+        // 사용자 accountId 가져오기
+        Long accountId = articleService.getAccountId();
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(() -> new IllegalStateException("계정 정보를 찾을 수 없습니다."));
+
+        // DTO 저장
         Comment comment = commentRepo.save(Comment.builder()
                 .account(account)
                 .article(article)
@@ -45,9 +51,15 @@ public class CommentService {
             Long commentId,
             CommentDto commentDto
     ) {
+        // 코멘트 가져오기
         Comment comment = commentRepo.findById(commentId)
                 .orElseThrow();
-        if (comment.getAccount() != null && comment.getAccount().getId().equals(commentDto.getAccountId())) {
+
+        // 현재 접속한 accountId 가져오기
+        Long accountId = articleService.getAccountId();
+
+        // 현재 유저와 comment에서 가져온 accountId 비교하기
+        if (comment.getAccount().getId().equals(accountId)) {
             comment.setContent(commentDto.getContent());
         } else {
             throw new IllegalStateException("권한이 없습니다.");
@@ -59,9 +71,16 @@ public class CommentService {
             Long commentId,
             CommentDto commentDto
     ) {
+        // 코멘트 가져오기
         Comment comment = commentRepo.findById(commentId)
-                .orElseThrow();
-        if (comment.getAccount() != null &&comment.getAccount().getId().equals(commentDto.getAccountId())) {
+                .orElseThrow(() -> new IllegalStateException ("댓글이 없습니다."));
+
+        // 현재 접속한 accountId 가져오기
+        Long accountId = articleService.getAccountId();
+
+        // 현재 유저와 comment에서 가져온 accountId 비교하기
+        if (comment.getAccount().getId().equals(accountId)
+                || articleService.checkAccessRights()) {
             commentRepo.delete(comment);
         } else {
             throw new IllegalStateException("권한이 없습니다.");

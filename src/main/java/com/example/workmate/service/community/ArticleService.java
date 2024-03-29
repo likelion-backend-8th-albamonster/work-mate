@@ -1,13 +1,15 @@
 package com.example.workmate.service.community;
 
 import com.example.workmate.dto.community.ArticleDto;
+import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
-import com.example.workmate.entity.account.CustomAccountDetails;
+import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.community.Article;
 import com.example.workmate.entity.community.Board;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
+import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
 import com.example.workmate.repo.community.ArticleRepo;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +18,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static com.example.workmate.entity.account.Authority.ROLE_ADMIN;
+import static com.example.workmate.entity.account.Authority.ROLE_BUSINESS_USER;
 
 @Slf4j
 @Service
@@ -33,37 +40,85 @@ public class ArticleService {
     private final AccountRepo accountRepo;
     private final AuthenticationFacade authFacade;
     private final UserDetailsManager userDetailsManager;
+    private final AccountShopRepo accountShopRepo;
 
     // 사용자 인증 정보 불러오기
     public Long getAccountId() {
         String username = authFacade.getAuth().getName();
-        UserDetails details
-                = userDetailsManager.loadUserByUsername(username);
-        accountRepo.findByUsername(username);
+        UserDetails details = userDetailsManager.loadUserByUsername(username);
         Account account = accountRepo.findByUsername(details.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "계정을 찾을 수 없습니다."));
         return account.getId();
     }
 
+    // 사용자 인증 정보를 기반으로 shopId List를 가져오기
+    public List<AccountShop> getShopId() {
+        Long accountId = getAccountId();
+        Optional<List<AccountShop>> accountShopsOpt
+                = accountShopRepo.findAllByAccount_id(accountId);
+        // Optional : null X-> 그 안의 리스트를 반환
+        // Optional : null  -> 빈 리스트 반환
+        return accountShopsOpt.orElseGet(Collections::emptyList);
+    }
+
+//    // 사용자 인증 정보를 기반으로 authority 가져오기
+//    public AccountStatus getAthority() {
+//        Long accountId = getAccountId();
+//        AccountStatus accountStatus = accountRepo.
+//    }
+
+    // 사용자 & 매장 매칭 정보 & 상태 확인하기
+    public boolean checkAccountShop(Long shopId) {
+        List<AccountShop> accountShops = getShopId();
+
+        // ACCEPT 일 때 true 반환
+        return accountShops.stream()
+                .anyMatch(accountShop -> accountShop.getShop().getId().equals(shopId)
+                && accountShop.getStatus() == AccountStatus.ACCEPT);
+    }
+
+    // 사용자 일치 여부 확인하기
+    public boolean checkAccountId(Long shopArticleId, Long shopId) {
+        Optional<Article> articleOpt = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId);
+        if (!articleOpt.isPresent()) {
+            throw new IllegalStateException("해당 게시글을 찾을 수 없습니다.");
+        }
+        Article article = articleOpt.get();
+        Long currentUserId = getAccountId();
+        return article.getAccount().getId().equals(currentUserId);
+    }
+
+    //매니저, 관리자 권한 체크하기
+    public boolean checkAccessRights() {
+        Long accountId = getAccountId();
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(() -> new IllegalStateException("계정 정보를 찾을 수 없습니다."));
+        return account.getAuthority().equals(ROLE_ADMIN)
+                || account.getAuthority().equals(ROLE_BUSINESS_USER);
+    }
 
     // 게시글 작성
     public ArticleDto create(
             ArticleDto articleDto
     ) {
         Shop shop = shopRepo.findById(articleDto.getShopId())
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalStateException("상점 정보를 찾을 수 없습니다."));
 
         Long accountId = getAccountId();
-
         Account account = accountRepo.findById(accountId)
                 .orElseThrow(() -> new IllegalStateException("계정 정보를 찾을 수 없습니다."));
-        if (articleDto.getAccountId() != null) {
-            account = accountRepo.findById(articleDto.getAccountId())
-                    .orElseThrow();
+
+
+        // 공지사항 작성 권한 확인
+        if(articleDto.getBoard().equals(Board.NOTICE) && !checkAccessRights()) {
+            throw new IllegalStateException("공지 사항 작성 권한이 없습니다.");
         }
 
+        // 매장별 고유 게시글 Id 부여
         Long lastShopArticleId = articleRepo.findLastShopArticleIdByShop(shop.getId())
                 .orElse(0L) + 1;
+
+        // 게시글 DTO 저장
         Article article = articleRepo.save(Article.builder()
                 .title(articleDto.getTitle())
                 .content(articleDto.getContent())
@@ -74,6 +129,7 @@ public class ArticleService {
                 .account(account)
                 .shop(shop)
                 .build());
+
         return ArticleDto.fromEntity(article);
     }
 
@@ -111,29 +167,52 @@ public class ArticleService {
             ArticleDto articleDto
     ) {
         Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
-                .orElseThrow();
-        if (article.getAccount() != null && article.getAccount().getId().equals(articleDto.getAccountId())) {
-            article.setTitle(articleDto.getTitle());
-            article.setContent(articleDto.getContent());
-        } else {
-            throw new IllegalStateException("권한이 없습니다.");
+                .orElseThrow(() -> new IllegalStateException("해당 게시글을 찾을 수 없습니다."));
+
+        // 지금 로그인 사용자의 accountId 가져오기
+        Long accountId = getAccountId();
+        // 게시글 작성자와 현재 사용자 ID 일치 여부 확인
+        boolean isAuthor = article.getAccount().getId().equals(accountId);
+
+        log.info("수정 시도자 account Id: {}", accountId);
+        log.info("수정 대상 게시글 account Id :{}", article.getAccount().getId());
+
+        // 게시글 작성자 아니면 수정 권한 없음
+        if (!isAuthor) {
+            throw new IllegalStateException("수정 권한이 없습니다.");
         }
+        // 게시글 작성자가 현재 사용자와 일치하면 제목, 내용 수정
+        article.setTitle(articleDto.getTitle());
+        article.setContent(articleDto.getContent());
+
         return ArticleDto.fromEntity(articleRepo.save(article));
     }
 
     // 게시글 삭제하기
     public void delete(
             Long shopId,
-            Long shopArticleId,
-            ArticleDto articleDto
+            Long shopArticleId
     ) {
         Article article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId)
-                .orElseThrow();
-        if (article.getAccount() != null && article.getAccount().getId().equals(articleDto.getAccountId())) {
-            articleRepo.delete(article);
-        } else {
-            throw new IllegalStateException("권한이 없습니다.");
+                .orElseThrow(() -> new IllegalStateException("해당 게시글을 찾을 수 없습니다."));
+
+        // 지금 로그인 사용자의 accountId 가져오기
+        Long accountId = getAccountId();
+        // 게시글 작성자와 현재 사용자 ID 일치 여부 확인
+        boolean isAuthor = article.getAccount().getId().equals(accountId);
+        // 매니저 또는 관리자 권한 여부 확인
+        boolean hasAdminRights = checkAccessRights();
+
+        log.info("삭제 시도자 account Id: {}", accountId);
+        log.info("삭제 대상 게시글 account Id :{}", article.getAccount().getId());
+
+        // 게시글 작성자 && 매니저, 관리자 아니면 삭제 권한 없음
+        if (!isAuthor && !hasAdminRights) {
+            throw new IllegalStateException("삭제 권한이 없습니다.");
         }
+
+        // 게시글 삭제
+        articleRepo.delete(article);
     }
 
     // 게시글 검색하기
@@ -153,7 +232,7 @@ public class ArticleService {
             Board board,
             Pageable pageable
     ) {
-        return articleRepo.findByKeyewordContainingAndBoard(type, keyword, board, pageable)
+        return articleRepo.findByKeywordContainingAndBoard(type, keyword, board, pageable)
                 .map(ArticleDto::fromEntity);
     }
 

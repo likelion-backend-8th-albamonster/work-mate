@@ -11,7 +11,7 @@ public class CommuExceptionHandler {
             IllegalStateException e,
             Model model
     ) {
-        model.addAttribute("errorMessage", "권한이 없습니다");
-        return "commu-error-page";
+        model.addAttribute("errorMessage", e.getMessage());
+        return "community/commu-error-page";
     }
 }

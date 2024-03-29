@@ -2,8 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title th:if="${selectedBoard == null}">게시판: 전체 게시글</title>
-  <title th:unless="${selectedBoard == null}">게시판: [[${selectedBoard.board}]]</title>
+  <title th:if="${board == null}">게시판: 전체 게시글</title>
+  <title th:unless="${board == null}">게시판: [[${board.board}]]</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
@@ -20,11 +20,26 @@
 
 <body class="p-3">
 <div class="container mt-3 mb-5">
+  <div class="d-flex align-items-center justify-content-between">
+    <!-- 게시판 이름  -->
+    <div>
+      <h1 class="me-3" th:if="${board == null}">전체 게시글</h1>
+      <h1 class="me-3" th:unless="${board == null}" th:text="${board.board}">게시판 이름</h1>
+    </div>
+
+    <!-- 홈으로 가기 버튼 -->
+    <div>
+      <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-secondary">홈으로 가기</a>
+    </div>
+  </div>
+  <hr>
   <!-- 게시글 제목 안내 -->
-  <div class="d-flex justify-content-between mt-3">
+  <div class="d-flex justify-content-between align-items-center">
     <h1 th:text="${article.title}"></h1>
-    <!-- 홈으로 가기 -->
-    <p><a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-secondary">홈으로 가기</a>
+    <div>
+      <span th:text="${article.accountName}"></span>
+      <span th:text="${#temporals.format(article.articleWriteTime, 'yyyy-MM-dd HH:mm')}"></span>
+    </div>
   </div>
   <hr>
 
@@ -68,19 +83,19 @@
     <!-- 유저 이름 -->
     <div class="d-flex justify-content-between align-items-center">
       <div>
-        <h5 class="me-3" th:text="${comment.accountName}"></h5>
+        <span class="me-3" th:text="${comment.accountName}"></span>
         <!-- 작성 시간 -->
         <span th:text="${#temporals.format(comment.commentWriteTime, 'yyyy-MM-dd HH:mm')}"></span>
       </div>
       <!-- 댓글 삭제 폼 제출 -->
-      <div class="d-flex justify-content-end">
-        <form class="d-flex align-items-center justify-content-end"
-              th:action="@{'/' + ${shopId} + '/community/' + ${board} + '/' + ${shopArticleId} + '/comment/' + ${comment.id} + '/delete'}"
-              method="post">
-          <!-- 댓글 삭제 버튼 -->
-          <input type="submit" class="btn btn-danger" value="댓글 삭제">
-        </form>
-      </div>
+
+      <form class="d-flex align-items-center justify-content-end"
+            th:action="@{'/' + ${shopId} + '/community/' + ${board} + '/' + ${shopArticleId} + '/comment/' + ${comment.id} + '/delete'}"
+            method="post">
+        <!-- 댓글 삭제 버튼 -->
+        <input type="submit" class="btn btn-danger" value="댓글 삭제">
+      </form>
+
     </div>
     <!-- 댓글 내용 -->
     <p th:text="${comment.content}"></p>
