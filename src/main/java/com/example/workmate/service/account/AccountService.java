@@ -1,21 +1,26 @@
 package com.example.workmate.service.account;
 
 import com.example.workmate.dto.account.AccountDto;
+import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.facade.AuthenticationFacade;
+import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -55,11 +60,11 @@ public class AccountService {
     }
 
     // 아르바이트 요청
-    public AccountStatus submit(Long accountId, String name) {
+    public AccountShopDto submit(String name) {
         AccountShop newAccountShop = new AccountShop();
 
         // 아르바이트를 요청할 사용자 정보, 매장 정보 불러오기
-        Account account = getAccount(accountId);
+        Account account = authFacade.getAccount();
         Shop shop = getShopByName(name);
 
         log.info("auth user: {}", authFacade.getAuth().getName());
@@ -90,14 +95,16 @@ public class AccountService {
                 .email(account.getEmail())
                 .build());
 
-        accountShopRepo.save(newAccountShop);
-
-        return newAccountShop.getStatus();
+        if (accountShopRepo.existsByShop_IdAndAccount_Id(shop.getId(), account.getId())) {
+            log.error("해당 매장에 이미 아르바이트 요청을 보냈습니다.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        return AccountShopDto.fromEntity(accountShopRepo.save(newAccountShop));
     }
 
     // Shop에서 아르바이트생으로 등록
-    public String accept(Long accountId, Long accountShopId, boolean flag) {
-        Account account = getAccount(accountId);
+    public String accept(Long accountShopId, boolean flag) {
+        Account account = authFacade.getAccount();
         AccountShop target = getAccountShop(accountShopId);
         Shop shop = getShop(target.getShop().getId());
 
@@ -141,17 +148,6 @@ public class AccountService {
         return authority.equals(Authority.ROLE_INACTIVE_USER);
     }
 
-    // 사용자 불러오기
-    private Account getAccount(Long id) {
-        Optional<Account> optionalAccount = accountRepo.findById(id);
-        if (optionalAccount.isEmpty()) {
-            log.error("사용자를 찾을 수 없습니다.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        return optionalAccount.get();
-    }
-
     // 이름으로 매장 불러오기
     private Shop getShopByName(String name) {
         Optional<Shop> optionalShop = shopRepo.findByName(name);
@@ -173,12 +169,21 @@ public class AccountService {
     }
 
     // AccountShop 불러오기
-    private AccountShop getAccountShop(Long id) {
+    public AccountShop getAccountShop(Long id) {
         Optional<AccountShop> optionalAccountShop = accountShopRepo.findById(id);
         if (optionalAccountShop.isEmpty()) {
             log.error("요청을 찾을 수 없습니다.");
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         return optionalAccountShop.get();
+    }
+
+    // AccountShop의 Shop불러오기
+    public String ShopName(Long id) {
+        AccountShop accountShop = getAccountShop(id);
+        String shopName = accountShop.getShop().getName();
+        log.info("shop: {}", shopName);
+
+        return shopName;
     }
 }

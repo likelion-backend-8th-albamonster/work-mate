@@ -29,6 +29,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
                     .name("admin")
                     .email("admin")
                     .authority(Authority.ROLE_ADMIN)
+                    .mailAuth(true)
                     .build());
         }
     }
@@ -64,7 +65,7 @@ public class JpaUserDetailsManger implements UserDetailsManager {
                     .email(accountDetails.getEmail())
                     .businessNumber(accountDetails.getBusinessNumber())
                     .authority(accountDetails.getAuthority())
-                    .mailAuth(false)
+                    .mailAuth(accountDetails.isMailAuth())
                     .build();
             log.info("authority: {}", accountDetails.getAuthorities());
 

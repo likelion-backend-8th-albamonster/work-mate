@@ -1,6 +1,8 @@
 package com.example.workmate.controller.account;
 
 import com.example.workmate.dto.account.AccountDto;
+import com.example.workmate.dto.account.AccountShopDto;
+import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,12 @@ public class ProfileRestController {
        return service.readOneAccount();
     }
 
+    @GetMapping("/{id}")
+    public String readOneAccountShop(@PathVariable("id") Long id) {
+        AccountShopDto accountShopDto = AccountShopDto.fromEntity(service.getAccountShop(id));
+        return service.ShopName(accountShopDto.getId());
+    }
+
     // 정보 업데이트
     @PostMapping("/{id}/update")
     public AccountDto updateAccount(@PathVariable("id") Long id, AccountDto dto) {
@@ -35,20 +43,17 @@ public class ProfileRestController {
     }
 
     // 이메일 코드를 보낸다.
-    @PostMapping("/{id}/email-check")
-    public String checkEmail(
-            @PathVariable("id") Long id,
+    @PostMapping("/email-check")
+    public void checkEmail(
             @RequestParam("username") String username,
             @RequestParam("email") String email
     ) {
         mailService.send(username, email);
-        return "send code";
     }
 
     // 이메일 코드 일치하는지 체크
-    @PostMapping("/{id}/check-code")
+    @PostMapping("/check-code")
     public String checkCode(
-            @PathVariable("id") Long id,
             @RequestParam("password") String password,
             @RequestParam("code") String code
     ) {
@@ -67,21 +72,19 @@ public class ProfileRestController {
     }
 
     // shop에 아르바이트 신청
-    @PostMapping("/{id}/submit")
-    public String submit(
-            @PathVariable("id") Long id,
-            @RequestParam("name") String name
+    @PostMapping("/submit")
+    public AccountShopDto submit(
+            @RequestBody ShopDto dto
     ) {
-        return String.format("%d Status: %s", id, service.submit(id,name).toString());
+        return service.submit(dto.getName());
     }
 
-    @PostMapping("/{id}/accept/{accountShopId}")
+    @PostMapping("/accept/{accountShopId}")
     public String accept(
-            @PathVariable("id") Long id,
             @PathVariable("accountShopId") Long accountShopId,
             @RequestParam("flag") boolean flag
     ) {
-        return String.format("%d Status: %s", id, service.accept(id, accountShopId, flag));
+        return String.format("Status: %s", service.accept(accountShopId, flag));
     }
 }
 

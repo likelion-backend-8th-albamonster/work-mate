@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -13,13 +13,18 @@
 <div id="profile">
     <!-- 프로필 정보가 여기에 표시됩니다 -->
 </div>
-
-
+<a href="/email-check">이메일 확인하기</a>
+<hr>
+<a href="/shop">아르바이트 매장 추가하기</a>
+<hr>
+<a href="/account/logout">로그아웃</a>
 <script>
     $(document).ready(function () {
         // 로그인 페이지에서 저장한 토큰을 가져옴
         const token = localStorage.getItem("jwtToken");
         const headers = {};
+
+        // console.log(`token = ${token}`);
 
         // 토큰이 있으면 헤더에 추가
         if (token) {
@@ -29,16 +34,50 @@
         // 서버에 토큰을 전달하여 프로필 정보 요청
         $.ajax({
             type: "GET",
-            url: "/profile",
+            url: `/profile`,
             headers: headers,
             contentType: "application/json",
             success: function (account) {
                 console.log(token);
-                $('#profile').html(`
-                    <h2>${account.name}</h2>
-                    <p>ID: ${account.username}</p>
-                    <p>Email: ${account.email}</p>
-                `);
+                console.log(account);
+                let shopPromises = [];
+
+                // 각 accountShop의 id를 이용하여 실제 Shop 데이터를 불러오는 Promise를 생성하여 배열에 추가
+                account.accountShopsId.forEach(id => {
+                    let promise = $.ajax({
+                        type: "GET",
+                        url: `/profile/${id}`, // 해당 URL은 각 Shop의 정보를 반환하는 API 엔드포인트여야 합니다.
+                        headers: headers,
+                        contentType: "application/json"
+                    });
+                    shopPromises.push(promise);
+                });
+
+                Promise.all(shopPromises)
+                    .then(shops => {
+                        let shopList = '';
+                        shops.forEach(shop => {
+                            shopList += `<li>${shop}</li>`;
+                        });
+
+                        // 비어있는 경우
+                        if (shopList === '') {
+                            shopList += '<p>아르바이트 중인 매장이 없습니다.</p>';
+                        }
+
+                        $('#profile').html(`
+                            <h2>${account.name}님 반갑습니다.</h2>
+                            <p>ID: ${account.username}</p>
+                            <p>Email: ${account.email}</p>
+                            <p>아르바이트</p>
+                            <ul>
+                                ${shopList}
+                            </ul>
+                        `);
+                    })
+                    .catch(error => {
+                        console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
+                    });
             },
             error: function (xhr, status, error) {
                 console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
@@ -46,6 +85,5 @@
         });
     });
 </script>
-
 </body>
 </html>

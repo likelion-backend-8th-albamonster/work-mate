@@ -33,6 +33,11 @@ public class AccountController {
         return "account/login-form";
     }
 
+    @GetMapping("/logout")
+    public String logout() {
+        return "account/logout";
+    }
+
     // 회원가입 화면
     @GetMapping("/register")
     public String registerForm() {
