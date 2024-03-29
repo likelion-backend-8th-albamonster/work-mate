@@ -1,7 +1,6 @@
 package com.example.workmate.controller.community;
 
 import com.example.workmate.dto.community.ArticleDto;
-import com.example.workmate.entity.account.CustomAccountDetails;
 import com.example.workmate.entity.community.Article;
 import com.example.workmate.entity.community.Board;
 import com.example.workmate.repo.community.ArticleRepo;
@@ -14,14 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Arrays;
@@ -70,7 +64,7 @@ public class ArticleController {
         model.addAttribute("boards", Board.values());
         redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
         if (board == Board.SECRET) {
-            return  String.format("redirect:/%d/community/%s", shopId, articleDto.getBoard().name());
+            return String.format("redirect:/%d/community/%s", shopId, articleDto.getBoard().name());
         }
         return String.format("redirect:/%d/community/%s/%d", shopId, articleDto.getBoard().name(), newId);
     }
@@ -156,7 +150,9 @@ public class ArticleController {
 
         // 세션에서 접근 권한 확인
         Boolean isAuthorized = (Boolean) httpSession.getAttribute(shopArticleId.toString());
-        if (board == Board.SECRET && (isAuthorized == null || !isAuthorized)) {
+        if (board == Board.SECRET && articleService.checkAccessRights()) {
+            return "community/commu-article-read";
+        } else if (board == Board.SECRET && (isAuthorized == null || !isAuthorized)) {
             return "community/commu-secret-password";
         }
         httpSession.removeAttribute(shopArticleId.toString());
@@ -172,11 +168,10 @@ public class ArticleController {
             String board,
             @PathVariable("shopArticleId")
             Long shopArticleId,
-            Model model) {
-
-        Optional<Article> articleOpt = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId);
-
-        if (articleOpt.isPresent()) {
+            Model model
+    ) {
+            articleService.checkAccountId(shopArticleId, shopId);
+            Optional<Article> article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId);
             List<Board> filteredBoards = Arrays.stream(Board.values())
                     .filter(b -> !b.name().equals(board.toUpperCase()))
                     .collect(Collectors.toList());
@@ -185,14 +180,11 @@ public class ArticleController {
             model.addAttribute("board", board);
             model.addAttribute("boards", Board.values());
             model.addAttribute("filteredBoards", filteredBoards);
-            model.addAttribute("article", articleOpt.get());
+            model.addAttribute("article", article.get());
             model.addAttribute("shopArticleId", shopArticleId);
-        } else {
-            model.addAttribute("errorMessage", "게시글이 없습니다");
-            return "redirect:community/error-page";
+
+            return "community/commu-article-edit";
         }
-        return "community/commu-article-edit";
-    }
 
     // 게시글 수정 처리
     @PostMapping("{board}/{shopArticleId}/update")
@@ -227,7 +219,7 @@ public class ArticleController {
             ArticleDto articleDto,
             RedirectAttributes redirectAttributes
     ) {
-        articleService.delete(shopId, shopArticleId, articleDto);
+        articleService.delete(shopId, shopArticleId);
         redirectAttributes.addFlashAttribute("message", "게시글이 삭제되었습니다.");
         return "redirect:/" + shopId + "/community";
     }
@@ -249,8 +241,8 @@ public class ArticleController {
         model.addAttribute("shopId", shopId);
         model.addAttribute("shopArticleId", shopArticleId);
         model.addAttribute("board", board);
-        if(!articleService.checkPassword(shopArticleId, shopId, password)) {
-            throw new IllegalStateException("권한이 없습니다.");
+        if (!articleService.checkPassword(shopArticleId, shopId, password)) {
+            throw new IllegalStateException("비밀번호가 틀렸습니다.");
         }
 
         // 비밀번호 일치시 세션에 접근 권한 저장
