@@ -92,39 +92,13 @@ public class ShopService {
 
         shopRepo.delete(target);
     }
+    public AccountDto getAccountByAccountShop(Long shopId) {
+        AccountShop accountShopDto = accountShopRepo.findByShop_Id(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-    public Map<String, AccountStatus>  getAccountByAccountShop(Long shopId) {
-        Account account = accountRepo.findByUsername(authFacade.getAuth().getName())
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Account account = accountShopDto.getAccount();
 
-        if (isAuthority(account.getAuthority())) {
-            log.info("권한이 없습니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        Optional<List<AccountShop>> optionalAccountShopList
-                = accountShopRepo.findAllByShop_id(shopId);
-        if (optionalAccountShopList.isEmpty()) {
-            log.info("아르바이트 명단이 없습니다.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        List<AccountShop> accountShopList = optionalAccountShopList.get();
-
-        List<String> names = accountShopList.stream()
-                .map(AccountShop::getAccount)
-                .map(Account::getName)
-                .toList();
-
-        List<AccountStatus> statuses = accountShopList.stream()
-                .map(AccountShop::getStatus)
-                .toList();
-
-        Map<String, AccountStatus> accountStatusMap = new HashMap<>();
-        for (int i = 0; i < names.size(); i++) {
-            accountStatusMap.put(names.get(i), statuses.get(i));
-        }
-        return accountStatusMap;
+        return AccountDto.fromEntity(account);
     }
 
 

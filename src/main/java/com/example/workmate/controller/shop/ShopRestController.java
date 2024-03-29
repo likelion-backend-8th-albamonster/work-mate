@@ -1,6 +1,7 @@
 package com.example.workmate.controller.shop;
 
 import com.example.workmate.dto.account.AccountDto;
+import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.account.AccountStatus;
@@ -58,7 +59,7 @@ public class ShopRestController {
 
     // 아르바이트 요청 명단 불러오기
     @GetMapping("/{id}/shop-account")
-    public Map<String, AccountStatus> getAccountByAccountShop(@PathVariable("id") Long id) {
+    public AccountDto getAccountByAccountShop(@PathVariable("id") Long id) {
         return service.getAccountByAccountShop(id);
     }
 }
