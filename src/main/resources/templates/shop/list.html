@@ -65,8 +65,13 @@
                     console.log("success: ", data);
                 },
                 error: function (xhr, status, error) {
-                    alert("이메일 인증이 필요합니다.")
-                    console.log("아르바이트 등록 실패", xhr.responseText);
+                    if (xhr.status === 404) {
+                        alert("매장을 찾을 수 없습니다.")
+                    } else if (xhr.status === 400) {
+                        alert("해당 매장에 이미 아르바이트 요청을 보냈습니다.")
+                    }
+                    console.log("Error:", xhr.status, xhr.responseText);
+
                 }
             });
         });
