@@ -235,7 +235,7 @@ public class AttendanceController {
             Long shopId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "2", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false)
             Integer pageSize,
             Model model
     ){
@@ -279,21 +279,19 @@ public class AttendanceController {
 
     //출퇴근 기록 검색 페이지
     //pagenation
-    @PostMapping("/showLog/search/{accountId}")
+    @GetMapping("/showLog/search/{accountId}")
     public String showLogSearch(
             @PathVariable("accountId")
             Long accountId,
-            @RequestParam(value = "shopId", defaultValue = "0", required = false)
-            Long shopId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "2", required = false)
             Integer pageSize,
-            @RequestParam(value = "searchDuration", defaultValue = "", required = true)
+            @RequestParam(value = "searchDuration", defaultValue = "allDay", required = true)
             String searchDuration,
             @RequestParam(value = "searchWord", defaultValue = "", required = true)
             String searchWord,
-            @RequestParam(value = "searchType", defaultValue = "", required = true)
+            @RequestParam(value = "searchType", defaultValue = "shopName", required = true)
             String searchType,
             Model model
     ){
@@ -308,9 +306,8 @@ public class AttendanceController {
         //검색 서비스
         Page<AttendanceLogDto> attendanceLogList
                 = attendanceService.showLogSearch(
-                        accountId,shopId,pageNumber,pageSize,
+                        accountId,pageNumber,pageSize,
                         searchDuration,searchWord,searchType, account);
-
         //사용자
         model.addAttribute("account", account);
         //출퇴근상태
@@ -320,11 +317,14 @@ public class AttendanceController {
         //매장명
         model.addAttribute("shopList",
                 attendanceService.readOneAccountShopList(accountId));
-        //shop id
-        model.addAttribute("shopId", shopId);
         //사용자 권한
         model.addAttribute("auth", account.getAuthority());
-        return String.format("redirect:/attendance/showLog/%d", accountId);
+
+        //검색기간/검색타입/검색단어
+        model.addAttribute("searchDuration", searchDuration);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("searchWord", searchWord);
+        return "attendance/attendanceSearch";
     }
 
     //출퇴근 수정(관리자)

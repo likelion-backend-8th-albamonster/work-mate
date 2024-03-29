@@ -1,22 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="kr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>출퇴근기록</title>
+    <title>출퇴근기록 검색</title>
 </head>
 <body>
+<h1>검색페이지</h1>
+<a th:href="@{/attendance/showLog/{accountId}(accountId=${account.getId()})}">기록페이지로</a>
 <h2 th:if="${attendanceLogList.isEmpty()}">
     <p>출근기록이 없습니다.</p>
 </h2>
-<div>
-    <form th:action="@{/attendance/showLog/{accountId}(accountId=${account.getId()})}" method="get">
-        <select name="shopId" id="shopId" class="form-select">
-            <option selected value="0">매장 선택</option>
-            <option th:each="shop: ${shopList}" th:value="${shop.id}" th:text="${shop.name}"></option>
-        </select>
-        <input type="submit" class="btn btn-danger" value="매장 찾기">
-    </form>
-</div>
 <div>
     <form th:action="@{/attendance/showLog/search/{accountId}(accountId=${account.getId()})}" method="get">
         <select id="searchDuration" name="searchDuration">
@@ -39,22 +32,22 @@
 </div>
 <table th:unless="${attendanceLogList.isEmpty()}" class="table">
     <thead>
-        <tr>
-            <th scope="col">매장명</th>
-            <th scope="col">닉네임</th>
-            <th scope="col">출근시간</th>
-            <th scope="col">퇴근시간</th>
-            <th scope="col">상태</th>
-        </tr>
+    <tr>
+        <th scope="col">매장명</th>
+        <th scope="col">닉네임</th>
+        <th scope="col">출근시간</th>
+        <th scope="col">퇴근시간</th>
+        <th scope="col">상태</th>
+    </tr>
     </thead>
     <tbody th:if="${#strings.equals(auth.getAuthority(), '아르바이트생')}">
-        <tr th:each="attendance: ${attendanceLogList}">
-            <th scope="col" th:text="${attendance.shopName}"></th>
-            <th scope="col" th:text="${account.getName()}"></th>
-            <th scope="col" th:text="${attendance.checkInTime}"></th>
-            <th scope="col" th:text="${attendance.checkOutTime}"></th>
-            <th scope="col" th:text="${attendance.status.status}"></th>
-        </tr>
+    <tr th:each="attendance: ${attendanceLogList}">
+        <th scope="col" th:text="${attendance.shopName}"></th>
+        <th scope="col" th:text="${account.getName()}"></th>
+        <th scope="col" th:text="${attendance.checkInTime}"></th>
+        <th scope="col" th:text="${attendance.checkOutTime}"></th>
+        <th scope="col" th:text="${attendance.status.status}"></th>
+    </tr>
     </tbody>
     <!--관리자-->
     <tbody th:unless="${#strings.equals(auth.getAuthority(), '아르바이트생')}">
@@ -82,16 +75,20 @@
 </table>
 <div th:if="${!attendanceLogList.isEmpty()}">
     <nav aria-label="Page navigation example">
-        <ul th:if="${shopId.equals(0)}" class="pagination" >
+        <ul class="pagination">
             <li class="page-item" th:each="page : ${#numbers.sequence(1,attendanceLogList.getTotalPages())}">
-                <a class="page-link" th:href="@{/attendance/showLog/{accountId}?pageNumber={page}(accountId=${account.getId()}, page=${page - 1})}">
-                    <span aria-hidden="true" th:text="${page}"></span>
-                </a>
-            </li>
-        </ul>
-        <ul th:unless="${shopId.equals(0)}" class="pagination" >
-            <li class="page-item" th:each="page : ${#numbers.sequence(1,attendanceLogList.getTotalPages())}">
-                <a class="page-link" th:href="@{/attendance/showLog/{accountId}?shopId={shopId}&pageNumber={page}(accountId=${account.getId()}, shopId=${shopId}, page=${page - 1})}">
+                <a
+                        class="page-link"
+                        th:href="
+                                @{/attendance/showLog/search/{accountId}?searchDuration={searchDuration}&searchType={searchType}&searchWord={searchWord}&pageNumber={page}(
+                                    accountId=${account.getId()},
+                                    searchDuration=${searchDuration},
+                                    searchType=${searchType},
+                                    searchWord=${searchWord},
+                                    page=${page - 1}
+                                )
+                            }"
+                >
                     <span aria-hidden="true" th:text="${page}"></span>
                 </a>
             </li>
@@ -103,7 +100,6 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous">
 <script th:inline="javascript">
-
     //페이지 요청 시 자동실행
     window.onload = function () {
         //리다이렉트시 발생하는 alert 메시지
@@ -113,7 +109,21 @@
             alert(alertMsg);
         }
     }
+    // //페이징부분 값 넘기기
+    // const searchDurationForPage = document.querySelector("#searchDurationForPage");
+    // const searchTypeForPage = document.querySelector("#searchTypeForPage");
+    // const searchWordForPage = document.querySelector("#searchWordForPage");
+    //
+    // searchDurationForPage.value = searchDuration.options[searchDuration.selectedIndex].value;
+    // searchTypeForPage.value = searchType.options[searchType.selectedIndex].value;
+    // searchWordForPage.value = searchWord.value;
+</script>
+
+<script>
+
     //검색어
+    // const searchDuration = document.querySelector("#searchDuration");
+    // const searchType = document.querySelector("#searchType");
     const searchWord = document.querySelector("#searchWord");
     const searchBtn = document.querySelector("#searchBtn");
 
@@ -126,7 +136,16 @@
 
     })
 
+    // //페이지버튼 누를 때
+    // function pageBtnClick(){
+    //     searchDurationForPage.value = searchDuration.options[searchDuration.selectedIndex].value;
+    //     searchTypeForPage.value = searchType.options[searchType.selectedIndex].value;
+    //     searchWordForPage.value = searchWord.value;
+    // }
+
 </script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous">
