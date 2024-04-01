@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 쿠키에서 특정 이름의 값을 가져오는 함수
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // 'auth_token' 쿠키의 값을 localStorage에 저장
+        const jwtToken = getCookie('jwtToken');
+        if (jwtToken) {
+            localStorage.setItem('jwtToken', jwtToken);
+            console.log(jwtToken);
+
+            location.href = '/my-profile';
+        } else {
+            console.log('No JWT token found in cookies');
+        }
+    });
+</script>
+</body>
+</html>

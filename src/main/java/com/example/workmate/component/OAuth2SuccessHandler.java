@@ -73,7 +73,7 @@ public class OAuth2SuccessHandler
         response.addCookie(cookie);
 
         // 어디로 리다이렉트 할지 지정
-        String targetUrl = "http://localhost:8080/my-profile";
+        String targetUrl = "http://localhost:8080/account/oauth";
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }
