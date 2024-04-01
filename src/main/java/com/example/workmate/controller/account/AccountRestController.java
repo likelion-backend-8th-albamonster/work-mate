@@ -49,6 +49,9 @@ public class AccountRestController {
         Cookie cookie = new Cookie("jwtToken", token);
         cookie.setMaxAge(24 * 60 * 60); // 쿠키의 만료 시간 설정 (예: 24시간)
         cookie.setPath("/"); // 쿠키의 경로 설정
+        cookie.setDomain("localhost");
+        cookie.setSecure(false);
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
 
         JwtResponseDto responseDto = new JwtResponseDto();

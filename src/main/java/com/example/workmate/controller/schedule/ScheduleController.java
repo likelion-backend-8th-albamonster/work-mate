@@ -12,7 +12,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/schedule")
+@CrossOrigin
 public class ScheduleController {
     private final ScheduleService scheduleService;
     private final ScheduleDataService scheduleDataService;
@@ -60,7 +64,8 @@ public class ScheduleController {
     public String mainSchedule(
             Model model,
             @PathVariable("shopId")
-            Long shopId
+            Long shopId,
+            Authentication auth
     ){
         LocalDate now = LocalDate.now();
         ScheduleDto dto = ScheduleDto.builder()
@@ -68,6 +73,12 @@ public class ScheduleController {
                 .month(now.getMonthValue())
                 .day(now.getDayOfMonth())
                 .build();
+
+        if (auth != null){
+            log.info("auth: {}",auth.getName());
+        }
+        else
+            log.info("auth is null");
         PeriodScheduleDto periodScheduleDto = new PeriodScheduleDto();
         List<WorkTimeDto> schedules = scheduleService.viewMonth(shopId, dto);
         model.addAttribute("periodScheduleDto", periodScheduleDto);

@@ -3,6 +3,7 @@ package com.example.workmate.service.schedule;
 
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
+import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.schedule.WorkRole;
 import com.example.workmate.entity.schedule.WorkTime;
 import com.example.workmate.entity.account.Account;
@@ -91,6 +92,7 @@ public class ScheduleDataService {
         AccountShop accountShop1 = AccountShop.builder()
                 .account(account1)
                 .shop(shop)
+                .status(AccountStatus.ACCEPT)
                 .build();
         accountShopRepo.save(accountShop1);
 
@@ -100,6 +102,7 @@ public class ScheduleDataService {
         AccountShop accountShop2 = AccountShop.builder()
                 .account(account2)
                 .shop(shop)
+                .status(AccountStatus.ACCEPT)
                 .build();
         accountShopRepo.save(accountShop2);
 
@@ -109,6 +112,7 @@ public class ScheduleDataService {
         AccountShop accountShop3 = AccountShop.builder()
                 .account(account3)
                 .shop(shop)
+                .status(AccountStatus.ACCEPT)
                 .build();
         accountShopRepo.save(accountShop3);
     }

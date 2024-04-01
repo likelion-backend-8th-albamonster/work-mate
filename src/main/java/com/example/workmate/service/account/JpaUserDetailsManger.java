@@ -40,8 +40,13 @@ public class JpaUserDetailsManger implements UserDetailsManager {
         if (optionalAccount.isEmpty())
             throw new UsernameNotFoundException(username);
 
+        log.info("findbyusername: {}",optionalAccount.get().getUsername());
+
         Account account = optionalAccount.get();
-        return CustomAccountDetails.builder()
+
+        log.info("accountusername: {}",optionalAccount.get().getUsername());
+
+        CustomAccountDetails customAccountDetails = CustomAccountDetails.builder()
                 .username(account.getUsername())
                 .password(account.getPassword())
                 .name(account.getName())
@@ -49,6 +54,9 @@ public class JpaUserDetailsManger implements UserDetailsManager {
                 .businessNumber(account.getBusinessNumber())
                 .authority(account.getAuthority())
                 .build();
+        log.info("custom: {}",customAccountDetails.getUsername());
+
+        return customAccountDetails;
     }
 
     @Override
