@@ -120,6 +120,33 @@ public class ShopService {
                 .toList();
     }
 
+    // Shop에서 아르바이트생으로 등록
+    public String accept(Long shopId, Long accountShopId) {
+        Account account = authFacade.getAccount();
+        AccountShop target = accountShopRepo.findById(accountShopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Shop shop = target.getShop();
+
+        log.info("auth user: {}", authFacade.getAuth().getName());
+        log.info("page username: {}", account.getUsername());
+
+        if (!account.getAuthority().equals(Authority.ROLE_BUSINESS_USER)
+        && !account.getAuthority().equals(Authority.ROLE_ADMIN)) {
+            log.error("매장의 관리자만 접근 가능합니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        // 등록 승락
+        target.setStatus(AccountStatus.ACCEPT);
+        target.setShop(Shop.builder()
+                .id(shop.getId())
+                .name(shop.getName())
+                .address(shop.getAddress())
+                .build());
+        accountShopRepo.save(target);
+        return target.getStatus().getStatus();
+    }
+
     // Check Authority
     private boolean checkAuthority(Account account) {
         // 비활성유저거나 일반 유저일 경우 true

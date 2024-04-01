@@ -78,13 +78,5 @@ public class ProfileRestController {
     ) {
         return service.submit(dto.getName());
     }
-
-    @PostMapping("/accept/{accountShopId}")
-    public String accept(
-            @PathVariable("accountShopId") Long accountShopId,
-            @RequestParam("flag") boolean flag
-    ) {
-        return String.format("Status: %s", service.accept(accountShopId, flag));
-    }
 }
 
