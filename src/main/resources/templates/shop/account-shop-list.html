@@ -64,6 +64,17 @@
                 const accountName = accountNameData[0];
                 const accountStatus = accountStatusData[0];
 
+                // "SUBMITTED" 상태인 계정의 id 리스트 만들기
+                const submittedAccountIds = [];
+                for (let i = 0; i < accountShop.length; i++) {
+                    if (accountShop[i].status === "SUBMITTED") {
+                        submittedAccountIds.push(accountShop[i].id);
+                    }
+                }
+
+                // 만들어진 id 리스트 사용 예시
+                console.log("Submitted Account IDs:", submittedAccountIds);
+
                 // HTML 업데이트
                 const shopAccountDiv = $('#shop-account');
 
