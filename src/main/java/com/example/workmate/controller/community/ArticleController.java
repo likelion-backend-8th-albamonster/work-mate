@@ -32,6 +32,7 @@ public class ArticleController {
     private final ArticleService articleService;
     private final ArticleRepo articleRepo;
 
+
     // 게시글 작성 페이지로 이동
     @GetMapping("/article/new")
     public String newForm(
@@ -48,6 +49,29 @@ public class ArticleController {
         return "community/commu-article-new";
     }
 
+    // 컨트롤러에서 리다이렉션 하는 방식
+//    // 게시글 작성 폼 제출
+//    @PostMapping("/article/create")
+//    public String create(
+//            @PathVariable("shopId")
+//            Long shopId,
+//            @RequestParam
+//            Board board,
+//            @ModelAttribute
+//            ArticleDto articleDto,
+//            RedirectAttributes redirectAttributes,
+//            Model model
+//    ) {
+//        Long newId = articleService.create(articleDto).getShopArticleId();
+//        model.addAttribute("boards", Board.values());
+//        redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
+//        if (board == Board.SECRET) {
+//            return String.format("redirect:/%d/community/%s", shopId, articleDto.getBoard().name());
+//        }
+//        return String.format("redirect:/%d/community/%s/%d", shopId, articleDto.getBoard().name(), newId);
+//    }
+
+    // ajax에서 리다이렉션 하는 방식 : 응답에 상태코드랑 데이터를 json형태로 클라이언트에 전달
     // 게시글 작성 폼 제출
     @PostMapping("/article/create")
     public String create(
@@ -69,7 +93,7 @@ public class ArticleController {
         return String.format("redirect:/%d/community/%s/%d", shopId, articleDto.getBoard().name(), newId);
     }
 
-    //전체 게시글 보기
+    //전체 게시글 보기 (Main)
     @GetMapping
     public String readPage(
             @PathVariable("shopId")
