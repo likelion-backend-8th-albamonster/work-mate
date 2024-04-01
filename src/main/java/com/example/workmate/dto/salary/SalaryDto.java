@@ -14,7 +14,8 @@ public class SalaryDto {
     private Long id;
     private Long accountId;
     private Long shopId;
-    private LocalDate salaryDate;
+    private Integer salaryYear;
+    private Integer salaryMonth;
     private Integer totalSalary;
     private Salary.Status status;
 
@@ -23,7 +24,8 @@ public class SalaryDto {
                 .id(entity.getId())
                 .accountId(entity.getAccount().getId())
                 .shopId(entity.getShop().getId())
-                .salaryDate(entity.getSalaryDate())
+                .salaryYear(entity.getSalaryYear())
+                .salaryMonth(entity.getSalaryMonth())
                 .totalSalary(entity.getTotalSalary())
                 .status(entity.getStatus())
                 .build();
