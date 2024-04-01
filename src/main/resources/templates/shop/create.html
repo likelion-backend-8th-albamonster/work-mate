@@ -54,6 +54,11 @@
                     location.href="/shop";
                 },
                 error: function (xhr, status, error) {
+                    if (xhr.status === 403) {
+                        alert("권한이 없습니다.")
+                    } else if (xhr.status === 400) {
+                        alert("이미 존재하는 매장입니다.")
+                    }
                     console.error("매장 생성 중 오류 발생:", error);
                 }
             });

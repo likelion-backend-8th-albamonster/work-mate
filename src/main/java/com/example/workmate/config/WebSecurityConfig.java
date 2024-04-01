@@ -41,11 +41,13 @@ public class WebSecurityConfig {
                                         "/token/issue",
                                         "/token/validate",
                                         "/account/home",
+                                        "/account/login",
 
                                         // 계정 html
                                         "/my-profile/**",
                                         "/email-check",
                                         "/shop",
+                                        "/shop/{id}",
                                         "/shop/{shopId}/shop-account",
                                         "/shop/create",
                                         "/account/logout",
@@ -59,7 +61,6 @@ public class WebSecurityConfig {
                                 .permitAll()
 
                                 .requestMatchers(
-                                        "/account/login",
                                         "/account/register",
                                         "/account/users-register",
                                         "/account/business-register"
@@ -67,16 +68,31 @@ public class WebSecurityConfig {
                                 .anonymous()
 
                                 .requestMatchers(
-                                        "/profile/**",
-                                        "/account/oauth")
+                                        "/account/oauth",
+                                        "/profile",
+                                        "/profile/{id}",
+                                        "/profile/{id}/update",
+                                        "/profile/email-check",
+                                        "/profile/check-code",
+                                        "/profile/submit")
                                 .authenticated()
 
                                 // 매장 생성 테스트용
-                                .requestMatchers("/shop/**")
-                                .permitAll()
+                                .requestMatchers(
+                                        "/api/shop/crete",
+                                        "/api/shop/{id}",
+                                        "/api/shop/{id}/update",
+                                        "/api/shop/{id}/delete",
+                                        "/api/shop/{id}/shop-account",
+                                        "/api/shop/{id}/shop-account/account-name",
+                                        "/api/shop/{id}/shop-account/account-status",
+                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}",
+                                        "/{id}/shop-account/account-name")
+                                .authenticated()
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
+                        .permitAll()
                         .successHandler(oAuth2SuccessHandler)
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService))

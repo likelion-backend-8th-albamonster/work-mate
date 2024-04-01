@@ -34,11 +34,6 @@ public class ShopService {
         Account account = authFacade.getAccount();
         log.info("account: {}", account.getUsername());
 
-        if (checkAuthority(account)) {
-            log.error("권한이 없습니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
         Shop newShop = Shop.builder()
                 .name(dto.getName())
                 .address(dto.getAddress())
