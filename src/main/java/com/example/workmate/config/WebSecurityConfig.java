@@ -36,18 +36,27 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 //                                .anyRequest()
 //                                .permitAll()
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
                                         "/account/home",
 
+                                        // 계정 html
+                                        "/my-profile/**",
+                                        "/email-check",
+                                        "/shop",
+                                        "/shop/{shopId}/shop-account",
+                                        "/shop/create",
+                                        "/account/logout",
+
                                         // 메일 코드 확인
                                         "/account/check-code",
                                         //근무표 관련 테스트중
                                         "/schedule/**"
+
                                 )
                                 .permitAll()
 
@@ -62,8 +71,8 @@ public class WebSecurityConfig {
                                 // 권한 설정 필요
                                 .requestMatchers(
                                         "/profile/**",
-                                        "/my-profile/**")
-                                .hasAnyAuthority(Authority.ROLE_ADMIN.name(), Authority.ROLE_USER.name(), Authority.ROLE_INACTIVE_USER.name(), Authority.ROLE_BUSINESS_USER.name())
+                                        "/account/oauth")
+                                .authenticated()
 
                                 // 매장 생성 테스트용
                                 .requestMatchers("/shop/**")

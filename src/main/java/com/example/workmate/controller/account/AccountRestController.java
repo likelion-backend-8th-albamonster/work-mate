@@ -1,10 +1,8 @@
 package com.example.workmate.controller.account;
 
-import com.example.workmate.entity.account.Account;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.jwt.dto.JwtRequestDto;
 import com.example.workmate.jwt.dto.JwtResponseDto;
-import com.example.workmate.repo.AccountRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,8 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AccountRestController {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
-    private final AccountRepo accountRepo;
-    private final JwtTokenUtils tokenUtils;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @PostMapping("/login")
     public JwtResponseDto login(
@@ -41,12 +38,8 @@ public class AccountRestController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Account account = accountRepo.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("account Id: {}", account.getId());
-
         JwtResponseDto response = new JwtResponseDto();
-        response.setToken(tokenUtils.generateToken(userDetails));
+        response.setToken(jwtTokenUtils.generateToken(userDetails));
         log.info("token: {}", response.getToken());
 
         return response;
