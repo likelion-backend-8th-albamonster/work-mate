@@ -193,9 +193,9 @@ public class ScheduleController {
     }
     // 근무표 변경요청 보기, 아직 제안 중인 것만
     @ResponseBody
-    @GetMapping("view-change-all")
-    public List<ChangeRequestDto> viewChangeAll(
-            @RequestParam("shopId")
+    @GetMapping("read-change-all/{shopId}")
+    public List<ChangeRequestDto> readChangeAll(
+            @PathVariable("shopId")
             Long shopId
     ){
         return scheduleService.readChangeAll(shopId);

@@ -29,7 +29,8 @@ public class Salary {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    private LocalDate salaryDate;
+    private Integer salaryYear;
+    private Integer salaryMonth;
     private Integer totalSalary;
 
     @Setter

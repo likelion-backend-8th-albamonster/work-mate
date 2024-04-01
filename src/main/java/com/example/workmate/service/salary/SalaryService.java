@@ -62,12 +62,12 @@ public class SalaryService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // 매장사람의 이전 월급내용을 찾아온다.
-        Salary salary = salaryRepo.findTopByAccount_IdAndShop_IdOrderBySalaryDateDesc(
+        Salary salary = salaryRepo.findTopByAccount_IdAndShop_IdOrderByIdDesc(
                 dto.getAccountId(), dto.getShopId());
 
         // 새로 만들 때 이번 달근무표에 올라와있는 만큼을 참고해서 만듬, 매월 1일 ~ 말일 기준, 시급은 만원이라고 가정
         // 근무표에 없으면 오류가 난다.
-        LocalDate date = dto.getSalaryDate();
+        LocalDate date = LocalDate.of(dto.getSalaryYear(),dto.getSalaryMonth(),1);
         YearMonth yearMonth = YearMonth.from(date);
 
         LocalDateTime startDay = LocalDate.of(date.getYear(), date.getMonth(), 1).atStartOfDay();
@@ -82,12 +82,12 @@ public class SalaryService {
         long albaMinute = 0L;
         for(WorkTime workTime : workTimes){
             albaMinute = albaMinute + ChronoUnit.MINUTES.between(
-                    workTime.getWorkEndTime(),workTime.getWorkStartTime());
+                    workTime.getWorkStartTime(),workTime.getWorkEndTime());
         }
         int totalSalary = (int)(HourlyRate * albaMinute / 60);
 
         if(salary != null) {
-            // 이전 내용이 정산이 안돼있으면 정산하고 새로 만들기
+            // 이전달이 정산 안돼있으면 정산하고 새로 만들기
             if(salary.getStatus().equals(Salary.Status.BEFORE)){
                 salary.setStatus(Salary.Status.DONE);
                 salaryRepo.save(salary);
@@ -97,7 +97,8 @@ public class SalaryService {
         Salary newSalary = Salary.builder()
                 .account(salaryAccount)
                 .shop(shop)
-                .salaryDate(date)
+                .salaryYear(dto.getSalaryYear())
+                .salaryMonth(dto.getSalaryMonth())
                 .totalSalary(totalSalary)
                 .build();
 
@@ -143,7 +144,6 @@ public class SalaryService {
     // 한 유저의 한 매장 정산내역 보기
     public List<SalaryDto> mySalaryAll(Long shopId){
         Account account = checkMember(shopId);
-        checkManagerOrAdmin(account);
 
         List<Salary> salaries = salaryRepo
                 .findByShop_IdAndAccount_IdOrderByIdDesc(shopId,account.getId());
@@ -163,6 +163,7 @@ public class SalaryService {
         String username = authFacade.getAuth().getName();
         Account account = accountRepo.findByUsername(username).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         Optional<List<AccountShop>> optionalList = accountShopRepo.findAllByAccount_id(account.getId());
         if (optionalList.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -173,20 +174,33 @@ public class SalaryService {
         for (AccountShop accountShop : accountShops){
             shopIds.add(accountShop.getId());
         }
-        List<Salary> salaries = salaryRepo.findAllById(shopIds);
+        List<Salary> salaries = new ArrayList<>();
+        for (Long shopId : shopIds){
+            List<Salary> salaryFind = salaryRepo.findAllByShop_IdOrderByIdDesc(shopId);
+            if(!salaryFind.isEmpty()){
+                salaries.addAll(salaryFind);
+            }
+        }
+
         if (salaries.isEmpty()){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+        log.info("salaries.size: {}", salaries.size());
         List<List<SalaryDto>> listDtos = new ArrayList<>();
-        List<SalaryDto> dtos = new ArrayList<>();
+
         for (AccountShop accountShop : accountShops) {
+            List<SalaryDto> dtos = new ArrayList<>();
             for (Salary salary : salaries){
                 if(accountShop.getShop().getId().equals(salary.getShop().getId())){
+                    log.info("ok");
                     dtos.add(SalaryDto.fromEntity(salary));
+                    log.info(dtos.get(0).getId().toString());
+                    log.info(dtos.get(0).getTotalSalary().toString());
                 }
             }
             listDtos.add(dtos);
-            dtos.clear();
+            log.info(listDtos.get(0).get(0).getId().toString());
+            log.info(listDtos.get(0).get(0).getTotalSalary().toString());
         }
         return listDtos;
     }

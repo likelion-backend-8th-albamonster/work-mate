@@ -45,8 +45,10 @@ public class ScheduleUtil {
         log.info("endOfDay: {}",endOfDay);
 
         int allWeek = (dayOfWeek + endOfDay) / 7 + 1;
+        log.info("allWeek: {}",allWeek);
+        log.info("allWeek * 7 - dayOfWeek - 1: {}",(allWeek * 7 - dayOfWeek - 1));
         for (int i = 0; i < (allWeek * 7); i++) {
-            if((i >= dayOfWeek)&&(i < allWeek * 7 - dayOfWeek - 1)){
+            if((i >= dayOfWeek)&&(i < endOfDay + dayOfWeek)){
                 days.add(i - dayOfWeek + 1);
             }
             else
