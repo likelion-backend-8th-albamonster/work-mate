@@ -66,5 +66,9 @@ public class ShopRestController {
         return service.getAccountNameByAccountShop(id);
     }
 
-
+    // 아르바이트 요청 명단에서 아르바이트 상태 불러오기
+    @GetMapping("/{id}/shop-account/account-status")
+    public List<AccountStatus> getAccountStatus(@PathVariable("id") Long id) {
+        return service.getAccountStatus(id);
+    }
 }

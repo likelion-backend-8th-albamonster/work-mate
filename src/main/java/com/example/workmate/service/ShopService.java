@@ -5,6 +5,7 @@ import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
+import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
@@ -110,6 +111,14 @@ public class ShopService {
     }
 
     // 아르바이트 요청 명단에서 아르바이트 상태 불러오기
+    public List<AccountStatus> getAccountStatus(Long shopId) {
+        List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return accountShops.stream()
+                .map(AccountShop::getStatus)
+                .toList();
+    }
 
     // Check Authority
     private boolean checkAuthority(Account account) {
