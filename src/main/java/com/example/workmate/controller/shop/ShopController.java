@@ -76,4 +76,6 @@ public class ShopController {
         shopService.getAccountShopsByShopId(id);
         return "shop/account-shop-list";
     }
+
+
 }

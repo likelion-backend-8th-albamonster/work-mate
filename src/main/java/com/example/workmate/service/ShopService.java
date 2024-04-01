@@ -88,6 +88,7 @@ public class ShopService {
         shopRepo.delete(target);
     }
 
+    // 아르바이트 요청 명단 불러오기
     public List<AccountShopDto> getAccountShopsByShopId(Long shopId) {
         List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -96,6 +97,19 @@ public class ShopService {
                 .map(AccountShopDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    // 아르바이트 요청 명단에서 Account name 불러오기
+    public List<String> getAccountNameByAccountShop(Long shopId) {
+        List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return accountShops.stream()
+                .map(AccountShop::getAccount)
+                .map(Account::getName)
+                .toList();
+    }
+
+    // 아르바이트 요청 명단에서 아르바이트 상태 불러오기
 
     // Check Authority
     private boolean checkAuthority(Account account) {

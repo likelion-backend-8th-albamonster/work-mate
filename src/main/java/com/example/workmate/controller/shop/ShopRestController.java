@@ -2,6 +2,7 @@ package com.example.workmate.controller.shop;
 
 import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
+import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.service.ShopService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,12 @@ public class ShopRestController {
     @GetMapping("/{id}/shop-account")
     public List<AccountShopDto> getAccountByAccountShop(@PathVariable("id") Long id) {
         return service.getAccountShopsByShopId(id);
+    }
+
+    // 아르바이트 요청 명단에서 Account name 불러오기
+    @GetMapping("/{id}/shop-account/account-name")
+    public List<String> getAccountNameByAccountShop(@PathVariable("id") Long id) {
+        return service.getAccountNameByAccountShop(id);
     }
 
 
