@@ -122,13 +122,14 @@ public class ShopService {
 
     // Shop에서 아르바이트생으로 등록
     public String accept(Long shopId, Long accountShopId) {
-        Account account = authFacade.getAccount();
+        Shop shop = shopRepo.findById(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         AccountShop target = accountShopRepo.findById(accountShopId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        Shop shop = target.getShop();
 
-        log.info("auth user: {}", authFacade.getAuth().getName());
-        log.info("page username: {}", account.getUsername());
+        log.info("account: {}", authFacade.getAuth().getName());
+        Account account = accountRepo.findByUsername(authFacade.getAuth().getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         if (!account.getAuthority().equals(Authority.ROLE_BUSINESS_USER)
         && !account.getAuthority().equals(Authority.ROLE_ADMIN)) {
