@@ -1,6 +1,5 @@
 package com.example.workmate.service;
 
-import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.AccountShop;
@@ -15,14 +14,11 @@ import com.example.workmate.repo.ShopRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -92,15 +88,65 @@ public class ShopService {
 
         shopRepo.delete(target);
     }
-    public AccountDto getAccountByAccountShop(Long shopId) {
-        AccountShop accountShopDto = accountShopRepo.findByShop_Id(shopId)
+
+    // 아르바이트 요청 명단 불러오기
+    public List<AccountShopDto> getAccountShopsByShopId(Long shopId) {
+        List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Account account = accountShopDto.getAccount();
-
-        return AccountDto.fromEntity(account);
+        return accountShops.stream()
+                .map(AccountShopDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
+    // 아르바이트 요청 명단에서 Account name 불러오기
+    public List<String> getAccountNameByAccountShop(Long shopId) {
+        List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return accountShops.stream()
+                .map(AccountShop::getAccount)
+                .map(Account::getName)
+                .toList();
+    }
+
+    // 아르바이트 요청 명단에서 아르바이트 상태 불러오기
+    public List<AccountStatus> getAccountStatus(Long shopId) {
+        List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return accountShops.stream()
+                .map(AccountShop::getStatus)
+                .toList();
+    }
+
+    // Shop에서 아르바이트생으로 등록
+    public String accept(Long shopId, Long accountShopId) {
+        Shop shop = shopRepo.findById(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        AccountShop target = accountShopRepo.findById(accountShopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        log.info("account: {}", authFacade.getAuth().getName());
+        Account account = accountRepo.findByUsername(authFacade.getAuth().getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!account.getAuthority().equals(Authority.ROLE_BUSINESS_USER)
+        && !account.getAuthority().equals(Authority.ROLE_ADMIN)) {
+            log.error("매장의 관리자만 접근 가능합니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        // 등록 승락
+        target.setStatus(AccountStatus.ACCEPT);
+        target.setShop(Shop.builder()
+                .id(shop.getId())
+                .name(shop.getName())
+                .address(shop.getAddress())
+                .build());
+        accountShopRepo.save(target);
+        return target.getStatus().getStatus();
+    }
 
     // Check Authority
     private boolean checkAuthority(Account account) {

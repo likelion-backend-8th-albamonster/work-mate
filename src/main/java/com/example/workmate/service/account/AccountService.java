@@ -8,19 +8,15 @@ import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.facade.AuthenticationFacade;
-import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -102,46 +98,6 @@ public class AccountService {
         return AccountShopDto.fromEntity(accountShopRepo.save(newAccountShop));
     }
 
-    // Shop에서 아르바이트생으로 등록
-    public String accept(Long accountShopId, boolean flag) {
-        Account account = authFacade.getAccount();
-        AccountShop target = getAccountShop(accountShopId);
-        Shop shop = getShop(target.getShop().getId());
-
-        log.info("auth user: {}", authFacade.getAuth().getName());
-        log.info("page username: {}", account.getUsername());
-
-        // 토큰으로 접근 시도한 유저와, 페이지의 유저가 다른경우 예외
-        if (!authFacade.getAuth().getName().equals(account.getUsername())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        if (!account.getAuthority().equals(Authority.ROLE_BUSINESS_USER)) {
-            log.error("매장의 관리자만 접근 가능합니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
-        // 등록 승락
-        if (flag) {
-            target.setStatus(AccountStatus.ACCEPT);
-            target.setShop(Shop.builder()
-                    .id(shop.getId())
-                    .name(shop.getName())
-                    .address(shop.getAddress())
-                    .build());
-            accountShopRepo.save(target);
-            return target.getStatus().getStatus();
-        }
-
-        // 등록 거절
-        else {
-            target.setStatus(AccountStatus.REJECT);
-            log.info("Status: {}", target.getStatus());
-            accountShopRepo.delete(target);
-            return "등록 거절";
-        }
-    }
-
     // 권한 체크
     private boolean isAuthority(Authority authority) {
         // 비활성 유저인 경우 true
@@ -181,8 +137,12 @@ public class AccountService {
     // AccountShop의 Shop불러오기
     public String ShopName(Long id) {
         AccountShop accountShop = getAccountShop(id);
+
         String shopName = accountShop.getShop().getName();
         log.info("shop: {}", shopName);
+        if (!accountShop.getStatus().equals(AccountStatus.ACCEPT)) {
+            return String.format("%s: ", shopName + "아르바이트 요청중입니다.");
+        }
 
         return shopName;
     }
