@@ -36,8 +36,6 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-//                                .anyRequest()
-//                                .permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers(
                                         "/token/issue",
@@ -68,7 +66,6 @@ public class WebSecurityConfig {
                                 )
                                 .anonymous()
 
-                                // 권한 설정 필요
                                 .requestMatchers(
                                         "/profile/**",
                                         "/account/oauth")
@@ -84,6 +81,13 @@ public class WebSecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService))
 
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/account/logout")
+                        .logoutSuccessUrl("/account/home")
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID", "jwtToken")
                 )
 //                .sessionManagement(sessionManagement ->
 //                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
