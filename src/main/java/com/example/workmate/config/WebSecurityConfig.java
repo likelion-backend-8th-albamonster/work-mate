@@ -6,9 +6,11 @@ import com.example.workmate.jwt.JwtTokenFilter;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.service.account.OAuth2UserServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -24,14 +26,20 @@ public class WebSecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
-                                .anyRequest()
-                                .permitAll()
-     /*                           .requestMatchers(
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+//                                .anyRequest()
+//                                .permitAll()
+                                .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
                                         "/account/home",
@@ -59,7 +67,7 @@ public class WebSecurityConfig {
 
                                 // 매장 생성 테스트용
                                 .requestMatchers("/shop/**")
-                                .permitAll()*/
+                                .permitAll()
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
