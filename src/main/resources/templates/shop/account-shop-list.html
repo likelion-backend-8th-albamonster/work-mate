@@ -1,35 +1,89 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>아르바이트 명단 확인</title>
 </head>
 <body>
 <h1>아르바이트 명단</h1>
-<h2>[[${shop.name}]]</h2>
 <hr>
 <div id="shop-account">
 
 </div>
 
-
-</body>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script>
     $(document).ready(function () {
         const token = localStorage.getItem("jwtToken");
         const headers = {};
 
-        console.log(`token = ${token}`);
-
         // 토큰이 있으면 헤더에 추가
         if (token) {
             headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
         }
 
-        $.ajax()
-    })
+        console.log(token);
 
+        // URL에서 shopId 추출
+        const url = window.location.href;
+        const shopIdIndex = url.indexOf("/shop/") + 6; // "/shop/"의 길이는 6
+        const shopIdEndIndex = url.indexOf("/shop-account");
+        const shopId = url.substring(shopIdIndex, shopIdEndIndex);
+
+        // 각각의 API를 호출하고 데이터를 가져오는 함수들
+        function getAccountShop(id) {
+            return $.ajax({
+                url: `/api/shop/${id}/shop-account`,
+                method: 'GET',
+                headers: headers
+            });
+        }
+
+        function getAccountName(id) {
+            return $.ajax({
+                url: `/api/shop/${id}/shop-account/account-name`,
+                method: 'GET',
+                headers: headers
+            });
+        }
+
+        function getAccountStatus(id) {
+            return $.ajax({
+                url: `/api/shop/${id}/shop-account/account-status`,
+                method: 'GET',
+                headers: headers
+            });
+        }
+
+        // 데이터를 가져와서 HTML을 업데이트하는 함수
+        function updatePage() {
+            // 각각의 API 호출
+            $.when(getAccountShop(shopId), getAccountName(shopId), getAccountStatus(shopId)).done(function (accountShopData, accountNameData, accountStatusData) {
+                const accountShop = accountShopData[0];
+                const accountName = accountNameData[0];
+                const accountStatus = accountStatusData[0];
+
+                // HTML 업데이트
+                const shopAccountDiv = $('#shop-account');
+
+                // 데이터를 가지고 HTML 구성
+                for (let i = 0; i < accountShop.length; i++) {
+                    const account = accountShop[i];
+                    const name = accountName[i];
+                    const status = accountStatus[i];
+
+                    const div = $('<div>');
+                    div.text('Name: ' + name + ', Status: ' + status);
+                    shopAccountDiv.append(div);
+                }
+            }).fail(function (error) {
+                console.error('Error:', error);
+            });
+        }
+
+        // 페이지 로드 시 데이터 업데이트
+        updatePage();
+    });
 </script>
-
+</body>
 </html>

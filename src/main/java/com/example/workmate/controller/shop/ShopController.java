@@ -1,5 +1,6 @@
 package com.example.workmate.controller.shop;
 
+import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.service.ShopService;
 import lombok.RequiredArgsConstructor;
@@ -72,10 +73,9 @@ public class ShopController {
 
     // 아르바이트 요청 명단 불러오기
     @GetMapping("/{id}/shop-account")
-    public String getAccountByAccountShop(@PathVariable("id") Long id) {
-        shopService.getAccountShopsByShopId(id);
-        return "shop/account-shop-list";
+    public String getAccountByAccountShop(@PathVariable("id") Long id, Model model) {
+        List<AccountShopDto> accountShopList = shopService.getAccountShopsByShopId(id);
+        model.addAttribute("accountShopList", accountShopList);
+        return "shop/account-shop-list"; // 해당 뷰의 이름 반환
     }
-
-
 }
