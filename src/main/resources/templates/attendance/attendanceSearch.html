@@ -6,7 +6,13 @@
 </head>
 <body>
 <h1>검색페이지</h1>
-<a th:href="@{/attendance/showLog/{accountId}(accountId=${account.getId()})}">기록페이지로</a>
+<a th:href="@{/attendance/showLog/{accountId}(accountId=${account.getId()})}">기록페이지</a>
+<select id="attendanceShopId" name="shopIdToAttendance" class="form-select">
+    <option selected value="0">출퇴근 페이지 매장 선택</option>
+    <option th:each="shop: ${shopList}" th:value="${shop.id}" th:text="${shop.name}"></option>
+</select>
+<a id="attendanceUrlBtn">출퇴근페이지로</a>
+
 <h2 th:if="${attendanceLogList.isEmpty()}">
     <p>출근기록이 없습니다.</p>
 </h2>
@@ -109,21 +115,10 @@
             alert(alertMsg);
         }
     }
-    // //페이징부분 값 넘기기
-    // const searchDurationForPage = document.querySelector("#searchDurationForPage");
-    // const searchTypeForPage = document.querySelector("#searchTypeForPage");
-    // const searchWordForPage = document.querySelector("#searchWordForPage");
-    //
-    // searchDurationForPage.value = searchDuration.options[searchDuration.selectedIndex].value;
-    // searchTypeForPage.value = searchType.options[searchType.selectedIndex].value;
-    // searchWordForPage.value = searchWord.value;
 </script>
 
 <script>
 
-    //검색어
-    // const searchDuration = document.querySelector("#searchDuration");
-    // const searchType = document.querySelector("#searchType");
     const searchWord = document.querySelector("#searchWord");
     const searchBtn = document.querySelector("#searchBtn");
 
@@ -136,12 +131,25 @@
 
     })
 
-    // //페이지버튼 누를 때
-    // function pageBtnClick(){
-    //     searchDurationForPage.value = searchDuration.options[searchDuration.selectedIndex].value;
-    //     searchTypeForPage.value = searchType.options[searchType.selectedIndex].value;
-    //     searchWordForPage.value = searchWord.value;
-    // }
+    //출퇴근페이지로 이동버튼
+    const attendanceUrlBtn = document.querySelector("#attendanceUrlBtn");
+
+    //출퇴근페이지로 이동 버튼 클릭
+    attendanceUrlBtn.addEventListener('click', function (event){
+        //selected 값 가져오기
+        const attendanceShopId =  document.querySelector("#attendanceShopId");
+        const selectedShopId = attendanceShopId.options[attendanceShopId.selectedIndex].value;
+
+        if (selectedShopId === "0"){
+            alert('매장을 선택해주세요.');
+            event.preventDefault();
+        }
+
+        //thymeleaf값
+        const accountId = [[${account.getId()}]];
+
+        attendanceUrlBtn.href = "/attendance/"+accountId+"/"+selectedShopId;
+    })
 
 </script>
 
