@@ -16,6 +16,19 @@
 </body>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script>
+    $(document).ready(function () {
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        console.log(`token = ${token}`);
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        $.ajax()
+    })
 
 </script>
 

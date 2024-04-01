@@ -1,12 +1,10 @@
 package com.example.workmate.service;
 
-import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.Shop;
 import com.example.workmate.entity.account.Account;
-import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
@@ -15,14 +13,11 @@ import com.example.workmate.repo.ShopRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -92,15 +87,15 @@ public class ShopService {
 
         shopRepo.delete(target);
     }
-    public AccountDto getAccountByAccountShop(Long shopId) {
-        AccountShop accountShopDto = accountShopRepo.findByShop_Id(shopId)
+
+    public List<AccountShopDto> getAccountShopsByShopId(Long shopId) {
+        List<AccountShop> accountShops = accountShopRepo.findByShop_Id(shopId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Account account = accountShopDto.getAccount();
-
-        return AccountDto.fromEntity(account);
+        return accountShops.stream()
+                .map(AccountShopDto::fromEntity)
+                .collect(Collectors.toList());
     }
-
 
     // Check Authority
     private boolean checkAuthority(Account account) {

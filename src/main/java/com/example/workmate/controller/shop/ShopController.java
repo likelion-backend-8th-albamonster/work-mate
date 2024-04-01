@@ -73,7 +73,7 @@ public class ShopController {
     // 아르바이트 요청 명단 불러오기
     @GetMapping("/{id}/shop-account")
     public String getAccountByAccountShop(@PathVariable("id") Long id) {
-        shopService.getAccountByAccountShop(id);
+        shopService.getAccountShopsByShopId(id);
         return "shop/account-shop-list";
     }
 }
