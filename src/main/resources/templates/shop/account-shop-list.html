@@ -10,6 +10,7 @@
 <div id="shop-account">
 
 </div>
+<hr>
 <a href="javascript:history.back()">Back</a>
 <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 <script>
@@ -55,7 +56,7 @@
             });
         }
 
-// 데이터를 가져와서 HTML을 업데이트하는 함수
+        // 데이터를 가져와서 HTML을 업데이트하는 함수
         function updatePage() {
             // 각각의 API 호출
             $.when(getAccountShop(shopId), getAccountName(shopId), getAccountStatus(shopId)).done(function (accountShopData, accountNameData, accountStatusData) {

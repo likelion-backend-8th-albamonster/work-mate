@@ -4,7 +4,6 @@ import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.service.ShopService;
-import com.example.workmate.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,6 @@ import java.util.List;
 @RequestMapping("/api/shop")
 @RequiredArgsConstructor
 public class ShopRestController {
-    private final AccountService accountService;
     private final ShopService service;
 
     // CREATE Shop
