@@ -38,6 +38,10 @@ public class AccountController {
         return "account/logout";
     }
 
+    @GetMapping("/oauth")
+    public String oauth() {
+        return "account/oauth-login";
+    }
     // 회원가입 화면
     @GetMapping("/register")
     public String registerForm() {

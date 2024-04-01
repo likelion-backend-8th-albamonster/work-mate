@@ -1,13 +1,14 @@
 package com.example.workmate.controller.account;
 
-import com.example.workmate.entity.account.Account;
 import com.example.workmate.jwt.JwtTokenUtils;
 import com.example.workmate.jwt.dto.JwtRequestDto;
 import com.example.workmate.jwt.dto.JwtResponseDto;
-import com.example.workmate.repo.AccountRepo;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -21,12 +22,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class AccountRestController {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
-    private final AccountRepo accountRepo;
-    private final JwtTokenUtils tokenUtils;
+    private final JwtTokenUtils jwtTokenUtils;
 
     @PostMapping("/login")
-    public JwtResponseDto login(
-            @RequestBody JwtRequestDto dto
+    public ResponseEntity<JwtResponseDto> login(
+            @RequestBody JwtRequestDto dto,
+            HttpServletResponse response
     ) {
         if (!manager.userExists(dto.getUsername())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
@@ -41,14 +42,18 @@ public class AccountRestController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        Account account = accountRepo.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("account Id: {}", account.getId());
+        String token = jwtTokenUtils.generateToken(userDetails);
+        log.info("token: {}", token);
 
-        JwtResponseDto response = new JwtResponseDto();
-        response.setToken(tokenUtils.generateToken(userDetails));
-        log.info("token: {}", response.getToken());
+        // 쿠키에 토큰 저장
+        Cookie cookie = new Cookie("jwtToken", token);
+        cookie.setMaxAge(24 * 60 * 60); // 쿠키의 만료 시간 설정 (예: 24시간)
+        cookie.setPath("/"); // 쿠키의 경로 설정
+        response.addCookie(cookie);
 
-        return response;
+        JwtResponseDto responseDto = new JwtResponseDto();
+        responseDto.setToken(token);
+
+        return ResponseEntity.ok().body(responseDto);
     }
 }

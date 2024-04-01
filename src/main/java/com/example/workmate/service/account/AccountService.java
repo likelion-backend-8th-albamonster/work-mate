@@ -141,7 +141,7 @@ public class AccountService {
         String shopName = accountShop.getShop().getName();
         log.info("shop: {}", shopName);
         if (!accountShop.getStatus().equals(AccountStatus.ACCEPT)) {
-            return String.format("%s: ", shopName + "아르바이트 요청중입니다.");
+            return String.format("%s: 아르바이트 요청중입니다.", shopName);
         }
 
         return shopName;
