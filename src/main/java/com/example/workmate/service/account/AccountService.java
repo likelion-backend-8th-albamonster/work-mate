@@ -137,6 +137,9 @@ public class AccountService {
     // AccountShop의 Shop불러오기
     public String ShopName(Long id) {
         AccountShop accountShop = getAccountShop(id);
+        if (!accountShop.getStatus().equals(AccountStatus.ACCEPT)) {
+            return "아르바이트 요청중입니다.";
+        }
         String shopName = accountShop.getShop().getName();
         log.info("shop: {}", shopName);
 
