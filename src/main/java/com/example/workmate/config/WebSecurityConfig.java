@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
@@ -43,17 +42,13 @@ public class WebSecurityConfig {
                                         "/account/home",
                                         "/account/login",
 
-                                        // 계정 html
-                                        "/my-profile/**",
-                                        "/email-check",
-                                        "/shop",
-                                        "/shop/{id}",
-                                        "/shop/{shopId}/shop-account",
-                                        "/shop/create",
+                                        // 로그인, 매장 아르바이트 요청 html
+                                        "/account/login",
+                                        "/account/register",
+                                        "/account/users-register",
+                                        "/account/business-register",
                                         "/account/logout",
 
-                                        // 메일 코드 확인
-                                        "/account/check-code",
                                         //근무표 관련 테스트중
                                         "/schedule/**"
 
@@ -61,38 +56,61 @@ public class WebSecurityConfig {
                                 .permitAll()
 
                                 .requestMatchers(
-                                        "/account/register",
-                                        "/account/users-register",
-                                        "/account/business-register"
-                                )
-                                .anonymous()
-
-                                .requestMatchers(
-                                        "/account/oauth",
+                                        "/my-profile",
                                         "/profile",
-                                        "/profile/{id}",
-                                        "/profile/{id}/update",
-                                        "/profile/email-check",
-                                        "/profile/check-code",
-                                        "/profile/submit")
+                                        "/account/oauth")
                                 .authenticated()
 
-                                // 매장 생성 테스트용
                                 .requestMatchers(
-                                        "/api/shop/crete",
+                                        "/shop",
+                                        "/shop/{id}",
+                                        "/api/shop/read-all",
+                                        "/api/shop/read-one",
                                         "/api/shop/{id}",
+                                        "/profile/{id}",
+                                        "/profile/{id}/update")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_USER.getAuthority()
+                                )
+
+                                // 이메일 인증 - 비활성 유저
+                                .requestMatchers(
+                                        "/email-check",
+                                        "/profile/email-check",
+                                        "/profile/check-code")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_INACTIVE_USER.getAuthority(),
+                                        Authority.ROLE_ADMIN.getAuthority()
+                                )
+
+                                // 아르바이트 요청 - USER만 가능
+                                .requestMatchers(
+                                        "/profile/submit")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_USER.getAuthority(),
+                                        Authority.ROLE_ADMIN.getAuthority()
+                                )
+
+                                // 매장에서 아르바이트 요청 확인
+                                .requestMatchers(
+                                        "/shop/create",
+                                        "/shop/{shopId}/shop-account",
+                                        "/api/shop/crete",
                                         "/api/shop/{id}/update",
                                         "/api/shop/{id}/delete",
                                         "/api/shop/{id}/shop-account",
                                         "/api/shop/{id}/shop-account/account-name",
                                         "/api/shop/{id}/shop-account/account-status",
-                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}",
-                                        "/{id}/shop-account/account-name")
-                                .authenticated()
+                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority()
+                                )
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
-                        .permitAll()
                         .successHandler(oAuth2SuccessHandler)
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService))
