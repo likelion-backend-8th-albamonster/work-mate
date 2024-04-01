@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -98,6 +100,7 @@ public class ScheduleService {
 
     // 근무 하나 보기
     public WorkTimeDto readOne(Long workTimeId){
+
         WorkTime workTime = workTimeRepo.findById(workTimeId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
@@ -125,8 +128,8 @@ public class ScheduleService {
 
     // 한달 해당 매장의 근무표 불러오기
     public List<WorkTimeDto> viewMonth(Long shopId,ScheduleDto dto){
-        // 테스트중이라 확인하는거 임시로 자름
-        // checkMember(shopId);
+
+        checkMember(shopId);
 
         // 시작일과 마지막날 구하기
         dto.setDay(0);
@@ -160,7 +163,7 @@ public class ScheduleService {
             LocalDate start,
             LocalDate end
     ){
-        //checkMember(shopId);
+        checkMember(shopId);
 
         log.info("viewPeriod");
         // 시작일과 마지막날 구하기
@@ -200,16 +203,16 @@ public class ScheduleService {
         Shop shop = shopRepo.findById(dto.getShopId()).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
-        WorkTime workTime = workTimeRepo.findById(dto.getWorkTimeId()).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        );
         return ChangeRequestDto.fromEntity(changeRequestRepo.save(ChangeRequest.builder()
                 .account(account)
                 .shop(shop)
-                .workTime(workTime)
+                .myWorkTimeId(dto.getMyWorkTimeId())
+                .changeWorkTimeId(dto.getChangeWorkTimeId())
                 .cancelReason("")
+                .status(ChangeRequest.Status.OFFERED)
                 .build()));
     }
+
     // 근무표 변경요청 조회하기
     public List<ChangeRequestDto> readChangeAll(Long shopId){
         checkMember(shopId);
@@ -229,35 +232,42 @@ public class ScheduleService {
     // 근무표 변경요청 승인하기
     public ChangeRequestDto confirmChange(Long changeRequestId){
         ChangeRequest changeRequest = changeRequestRepo.findById(changeRequestId).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "change request failed")
         );
 
         //해당 매장의 매니저 이상 가능
         Account account = checkMember(changeRequest.getShop().getId());
         checkManagerOrAdmin(account);
 
+        if(changeRequest.getStatus().equals(ChangeRequest.Status.DECLINED)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "already declined");
+        }
         changeRequest.setStatus(ChangeRequest.Status.CONFIRMED);
 
-        WorkTime changeTime1 = workTimeRepo.findById(changeRequest.getWorkTime().getId()).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        WorkTime myWorkTime = workTimeRepo.findById(changeRequest.getMyWorkTimeId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "my workTime failed")
         );
-        WorkTime changeTime2 = workTimeRepo.findByAccount_Id(changeRequest.getAccount().getId()).orElseThrow(
-                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        WorkTime changeWorkTime = workTimeRepo.findById(changeRequest.getChangeWorkTimeId()).orElseThrow(
+                ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "change workTime failed")
         );
 
-        LocalDateTime changeStartTime = changeTime1.getWorkStartTime();
-        LocalDateTime changeEndTime = changeTime1.getWorkEndTime();
+        LocalDateTime changeStartTime = myWorkTime.getWorkStartTime();
+        LocalDateTime changeEndTime = myWorkTime.getWorkEndTime();
+        log.info("before workTime: {}",myWorkTime.getWorkStartTime());
 
-        changeTime1.changeTime(
-                changeTime2.getWorkStartTime(),
-                changeTime2.getWorkEndTime()
+        myWorkTime.changeTime(
+                changeWorkTime.getWorkStartTime(),
+                changeWorkTime.getWorkEndTime()
         );
-        changeTime2.changeTime(
+        changeWorkTime.changeTime(
                 changeStartTime,
                 changeEndTime
         );
+
+        log.info("after workTime: {}",myWorkTime.getWorkStartTime());
+
         changeRequestRepo.save(changeRequest);
-        workTimeRepo.saveAll(List.of(changeTime1,changeTime2));
+        workTimeRepo.saveAll(List.of(myWorkTime,changeWorkTime));
         return ChangeRequestDto.fromEntity(changeRequest);
     }
 
@@ -267,6 +277,9 @@ public class ScheduleService {
         ChangeRequest changeRequest = changeRequestRepo.findById(changeRequestId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
+        if(changeRequest.getStatus().equals(ChangeRequest.Status.CONFIRMED)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "already confirmed");
+        }
         //해당 매장의 매니저 이상 가능
         Account account = checkMember(changeRequest.getShop().getId());
         checkManagerOrAdmin(account);
@@ -279,10 +292,9 @@ public class ScheduleService {
 
     // 해당 매장 직원인지 확인하기
     public Account checkMember(Long shopId){
-        String username = authFacade.getAuth().getName();
-        Account account = accountRepo.findByUsername(username).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        );
+        Account account = authFacade.getAccount();
+        log.info("username: {}",account.getUsername());
+        log.info("accountId: {}, shopId: {}",account.getId(),shopId);
         Optional<AccountShop> optionalAccountShop =
                 accountShopRepo.findByShop_IdAndAccount_id(shopId, account.getId());
         if (optionalAccountShop.isEmpty())

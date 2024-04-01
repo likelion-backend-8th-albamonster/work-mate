@@ -23,10 +23,11 @@ public class ChangeRequest {
     @JoinColumn(name = "shop_id")
     private Shop shop;
 
-    //바꿀 사람의 근무시간
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workTime_id")
-    private WorkTime workTime;
+    //내 근무시간 id
+    private Long myWorkTimeId;
+
+    //바꿀 사람의 근무시간 id
+    private Long changeWorkTimeId;
 
     private String cancelReason;
 

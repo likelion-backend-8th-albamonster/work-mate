@@ -71,10 +71,10 @@ public class AttendanceController {
     //출근요청
     //NCP api를 통해 사용자의 위치가 매장 근처인지 확인
     //이미 기록된 시간이 있는 경우 출근 등록 거부
-    @PostMapping("/checkIn/{userId}/{shopId}")
+    @PostMapping("/checkIn/{accountId}/{shopId}")
     public String checkIn(
-            @PathVariable("userId")
-            Long userId,
+            @PathVariable("accountId")
+            Long accountId,
             @PathVariable("shopId")
             Long shopId,
             @RequestParam("userLat")
@@ -93,14 +93,14 @@ public class AttendanceController {
         //사용자가 매장 위치에 있는지 확인
         if (naviService.checkTwoPoint(userPointDto, shopAddress)){
             //오늘 날짜에 이미 기록된 출근이 있는지 확인
-            boolean isExist = attendanceService.isExistTodayCheckIn(userId, shopId);
+            boolean isExist = attendanceService.isExistTodayCheckIn(accountId, shopId);
             //이미 출근정보가 있다면
             if (isExist){
                 //"중복 출근 요청입니다." alert창으로 나타내기
                 redirectAttributes.addFlashAttribute("msg", "중복 출근 요청입니다.");
             }
             //사용자 출근 정보 저장
-            AttendanceDto dto = attendanceService.checkIn(userId, shopId);
+            AttendanceDto dto = attendanceService.checkIn(accountId, shopId);
             //출근 확인되었습니다 alert창으로 나타내기
             redirectAttributes.addFlashAttribute("msg", "출근 확인되었습니다.");
         }
@@ -108,15 +108,14 @@ public class AttendanceController {
         else {
             redirectAttributes.addFlashAttribute("msg", "현재 위치를 확인해주세요.");
         }
-        return String.format("redirect:/attendance/%d/%d", userId, shopId);
+        return String.format("redirect:/attendance/%d/%d", accountId, shopId);
     }
 
     //퇴근요청
-    //퇴근시간이 자신의 근무종료시간보다 늦다면 추가정산이 이루어진다.
-    @PostMapping("/checkOut/{userId}/{shopId}")
+    @PostMapping("/checkOut/{accountId}/{shopId}")
     public String checkOut(
-            @PathVariable("userId")
-            Long userId,
+            @PathVariable("accountId")
+            Long accountId,
             @PathVariable("shopId")
             Long shopId,
             @RequestParam("userLat")
@@ -147,15 +146,15 @@ public class AttendanceController {
             //"현재 위치를 확인해주세요" alert창으로 나타내기
             redirectAttributes.addFlashAttribute("msg", "현재 위치를 확인해주세요.");
         }
-        return String.format("redirect:/attendance/%d/%d", userId, shopId);
+        return String.format("redirect:/attendance/%d/%d", accountId, shopId);
     }
 
     //쉬는시간요청
     //출근상태에만 쉬는시간 요청이 가능
-    @PostMapping("/restIn/{userId}/{shopId}")
+    @PostMapping("/restIn/{accountId}/{shopId}")
     public String restIn(
-            @PathVariable("userId")
-            Long userId,
+            @PathVariable("accountId")
+            Long accountId,
             @PathVariable("shopId")
             Long shopId,
             @RequestParam("userLat2")
@@ -185,14 +184,14 @@ public class AttendanceController {
         else {
             redirectAttributes.addFlashAttribute("msg", "현재 위치를 확인해주세요.");
         }
-        return String.format("redirect:/attendance/%d/%d", userId, shopId);
+        return String.format("redirect:/attendance/%d/%d", accountId, shopId);
     }
     //쉬는시간종료요청
     //출근상태에만 요청이 가능
-    @PostMapping("/restOut/{userId}/{shopId}")
+    @PostMapping("/restOut/{accountId}/{shopId}")
     public String restOut(
-            @PathVariable("userId")
-            Long userId,
+            @PathVariable("accountId")
+            Long accountId,
             @PathVariable("shopId")
             Long shopId,
             @RequestParam("userLat2")
@@ -222,7 +221,7 @@ public class AttendanceController {
         else {
             redirectAttributes.addFlashAttribute("msg", "현재 위치를 확인해주세요.");
         }
-        return String.format("redirect:/attendance/%d/%d", userId, shopId);
+        return String.format("redirect:/attendance/%d/%d", accountId, shopId);
     }
 
     //출퇴근 기록 보기(아르바이트생/관리자)
@@ -329,7 +328,7 @@ public class AttendanceController {
 
     //출퇴근 수정(관리자)
     //모든 아르바이트생의 출퇴근 기록 수정 가능
-    //Status를 수정하여, 정상출근 / 지각 / 조퇴 상태 변경
+    //출근데이터의 Status를 수정하여 출근 / 쉬는시간 / 쉬는시간 종료 / 퇴큰 상태를 변경
     @PostMapping("/update/{accountId}")
     public String update(
             @PathVariable("accountId")
@@ -373,7 +372,7 @@ public class AttendanceController {
         attendanceService.updateLog(attendanceId, status);
         //일괄 update
         //attendanceService.updateLogAll(shopId,updateDto);
-        redirectAttributes.addFlashAttribute("msg", "수정되었습니다! 클릭한번에 알바생의 일급 삭제! ^0^");
+        redirectAttributes.addFlashAttribute("msg", "수정되었습니다! ^0^");
         return String.format("redirect:/attendance/showLog/%d", accountId);
 
     }

@@ -42,11 +42,16 @@
                 <label for="endDate">끝 날짜</label>
                 <input type="date" name="endDate" id="endDate"
                        th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />
-                <input type="submit" value = "검색하기">
+                <input type="submit" value = "근무검색하기">
             </form>
         </td>
         <td style="border: none; text-align: center; width: 200px">
-            <a th:href="@{/schedule/{shopId}/change(shopId = ${shopId})}">근무 변경신청</a>
+            <p style="margin-bottom: 0.3em">
+                <a th:href="@{/schedule/{shopId}/change(shopId = ${shopId})}">근무</a>
+            </p>
+            <p style="margin-top: 0.3em">
+                <a th:href="@{/schedule/{shopId}/change(shopId = ${shopId})}">변경신청</a>
+            </p>
         </td>
     </tr>
 </table>

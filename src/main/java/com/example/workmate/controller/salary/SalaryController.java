@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -60,10 +61,7 @@ public class SalaryController {
     // 알바가 자신이 일하는 모든 매장의 월급내역 볼 떄 필요
     @ResponseBody
     @PostMapping("my-salaries")
-    public List<List<SalaryDto>> mySettleAll(
-            @PathVariable("shopId")
-            Long shopId
-    ){
+    public List<List<SalaryDto>> mySettleAll(){
         return salaryService.readEachShopSalary();
     }
 
