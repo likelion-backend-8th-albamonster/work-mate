@@ -72,12 +72,22 @@ public class ShopRestController {
         return service.getAccountStatus(id);
     }
 
+    // 아르바이트 요청 승낙
     @PostMapping("/{id}/shop-account/accept/{accountShopId}")
     public String accept(
             @PathVariable("id") Long shopId,
             @PathVariable("accountShopId") Long accountShopId
     ) {
         return String.format("Status: %s", service.accept(shopId, accountShopId));
+    }
+
+    // 아르바이트 요청 거절
+    @DeleteMapping("/{id}/shop-account/delete/{accountShopId}")
+    public void delete(
+            @PathVariable("id") Long shopId,
+            @PathVariable("accountShopId") Long accountShopId
+    ) {
+        service.deleteAccountShop(shopId, accountShopId);
     }
 
 }

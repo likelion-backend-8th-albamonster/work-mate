@@ -105,7 +105,8 @@ public class WebSecurityConfig {
                                         "/api/shop/{id}/shop-account",
                                         "/api/shop/{id}/shop-account/account-name",
                                         "/api/shop/{id}/shop-account/account-status",
-                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}")
+                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}",
+                                        "/api/shop/{id}/shop-account/delete/{accountShopId}")
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
