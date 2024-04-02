@@ -22,66 +22,80 @@
     </style>
 </head>
 <body>
-
-<h1 th:text="${#temporals.month(schedules.get(0).workStartTime)} + '월 근무표'"
-    style="text-align: center; font-size: 50px; margin-top: 5%"></h1>
-
-<table style="border-style : none; width:20%; margin-left: 60% " >
-    <tr>
-        <td style="border: none;">
-        </td>
-        <td style="font-size: 35px; font-weight: bold; border: none;">
-        </td>
-        <td style="border: none;">
-            <form th:action="@{/schedule/find-schedule/{shopId}(shopId = ${shopId})}"
-                  th:object="${periodScheduleDto}" method="post">
-                <label for="startDate">시작 날짜</label>
-                <input type="date" name="startDate" id="startDate"
-                       th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />
-                <p></p>
-                <label for="endDate">끝 날짜</label>
-                <input type="date" name="endDate" id="endDate"
-                       th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />
-                <input type="submit" value = "근무검색하기">
-            </form>
-        </td>
-        <td style="border: none; text-align: center; width: 200px">
-            <p style="margin-bottom: 0.3em">
-                <a th:href="@{/schedule/{shopId}/change(shopId = ${shopId})}">근무</a>
-            </p>
-            <p style="margin-top: 0.3em">
-                <a th:href="@{/schedule/{shopId}/change(shopId = ${shopId})}">변경신청</a>
-            </p>
-        </td>
-    </tr>
-</table>
-<table style="width:70%; margin-left: 15%; margin-right: 15%;">
-    <caption style="font-size: 30px; padding-bottom: 30px">알바몬스터 분식 서울본점</caption>
-
-
-    <tr>
-        <th style = "font-size: 20px; font-weight: bold; background : #ff5464; color : aliceblue;">일</th>
-        <th class="day" style="font-size: 20px; font-weight: bold">월</th>
-        <th class="day" style="font-size: 20px; font-weight: bold">화</th>
-        <th class="day" style="font-size: 20px; font-weight: bold">수</th>
-        <th class="day" style="font-size: 20px; font-weight: bold">목</th>
-        <th class="day" style="font-size: 20px; font-weight: bold">금</th>
-        <th class="day" style = "font-size: 20px; font-weight: bold; background : cornflowerblue; color : aliceblue;">토</th>
-    </tr>
-    <tr th:if="${schedules.isEmpty()}" th:text="근무표 없음"></tr>
-    <tr th:unless="${schedules.isEmpty()}" th:each=" weeks : ${#numbers.sequence(0,calender.size() / 7 - 1)}">
-        <td th:each=" days : ${#numbers.sequence(0,6)}">
-            <label style="font-size: 20px; font-weight: bold" th:unless="${calender[days + weeks * 7]} == -1" th:text="${calender[days + weeks * 7]} + ' 일'"></label>
-            <th:block th:each="schedule : ${schedules}">
-                <th:block th:with ="day = ${days} + ${weeks} * 7">
-                       <p th:text="${schedule.name} + ' : ' + ${#temporals.hour(schedule.workStartTime)} + ' ~ ' + ${#temporals.hour(schedule.workEndTime)}"
-                          th:if="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
-                       <p th:unless="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
+<th:block th:if="${authority} != anonymous">
+    <h1 th:text="${#temporals.month(schedules.get(0).workStartTime)} + '월 근무표'"
+        style="text-align: center; font-size: 50px; margin-top: 5%"></h1>
+    <table style="border-style : none; width:20%; margin-left: 60% " >
+        <tr>
+            <td style="border: none;">
+            </td>
+            <td style="font-size: 35px; font-weight: bold; border: none;">
+            </td>
+            <td style="border: none;">
+                <form th:action="@{/schedule/list-schedule/{shopId}(shopId = ${shop.getId()})}"
+                      th:object="${periodScheduleDto}" method="post">
+                    <label for="startDate">시작 날짜</label>
+                    <input type="date" name="startDate" id="startDate"
+                           th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />
+                    <p></p>
+                    <label for="endDate">끝 날짜</label>
+                    <input type="date" name="endDate" id="endDate"
+                           th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />
+                    <input type="submit" value = "근무검색하기">
+                </form>
+            </td>
+            <td style="border: none; text-align: center; width: 200px">
+                <p style="margin-bottom: 0.3em">
+                    <a th:href="@{/schedule/change-worktime/{shopId}(shopId = ${shopId})}">근무</a>
+                </p>
+                <p style="margin-top: 0.3em">
+                    <a th:href="@{/schedule/change-worktime/{shopId}(shopId = ${shopId})}">변경신청</a>
+                </p>
+                <th:block th:if="${authority} != &#91;아르바이트생&#93;">
+                    <p style="margin-bottom: 0.3em; margin-top: 1em">
+                        <a th:href="@{/schedule/view-change-worktime/{shopId}(shopId = ${shopId})}">변경신청</a>
+                    </p>
+                    <p style="margin-top: 0.3em">
+                        <a th:href="@{/schedule/view-change-worktime/{shopId}(shopId = ${shopId})}">조회</a>
+                    </p>
+                    <p style="margin-bottom: 0.3em; margin-top: 1em">
+                        <a th:href="@{/schedule/manage-schedule/{shopId}(shopId = ${shopId})}">근무</a>
+                    </p>
+                    <p style="margin-top: 0.3em">
+                        <a th:href="@{/schedule/manage-schedule/{shopId}(shopId = ${shopId})}">관리하기</a>
+                    </p>
                 </th:block>
-            </th:block>
-        </td>
-    </tr>
-</table>
+            </td>
+        </tr>
+    </table>
+    <table style="width:70%; margin-left: 15%; margin-right: 15%;">
+        <caption th:text="${shop.getName()} + ' / 사용자: ' + ${username}" style="font-size: 30px; padding-bottom: 30px"></caption>
+
+
+        <tr>
+            <th style = "font-size: 20px; font-weight: bold; background : #ff5464; color : aliceblue;">일</th>
+            <th class="day" style="font-size: 20px; font-weight: bold">월</th>
+            <th class="day" style="font-size: 20px; font-weight: bold">화</th>
+            <th class="day" style="font-size: 20px; font-weight: bold">수</th>
+            <th class="day" style="font-size: 20px; font-weight: bold">목</th>
+            <th class="day" style="font-size: 20px; font-weight: bold">금</th>
+            <th class="day" style = "font-size: 20px; font-weight: bold; background : cornflowerblue; color : aliceblue;">토</th>
+        </tr>
+        <tr th:if="${schedules.isEmpty()}" th:text="근무표 없음"></tr>
+        <tr th:unless="${schedules.isEmpty()}" th:each=" weeks : ${#numbers.sequence(0,calender.size() / 7 - 1)}">
+            <td th:each=" days : ${#numbers.sequence(0,6)}">
+                <label style="font-size: 20px; font-weight: bold" th:unless="${calender[days + weeks * 7]} == -1" th:text="${calender[days + weeks * 7]} + ' 일'"></label>
+                <th:block th:each="schedule : ${schedules}">
+                    <th:block th:with ="day = ${days} + ${weeks} * 7">
+                        <p th:text="${schedule.name} + ' : ' + ${#temporals.hour(schedule.workStartTime)} + ' ~ ' + ${#temporals.hour(schedule.workEndTime)}"
+                           th:if="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
+                        <p th:unless="${#temporals.day(schedule.workStartTime)} == ${calender[day]}"></p>
+                    </th:block>
+                </th:block>
+            </td>
+        </tr>
+    </table>
+</th:block>
 </body>
 </html>
 
