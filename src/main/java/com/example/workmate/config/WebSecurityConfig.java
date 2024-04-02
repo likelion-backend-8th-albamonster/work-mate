@@ -137,14 +137,14 @@ public class WebSecurityConfig {
                                         Authority.ROLE_USER.getAuthority()
                                 )
 
-                                // 출퇴근 기록 페이지 테스트
-                                .requestMatchers(
-                                        "/attendance/{accountId}/{shopId}")
-                                .hasAnyAuthority(
-                                        Authority.ROLE_ADMIN.getAuthority(),
-                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
-                                        Authority.ROLE_USER.getAuthority()
-                                )
+//                                // 출퇴근 기록 페이지 테스트
+//                                .requestMatchers(
+//                                        "/attendance/{accountId}/{shopId}")
+//                                .hasAnyAuthority(
+//                                        Authority.ROLE_ADMIN.getAuthority(),
+//                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+//                                        Authority.ROLE_USER.getAuthority()
+//                                )
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
