@@ -23,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ProfileRestController {
     private final UserDetailsManager manager;
-    private final PasswordEncoder passwordEncoder;
     private final AccountService service;
     private final MailService mailService;
 

@@ -92,6 +92,7 @@ public class WebSecurityConfig {
                                         "/profile/submit")
                                 .hasAnyAuthority(
                                         Authority.ROLE_USER.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
                                         Authority.ROLE_ADMIN.getAuthority()
                                 )
 
