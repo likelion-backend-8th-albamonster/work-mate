@@ -98,8 +98,9 @@
 
                         submittedShopIds.forEach(shopId => {
                             const attendanceLink = `attendance/${accountId}/${shopId}`;
-                            const anchorTag = `<li><a href="${attendanceLink}">${shopName}</a></li>`;
-                            accountShopDiv.append(`<p>${anchorTag}</p>`);
+                            const communityLink = `community/${shopId}`;
+                            const listItem = `<li><a href="${attendanceLink}">${shopName}</a> | <a href="${communityLink}">${shopName} 커뮤니티</a></li>`;
+                            accountShopDiv.append(`<p>${listItem}</p>`);
                         });
                     }).fail(function (error) {
                         console.error('Error:', error);
