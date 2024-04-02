@@ -17,7 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -114,36 +116,34 @@ public class AccountService {
         return optionalShop.get();
     }
 
-    // Id로 매장 불러오기
-    private Shop getShop(Long id) {
-        Optional<Shop> optionalShop = shopRepo.findById(id);
-        if (optionalShop.isEmpty()) {
-            log.error("매장을 찾을 수 없습니다.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return optionalShop.get();
+    // 요청한 아르바이트 명단 불러오기
+    public List<AccountShopDto> getAccountShopByAccountId(Long accountId) {
+        List<AccountShop> accountShops = accountShopRepo.findByAccount_Id(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return accountShops.stream()
+                .map(AccountShopDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
-    // AccountShop 불러오기
-    public AccountShop getAccountShop(Long id) {
-        Optional<AccountShop> optionalAccountShop = accountShopRepo.findById(id);
-        if (optionalAccountShop.isEmpty()) {
-            log.error("요청을 찾을 수 없습니다.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        return optionalAccountShop.get();
+    // 아르바이트 명단에서 Shop name 불러오기
+    public List<String> getShopNameByAccountShop(Long accountId) {
+        List<AccountShop> accountShops = accountShopRepo.findByAccount_Id(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        return accountShops.stream()
+                .map(AccountShop::getShop)
+                .map(Shop::getName)
+                .toList();
     }
 
-    // AccountShop의 Shop불러오기
-    public String ShopName(Long id) {
-        AccountShop accountShop = getAccountShop(id);
+    // 아르바이트 요청 명단에서 아르바이트 상태 불러오기
+    public List<AccountStatus> getAccountStatus(Long accountId) {
+        List<AccountShop> accountShops = accountShopRepo.findByAccount_Id(accountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        String shopName = accountShop.getShop().getName();
-        log.info("shop: {}", shopName);
-        if (!accountShop.getStatus().equals(AccountStatus.ACCEPT)) {
-            return String.format("%s: 아르바이트 요청중입니다.", shopName);
-        }
-
-        return shopName;
+        return accountShops.stream()
+                .map(AccountShop::getStatus)
+                .toList();
     }
 }

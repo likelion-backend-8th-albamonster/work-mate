@@ -58,6 +58,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/my-profile",
                                         "/profile",
+                                        "/profile/{id}",
                                         "/account/oauth")
                                 .authenticated()
 
@@ -67,7 +68,6 @@ public class WebSecurityConfig {
                                         "/api/shop/read-all",
                                         "/api/shop/read-one",
                                         "/api/shop/{id}",
-                                        "/profile/{id}",
                                         "/profile/{id}/update")
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),

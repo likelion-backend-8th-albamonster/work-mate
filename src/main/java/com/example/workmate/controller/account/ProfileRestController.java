@@ -3,6 +3,7 @@ package com.example.workmate.controller.account;
 import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.account.AccountShopDto;
 import com.example.workmate.dto.shop.ShopDto;
+import com.example.workmate.entity.account.AccountStatus;
 import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.account.MailService;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,12 +31,6 @@ public class ProfileRestController {
     @GetMapping
     public AccountDto readOneAccount() {
        return service.readOneAccount();
-    }
-
-    @GetMapping("/{id}")
-    public String readOneAccountShop(@PathVariable("id") Long id) {
-        AccountShopDto accountShopDto = AccountShopDto.fromEntity(service.getAccountShop(id));
-        return service.ShopName(accountShopDto.getId());
     }
 
     // 정보 업데이트
@@ -69,6 +66,24 @@ public class ProfileRestController {
         }
 
         return mailService.checkCode(accountDto.getUsername(), code);
+    }
+
+    // 아르바이트 요청 명단 불러오기
+    @GetMapping("/{id}/account-shop")
+    public List<AccountShopDto> getAccountShopByAccountId(@PathVariable("id") Long id) {
+        return service.getAccountShopByAccountId(id);
+    }
+
+    // 아르바이트 요청 명단에서 Shop name 불러오기
+    @GetMapping("/{id}/account-shop/shop-name")
+    public List<String> getShopNameByAccountShop(@PathVariable("id") Long id) {
+        return service.getShopNameByAccountShop(id);
+    }
+
+    // 아르바이트 요청 명단에서 아르바이트 상태 불러오기
+    @GetMapping("/{id}/account-shop/account-status")
+    public List<AccountStatus> getAccountStatus(@PathVariable("id") Long id) {
+        return service.getAccountStatus(id);
     }
 
     // shop에 아르바이트 신청
