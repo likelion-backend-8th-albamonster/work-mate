@@ -19,4 +19,9 @@ public class ProfileController {
     public String emailCheck() {
         return "account/check-email";
     }
+
+    @GetMapping("/check-code")
+    public String checkCode() {
+        return "account/check-code";
+    }
 }

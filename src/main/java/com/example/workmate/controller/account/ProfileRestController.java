@@ -13,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -65,7 +62,7 @@ public class ProfileRestController {
     // 이메일 코드 일치하는지 체크
     @PostMapping("/check-code")
     public ResponseEntity<String> checkCode(
-            @RequestParam("username-check") String username,
+            @RequestParam("username") String username,
             @RequestParam("code") String code
     ) {
         Account account = accountRepo.findByUsername(authFacade.getAuth().getName())
