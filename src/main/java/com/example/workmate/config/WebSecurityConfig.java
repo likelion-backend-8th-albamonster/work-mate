@@ -54,7 +54,8 @@ public class WebSecurityConfig {
 
                                 .requestMatchers(
                                         "/my-profile",
-                                        "/profile",
+                                        "/profile/**",
+                                        "/profile/{id}",
                                         "/account/oauth")
                                 .authenticated()
 
@@ -64,8 +65,9 @@ public class WebSecurityConfig {
                                         "/api/shop/read-all",
                                         "/api/shop/read-one",
                                         "/api/shop/{id}",
-                                        "/profile/{id}",
-                                        "/profile/{id}/update")
+                                        "/profile/{id}/update",
+
+                                        "attendance/{accountId}/{shopId}")
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority(),
@@ -87,6 +89,7 @@ public class WebSecurityConfig {
                                         "/profile/submit")
                                 .hasAnyAuthority(
                                         Authority.ROLE_USER.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
                                         Authority.ROLE_ADMIN.getAuthority()
                                 )
 
@@ -100,7 +103,8 @@ public class WebSecurityConfig {
                                         "/api/shop/{id}/shop-account",
                                         "/api/shop/{id}/shop-account/account-name",
                                         "/api/shop/{id}/shop-account/account-status",
-                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}")
+                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}",
+                                        "/api/shop/{id}/shop-account/delete/{accountShopId}")
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()

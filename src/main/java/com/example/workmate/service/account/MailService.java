@@ -1,5 +1,6 @@
 package com.example.workmate.service.account;
 
+import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.MailAuth;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,6 +38,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class MailService {
     private static final Properties PROPERTIES = new Properties();
+    private final AccountService accountService;
 
     @Value("${spring.mail.username}")
     private String USERNAME;   //change it
@@ -62,11 +65,23 @@ public class MailService {
     }
 
     public void send(String username, String authMail){
+        Account user = accountRepo.findByUsername(authFacade.getAuth().getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        log.info("username: {}", user.getUsername());
+
+        if (!user.getUsername().equals(username) ||
+                !user.getEmail().equals(authMail))
+        {
+            log.error("아이디 또는 이메일이 일치하지 않습니다.");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
         Authenticator authenticator = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(USERNAME, PASSWORD);
             }
         };
+
         log.info("auth: {}",authenticator.getClass());
         // 랜덤 문자열 생성
         String securityCode = RandomStringUtils.random(codeLen, usedLetters, usedNumbers);

@@ -10,14 +10,16 @@
 </head>
 <body>
 <h1>마이페이지</h1>
-<a th:href="@{/schedule/1}">월별근무표</a>
-<a th:href="@{/1/community}">커뮤니티</a>
+  
 <div id="profile">
     <!-- 프로필 정보가 여기에 표시됩니다 -->
 </div>
 <a href="/email-check">이메일 확인하기</a>
 <hr>
-<a href="/shop">아르바이트 매장 추가하기</a>
+<a href="/shop">출근 중인 매장 추가하기</a>
+<div id="account-shop">
+    <!-- 아르바이트 매장 정보가 여기에 표시됩니다 -->
+</div>
 <hr>
 <a href="/account/logout">로그아웃</a>
 <script>
@@ -25,8 +27,6 @@
         // 로그인 페이지에서 저장한 토큰을 가져옴
         const token = localStorage.getItem("jwtToken");
         const headers = {};
-
-        // console.log(`token = ${token}`);
 
         // 토큰이 있으면 헤더에 추가
         if (token) {
@@ -42,44 +42,70 @@
             success: function (account) {
                 console.log(token);
                 console.log(account);
-                let shopPromises = [];
 
-                // 각 accountShop의 id를 이용하여 실제 Shop 데이터를 불러오는 Promise를 생성하여 배열에 추가
-                account.accountShopsId.forEach(id => {
-                    let promise = $.ajax({
-                        type: "GET",
-                        url: `/profile/${id}`, // 해당 URL은 각 Shop의 정보를 반환하는 API 엔드포인트여야 합니다.
-                        headers: headers,
-                        contentType: "application/json"
+                const accountId = account.id;
+                console.log(accountId)
+
+                $('#profile').html(`
+                    <h2>${account.name}님 반갑습니다.</h2>
+                    <p>ID: ${account.username}</p>
+                    <p>Email: ${account.email}</p>`
+                );
+
+                function getAccountShop(accountId) {
+                    return $.ajax({
+                        url: `profile/${accountId}/account-shop`,
+                        method: 'GET',
+                        headers: headers
                     });
-                    shopPromises.push(promise);
-                });
+                }
 
-                Promise.all(shopPromises)
-                    .then(shops => {
-                        let shopList = '';
-                        shops.forEach(shop => {
-                            shopList += `<li>${shop}</li>`;
-                        });
+                function getShopName(accountId) {
+                    return $.ajax({
+                        url: `profile/${accountId}/account-shop/shop-name`,
+                        method: 'GET',
+                        headers: headers
+                    });
+                }
 
-                        // 비어있는 경우
-                        if (shopList === '') {
-                            shopList += '<p>아르바이트 중인 매장이 없습니다.</p>';
+                function getAccountStatus(accountId) {
+                    return $.ajax({
+                        url: `profile/${accountId}/account-shop/account-status`,
+                        method: 'GET',
+                        headers: headers
+                    });
+                }
+
+                function updatePage() {
+                    $.when(getAccountShop(accountId), getShopName(accountId), getAccountStatus(accountId)).done(function (accountShopData, shopNameData, accountStatusData) {
+                        const accountShop = accountShopData[0];
+                        const shopName = shopNameData[0];
+                        const accountStatus = accountStatusData[0];
+
+                        // SUBMITTED 상태인 shop id 리스트 만들기
+                        const submittedShopIds = [];
+                        for (let i = 0; i < accountShop.length; i++) {
+                            if (accountShop[i].status === "ACCEPT") {
+                                submittedShopIds.push(accountShop[i].id);
+                            }
                         }
 
-                        $('#profile').html(`
-                            <h2>${account.name}님 반갑습니다.</h2>
-                            <p>ID: ${account.username}</p>
-                            <p>Email: ${account.email}</p>
-                            <p>아르바이트</p>
-                            <ul>
-                                ${shopList}
-                            </ul>
-                        `);
-                    })
-                    .catch(error => {
-                        console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);
+                        // 만들어진 id 리스트
+                        console.log("Submitted Account IDs:", submittedShopIds);
+
+                        // HTML 업데이트
+                        const accountShopDiv = $(`#account-shop`);
+
+                        submittedShopIds.forEach(id => {
+                            const attendanceLink = `attendance/${accountId}/${id}`;
+                            const anchorTag = `<li><a href="${attendanceLink}">${shopName}</a></li>`;
+                            accountShopDiv.append(`<p>${anchorTag}</p>`);
+                        });
+                    }).fail(function (error) {
+                        console.error('Error:', error);
                     });
+                }
+                updatePage();
             },
             error: function (xhr, status, error) {
                 console.error("프로필 정보를 가져오는 중 오류가 발생했습니다: " + error);

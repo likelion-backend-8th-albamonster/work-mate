@@ -143,6 +143,28 @@ public class ShopService {
         return target.getStatus().getStatus();
     }
 
+    // 아르바이트 요청 거절
+    public void deleteAccountShop(Long shopId, Long accountShopId) {
+        Shop shop = shopRepo.findById(shopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        AccountShop target = accountShopRepo.findById(accountShopId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        log.info("account: {}", authFacade.getAuth().getName());
+        Account account = accountRepo.findByUsername(authFacade.getAuth().getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (!account.getAuthority().equals(Authority.ROLE_BUSINESS_USER)
+                && !account.getAuthority().equals(Authority.ROLE_ADMIN)) {
+            log.error("매장의 관리자만 접근 가능합니다.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        target.setStatus(AccountStatus.REJECT);
+        log.info("Status: {}", target.getStatus().getStatus());
+        accountShopRepo.delete(target);
+    }
+
     // Check Authority
     private boolean checkAuthority(Account account) {
         // 비활성유저거나 일반 유저일 경우 true
