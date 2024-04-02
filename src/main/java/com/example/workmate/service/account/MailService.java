@@ -65,23 +65,11 @@ public class MailService {
     }
 
     public void send(String username, String authMail){
-        Account user = accountRepo.findByUsername(authFacade.getAuth().getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("username: {}", user.getUsername());
-
-        if (!user.getUsername().equals(username) ||
-                !user.getEmail().equals(authMail))
-        {
-            log.error("아이디 또는 이메일이 일치하지 않습니다.");
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
         Authenticator authenticator = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(USERNAME, PASSWORD);
             }
         };
-
         log.info("auth: {}",authenticator.getClass());
         // 랜덤 문자열 생성
         String securityCode = RandomStringUtils.random(codeLen, usedLetters, usedNumbers);
@@ -168,5 +156,15 @@ public class MailService {
         }
         else
             return "check code";
+    }
+
+    public boolean checkInfo(String username, String email) {
+        Account user = accountRepo.findByUsername(authFacade.getAuth().getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        log.info("username: {}", user.getUsername());
+        log.info("email: {}", user.getEmail());
+
+        return username.equals(user.getUsername()) &&
+                email.equals(user.getEmail());
     }
 }

@@ -67,16 +67,19 @@
             $.ajax({
                 type: "POST",
                 url: "/profile/email-check",
-                data: formData, // formData 객체를 전송
+                data: formData, // JSON 형식의 데이터 전송
                 headers: headers, // 헤더 정보 전송
                 success: function (response) {
                     // 성공적으로 요청을 처리한 경우 실행되는 코드
-                    alert("이메일을 전송했습니다.");
+                    alert("이메일을 전송했습니다.")
                     console.log(response); // 서버로부터의 응답 확인
                 },
-                error: function (error) {
-                    // 요청이 실패한 경우 실행되는 코드
-                    console.error("Error:", error);
+                error: function (xhr, status, error) {
+                    if (xhr.status === 400) {
+                        alert("아이디 또는 이메일이 일치하지 않습니다.");
+                    } else {
+                        console.error("Error:", error);
+                    }
                 }
             });
         });
