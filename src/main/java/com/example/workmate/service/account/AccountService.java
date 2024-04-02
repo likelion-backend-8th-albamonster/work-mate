@@ -45,6 +45,12 @@ public class AccountService {
         return AccountDto.fromEntity(account);
     }
 
+    public AccountDto readOneAccount(Long id) {
+        Account account = accountRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return AccountDto.fromEntity(account);
+    }
+
     // 사용자 정보 수정
     public AccountDto updateAccount(Long id, AccountDto dto) {
         Account target = accountRepo.findById(id)

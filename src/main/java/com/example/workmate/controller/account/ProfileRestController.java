@@ -27,10 +27,15 @@ public class ProfileRestController {
     private final AccountService service;
     private final MailService mailService;
 
-    // profile 정보 가져오기
     @GetMapping
     public AccountDto readOneAccount() {
        return service.readOneAccount();
+    }
+
+    // profile 정보 가져오기
+    @GetMapping("/{id}")
+    public AccountDto readOneAccount(@PathVariable("id") Long id) {
+        return service.readOneAccount(id);
     }
 
     // 정보 업데이트
