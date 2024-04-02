@@ -46,12 +46,19 @@ public class AttendanceController {
             //사용자의 ip와 매장 주소가 model에 들어가야 함
             Model model
     ){
-        //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
-        model.addAttribute("account", accountRepo.findById(accountId)
+
+        //사용자정보 확인
+        Account account = accountRepo.findById(accountId)
                 .orElseThrow(
-                        ()->new ResponseStatusException(HttpStatus.NOT_FOUND,
-                                "사용자 정보를 확인해주세요")));
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
+        model.addAttribute("account", account);
+
+        //해당매장에 다니는 사람인지 체크
+        scheduleService.checkMember(shopId);
+
         //매장 정보
         model.addAttribute("shop", shopRepo.findById(shopId)
                 .orElseThrow(
@@ -86,8 +93,16 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //사용자정보 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
         //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
+        scheduleService.checkMember(shopId);
+
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -130,8 +145,16 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //사용자정보 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
+
         //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
+        scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -169,8 +192,15 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //사용자정보 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
         //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
+        scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -206,8 +236,15 @@ public class AttendanceController {
             //리다이렉트 값을 보내기 위한 변수
             RedirectAttributes redirectAttributes
     ){
+        //사용자정보 확인
+        Account account = accountRepo.findById(accountId)
+                .orElseThrow(
+                        ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
+                );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
         //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
+        scheduleService.checkMember(shopId);
         //사용자 좌표
         PointDto userPointDto = new PointDto(userLat, userLng);
         //사용자가 매장 위치에 있는지 확인
@@ -238,8 +275,6 @@ public class AttendanceController {
             Integer pageSize,
             Model model
     ){
-        //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
         //페이징
         Page<AttendanceLogDto> attendanceLogList;
         //사용자정보 확인
@@ -247,6 +282,8 @@ public class AttendanceController {
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
                 );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
         //매장 id가 주어지지 않을 때
         if (shopId == 0){
             //한 유저의 모든 매장 출근 데이터 가져오기
@@ -294,13 +331,13 @@ public class AttendanceController {
             String searchType,
             Model model
     ){
-        //해당매장에 다니는 사람인지 체크
-        //scheduleService.checkMember(shopId);
         //사용자정보 확인
         Account account = accountRepo.findById(accountId)
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요")
                 );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
 
         //검색 서비스
         Page<AttendanceLogDto> attendanceLogList
@@ -351,10 +388,12 @@ public class AttendanceController {
                 .orElseThrow(
                         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 정보를 확인해주세요.")
                 );
+        //사용자 동일 여부 체크
+        attendanceService.checkSameAccount(account);
         //사용자 권한 확인. 아르바이트생이면 안됨.
         scheduleService.checkManagerOrAdmin(account);
         //해당 매장의 관리자가 맞는지 체크
-        //scheduleService.checkMember(shopId);
+        scheduleService.checkMember(shopId);
 //        List<AttendanceLogUpdateDto> updateDto
 //                = new ArrayList<>();
 //        AttendanceLogUpdateDto dto1 = AttendanceLogUpdateDto.builder()

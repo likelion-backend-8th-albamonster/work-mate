@@ -9,6 +9,7 @@ import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.attendance.Status;
+import com.example.workmate.facade.AuthenticationFacade;
 import com.example.workmate.repo.AccountRepo;
 import com.example.workmate.repo.AccountShopRepo;
 import com.example.workmate.repo.ShopRepo;
@@ -39,6 +40,7 @@ public class AttendanceService {
     private final ShopRepo shopRepo;
     private final AttendanceRepoDsl attendanceRepoDsl;
     private final AccountShopRepo accountShopRepo;
+    private final AuthenticationFacade authFacade;
 
     //출근요청
     //이미 기록된 시간이 있는 경우 출근 등록 거부
@@ -460,6 +462,13 @@ public class AttendanceService {
                         searchDuration,searchWord,searchType);
 
         return attendanceLogList;
+    }
+    
+    //접근요청한 사용자명이 jwt 안의 사용자명과 일치하는가
+    public void checkSameAccount(Account account){
+        if (!authFacade.getAuth().getName().equals(account.getUsername())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "사용자 정보가 일치하지 않습니다.");
+        }
     }
 
 }
