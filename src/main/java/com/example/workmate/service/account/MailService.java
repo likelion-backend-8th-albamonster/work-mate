@@ -38,7 +38,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RequiredArgsConstructor
 public class MailService {
     private static final Properties PROPERTIES = new Properties();
-    private final AccountService accountService;
 
     @Value("${spring.mail.username}")
     private String USERNAME;   //change it
@@ -114,8 +113,7 @@ public class MailService {
         }
     }
 
-    public String checkCode(String username, String code){
-
+    public boolean checkCode(String username, String code){
         Account account = accountRepo.findByUsername(username).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
@@ -152,10 +150,10 @@ public class MailService {
             }
 
             accountRepo.save(account);
-            return "done";
+            return true;
         }
         else
-            return "check code";
+            return false;
     }
 
     public boolean checkInfo(String username, String email) {
