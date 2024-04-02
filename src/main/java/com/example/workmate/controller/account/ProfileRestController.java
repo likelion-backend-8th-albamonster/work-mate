@@ -56,21 +56,14 @@ public class ProfileRestController {
     // 이메일 코드 일치하는지 체크
     @PostMapping("/check-code")
     public String checkCode(
-            @RequestParam("password") String password,
+            @RequestParam("username-check") String username,
             @RequestParam("code") String code
     ) {
-        AccountDto accountDto = service.readOneAccount();
-
-        UserDetails userDetails = manager.loadUserByUsername(accountDto.getUsername());
+        UserDetails userDetails = manager.loadUserByUsername(username);
         log.info("username: {}", userDetails.getUsername());
         log.info("password: {}", userDetails.getPassword());
 
-        if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            log.error("비밀번호가 일치하지 않습니다.");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
-        return mailService.checkCode(accountDto.getUsername(), code);
+        return mailService.checkCode(username, code);
     }
 
     // 아르바이트 요청 명단 불러오기
