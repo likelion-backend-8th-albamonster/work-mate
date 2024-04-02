@@ -75,6 +75,16 @@ public class ProfileRestController {
             return ResponseEntity.badRequest().body("아이디가 일치하지 않습니다.");
         }
 
+        if (!mailService.checkMailAuth(username)) {
+            log.error("잘못된 코드입니다.");
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!mailService.checkTimeLimit5L(username)) {
+            log.error("시간 만료입니다.");
+            return ResponseEntity.status(HttpStatus.GONE).body("인증 시간이 만료되었습니다.");
+        }
+
         if (!mailService.checkCode(username, code)) {
             return ResponseEntity.badRequest().body("코드를 확인하세요.");
         }

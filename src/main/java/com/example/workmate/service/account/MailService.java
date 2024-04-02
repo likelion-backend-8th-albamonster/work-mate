@@ -117,27 +117,8 @@ public class MailService {
         Account account = accountRepo.findByUsername(username).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
-        // 이 사람이 이미 메일인증을 받았는지
-        if(account.isMailAuth()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
-
         MailAuth mailAuth = mailAuthRepo.findTopByAccount_IdOrderBySendTimeDesc(account.getId());
-        if(mailAuth == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        LocalDateTime now = LocalDateTime.now();
-        Duration diff = Duration.between(mailAuth.getSendTime(), now);
-        Long diffMin = diff.toMinutes();
-        log.info("id: {}", mailAuth.getId());
-        log.info("diffMin: {}",diffMin);
 
-        // 5분 후에 코드를 입력하면 실패이고 send()를 다시 함
-        if(diffMin >= 5L){
-            send(username, account.getEmail());
-            log.info("re mail");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        }
         if (code.equals(mailAuth.getAuthString())){
             account.setMailAuth(true);
 
@@ -148,7 +129,6 @@ public class MailService {
                 account.setAuthority(Authority.ROLE_USER);
                 log.info("Set Authority: {} ", account.getAuthority());
             }
-
             accountRepo.save(account);
             return true;
         }
@@ -157,12 +137,44 @@ public class MailService {
     }
 
     public boolean checkInfo(String username, String email) {
-        Account user = accountRepo.findByUsername(authFacade.getAuth().getName())
+        Account account = accountRepo.findByUsername(authFacade.getAuth().getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        log.info("username: {}", user.getUsername());
-        log.info("email: {}", user.getEmail());
+        log.info("username: {}", account.getUsername());
+        log.info("email: {}", account.getEmail());
 
-        return username.equals(user.getUsername()) &&
-                email.equals(user.getEmail());
+        return username.equals(account.getUsername()) &&
+                email.equals(account.getEmail());
+    }
+
+    public boolean checkMailAuth(String username) {
+        Account account = accountRepo.findByUsername(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+        MailAuth mailAuth = mailAuthRepo.findTopByAccount_IdOrderBySendTimeDesc(account.getId());
+        return mailAuth != null;
+    }
+
+    // 5분 후에 코드를 입력한 경우
+    public boolean checkTimeLimit5L(String username) {
+        Account account = accountRepo.findByUsername(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
+        );
+
+        MailAuth mailAuth = mailAuthRepo.findTopByAccount_IdOrderBySendTimeDesc(account.getId());
+        
+        LocalDateTime now = LocalDateTime.now();
+        Duration diff = Duration.between(mailAuth.getSendTime(), now);
+        Long diffMin = diff.toMinutes();
+        log.info("id: {}", mailAuth.getId());
+        log.info("diffMin: {}",diffMin);
+
+        // 5분 후에 코드를 입력하면 실패이고 send()를 다시 함
+        if(diffMin >= 5L){
+            send(username, account.getEmail());
+            log.info("re mail");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            return false;
+        }
+        return true;
     }
 }

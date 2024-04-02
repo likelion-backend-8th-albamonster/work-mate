@@ -61,8 +61,10 @@
                 },
                 error: function (xhr, status, error) {
                     if (xhr.status === 400) {
-                        alert("아이디가 일치하지 않습니다.");
-                    } else {
+                        alert("아이디 또는 코드가 일치하지 않습니다.");
+                    } else if (xhr.status === 410) {
+                        alert("인증 시간이 만료되었습니다. 메일을 재전송합니다.");
+                    }else {
                         console.error("Error:", error);
                     }
                 }
