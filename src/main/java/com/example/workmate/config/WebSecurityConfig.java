@@ -47,17 +47,15 @@ public class WebSecurityConfig {
                                         "/account/register",
                                         "/account/users-register",
                                         "/account/business-register",
-                                        "/account/logout",
-
-                                        //근무표 관련 테스트중
-                                        "/schedule/**"
+                                        "/account/logout"
 
                                 )
                                 .permitAll()
 
                                 .requestMatchers(
                                         "/my-profile",
-                                        "/profile",
+                                        "/profile/**",
+                                        "/profile/{id}",
                                         "/account/oauth")
                                 .authenticated()
 
@@ -67,8 +65,9 @@ public class WebSecurityConfig {
                                         "/api/shop/read-all",
                                         "/api/shop/read-one",
                                         "/api/shop/{id}",
-                                        "/profile/{id}",
-                                        "/profile/{id}/update")
+                                        "/profile/{id}/update",
+
+                                        "attendance/{accountId}/{shopId}")
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority(),
@@ -90,6 +89,7 @@ public class WebSecurityConfig {
                                         "/profile/submit")
                                 .hasAnyAuthority(
                                         Authority.ROLE_USER.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
                                         Authority.ROLE_ADMIN.getAuthority()
                                 )
 
@@ -103,35 +103,79 @@ public class WebSecurityConfig {
                                         "/api/shop/{id}/shop-account",
                                         "/api/shop/{id}/shop-account/account-name",
                                         "/api/shop/{id}/shop-account/account-status",
-                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}")
+                                        "/api/shop/{shopId}/shop-account/accept/{accountShopId}",
+                                        "/api/shop/{id}/shop-account/delete/{accountShopId}")
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
 
-                                //출퇴근 관련 : 아르바이트생 이상 확인 가능
+                                // 근무표 url - 인증받은 사람만 가능
                                 .requestMatchers(
-                                        "/attendance/{accountId}/{shopId}",//출퇴근 페이지
-                                        "/attendance/checkIn/{accountId}/{shopId}",//출근 요청
-                                        "/attendance/checkOut/{accountId}/{shopId}",//퇴근 요청
-                                        "/attendance/restIn/{accountId}/{shopId}",//쉬는시간 요청
-                                        "/attendance/restOut/{accountId}/{shopId}",//쉬는시간 종료 요청
-                                        "/attendance/showLog/{accountId}",//출퇴근 기록 확인 페이지
-                                        "/attendance/showLog/search/{accountId}" //출퇴근 기록 검색 페이지
+                                        "/schedule/{shopId}",
+                                        "/schedule/list-schedule/{shopId}",
+                                        "/schedule/change-worktime/{shopId}"
+                                )
+                                .authenticated()
+                                // 근무표 url - 매니저, 관리자 가능
+                                .requestMatchers(
+                                        "/schedule/manage-schedule/{shopId}",
+                                        "/schedule/view-change-worktime/{shopId}"
+                                )
+                                .hasAnyAuthority(Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority()
+                                )
+                                // 근무표 api - 인증받은 사람만 가능
+                                .requestMatchers(
+                                        "/api/schedule/read/{shopId}",
+                                        "/api/schedule/read-one/{workTimeId}",
+                                        "/api/schedule/view-month/{shopId}",
+                                        "/api/schedule/view-period/{shopId}",
+                                        "/api/schedule/create-change/{shopId}",
+                                        "/api/schedule/read-change/{shopId}"
+                                )
+                                .authenticated()
+                                // 근무표 api - 매니저, 관리자만 가능
+                                .requestMatchers(
+                                        "/api/schedule/account-shop",
+                                        "/api/schedule/make",
+                                        "/api/schedule/create",
+                                        "/api/schedule/update/{workTimeId}",
+                                        "/api/schedule/delete/{workTimeId}",
+                                        "/api/schedule/confirm-change",
+                                        "/api/schedule/decline-change"
+                                )
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority()
+                                )
 
-                                )
-                                .hasAnyAuthority(
-                                        Authority.ROLE_USER.getAuthority(),
-                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
-                                        Authority.ROLE_ADMIN.getAuthority()
-                                )
-                                //출퇴근 수정 : 매니저 이상 가능
+                                // 매장 커뮤니티 접속 권한
                                 .requestMatchers(
-                                        "/attendance/update/{accountId}"//출퇴근 수정
-                                )
+                                        "/{shopId}/community",
+                                        "/{shopId}/community/article/new",
+                                        "/{shopId}/community/article/create",
+                                        "/{shopId}/community/{board}",
+                                        "/{shopId}/community/{board}/{shopArticleId}",
+                                        "/{shopId}/community/{board}/{shopArticleId}/edit",
+                                        "/{shopId}/community/{board}/{shopArticleId}/update",
+                                        "/{shopId}/community/{board}/{shopArticleId}/delete",
+                                        "/{shopId}/community/{board}/{shopArticleId}/password")
                                 .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority(),
-                                        Authority.ROLE_ADMIN.getAuthority()
+                                        Authority.ROLE_USER.getAuthority()
+                                )
+
+                                // 매장 커뮤니티 댓글 권한
+                                .requestMatchers(
+                                        "/{shopId}/community/{board}/{shopArticleId}/comment",
+                                        "/{shopId}/community/{board}/{shopArticleId}/comment/{commentId}/update",
+                                        "/{shopId}/community/{board}/{shopArticleId}/comment/{commentId}/delete")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_USER.getAuthority()
                                 )
 
                 )

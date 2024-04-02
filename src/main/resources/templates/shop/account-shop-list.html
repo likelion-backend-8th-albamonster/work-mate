@@ -2,10 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>아르바이트 명단 확인</title>
+    <title>출근 멤버 명단 확인</title>
 </head>
 <body>
-<h1>아르바이트 명단</h1>
+<h1>Member List</h1>
 <hr>
 <div id="shop-account">
 
@@ -108,7 +108,27 @@
                                 }
                             });
                         });
-                        div.append(postButton);
+
+                        const rejectButton = $('<button>'); // 거절 버튼 추가
+                        rejectButton.text('거절');
+                        rejectButton.click(function() {
+                            const accountShopId = account.id;
+                            $.ajax({
+                                url: `/api/shop/${shopId}/shop-account/delete/${accountShopId}`, // 삭제 URL
+                                method: 'DELETE', // DELETE 메소드 사용
+                                headers: headers,
+                                success: function(response) {
+                                    console.log('Delete request successful for account:', accountShopId);
+                                    // 성공한 후 페이지를 새로고침
+                                    location.reload();
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error:', error);
+                                }
+                            });
+                        });
+                        div.append(postButton); // 승인 버튼 추가
+                        div.append(rejectButton); // 거절 버튼 추가
                     }
                     shopAccountDiv.append(div);
                 }

@@ -27,8 +27,8 @@
 <p>이메일이 전송됐다면, 코드를 확인하세요.</p>
 <p>해당 정보를 정확히 입력하세요.</p>
 <form action="/profile/check-code" method="post">
-    <label for="password">Password</label>
-    <input id="password" name="password" type="password" placeholder="password">
+    <label for="username-check">ID</label>
+    <input id="username-check" name="username" type="text" placeholder="ID">
     <br>
     <label for="code">code</label>
     <input id="code" name="code" type="text" placeholder="code">
@@ -85,7 +85,7 @@
             e.preventDefault();
 
             const formData = {
-                password: $(`input[name="password"]`).val(),
+                password: $(`input[name="username-check"]`).val(),
                 code: $(`input[name="code"]`).val()
             }
             console.log(formData);

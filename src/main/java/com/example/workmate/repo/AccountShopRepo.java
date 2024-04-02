@@ -11,5 +11,6 @@ public interface AccountShopRepo extends JpaRepository <AccountShop, Long> {
     //한 계정에 대한 모든 accountShop 데이터
     Optional<List<AccountShop>> findAllByAccount_id(Long accountId);
     Optional <List<AccountShop>> findByShop_Id(Long shopId);
+    Optional<List<AccountShop>> findByAccount_Id(Long accountId);
     boolean existsByShop_IdAndAccount_Id(Long shop_id, Long account_id);
 }
