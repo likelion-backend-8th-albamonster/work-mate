@@ -105,7 +105,7 @@ public class WebSecurityConfig {
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
-
+                                       
                                 // 근무표 url - 인증받은 사람만 가능
                                 .requestMatchers(
                                         "/schedule/{shopId}",
@@ -145,6 +145,35 @@ public class WebSecurityConfig {
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
+ 
+                                // 매장 커뮤니티 접속 권한
+                                .requestMatchers(
+                                        "/{shopId}/community",
+                                        "/{shopId}/community/article/new",
+                                        "/{shopId}/community/article/create",
+                                        "/{shopId}/community/{board}",
+                                        "/{shopId}/community/{board}/{shopArticleId}",
+                                        "/{shopId}/community/{board}/{shopArticleId}/edit",
+                                        "/{shopId}/community/{board}/{shopArticleId}/update",
+                                        "/{shopId}/community/{board}/{shopArticleId}/delete",
+                                        "/{shopId}/community/{board}/{shopArticleId}/password")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_USER.getAuthority()
+                                )
+
+                                // 매장 커뮤니티 댓글 권한
+                                .requestMatchers(
+                                        "/{shopId}/community/{board}/{shopArticleId}/comment",
+                                        "/{shopId}/community/{board}/{shopArticleId}/comment/{commentId}/update",
+                                        "/{shopId}/community/{board}/{shopArticleId}/comment/{commentId}/delete")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_USER.getAuthority()
+                                )
+                                       
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
