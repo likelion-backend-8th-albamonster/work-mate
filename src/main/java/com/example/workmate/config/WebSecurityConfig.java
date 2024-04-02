@@ -108,6 +108,32 @@ public class WebSecurityConfig {
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
+
+                                //출퇴근 관련 : 아르바이트생 이상 확인 가능
+                                .requestMatchers(
+                                        "/attendance/{accountId}/{shopId}",//출퇴근 페이지
+                                        "/attendance/checkIn/{accountId}/{shopId}",//출근 요청
+                                        "/attendance/checkOut/{accountId}/{shopId}",//퇴근 요청
+                                        "/attendance/restIn/{accountId}/{shopId}",//쉬는시간 요청
+                                        "/attendance/restOut/{accountId}/{shopId}",//쉬는시간 종료 요청
+                                        "/attendance/showLog/{accountId}",//출퇴근 기록 확인 페이지
+                                        "/attendance/showLog/search/{accountId}" //출퇴근 기록 검색 페이지
+
+                                )
+                                .hasAnyAuthority(
+                                        Authority.ROLE_USER.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_ADMIN.getAuthority()
+                                )
+                                //출퇴근 수정 : 매니저 이상 가능
+                                .requestMatchers(
+                                        "/attendance/update/{accountId}"//출퇴근 수정
+                                )
+                                .hasAnyAuthority(
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_ADMIN.getAuthority()
+                                )
+
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")
