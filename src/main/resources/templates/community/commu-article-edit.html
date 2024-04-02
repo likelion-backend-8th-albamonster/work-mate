@@ -21,8 +21,8 @@
 <div class="container mt-3 mb-5">
   <!-- 선택한 게시판 이름 -->
   <div class="d-flex align-items-center">
-    <h1 class="me-3" th:if="${board == null}">전체 게시글</h1>
-    <h1 class="me-3" th:unless="${board == null}" th:text="${board.board}">게시판 이름</h1>
+    <h1 class="me-3" th:if="${selectedBoard == null}">전체 게시글</h1>
+    <h1 class="me-3" th:unless="${selectedBoard == null}" th:text="${selectedBoard.board}">게시판 이름</h1>
   </div>
   <hr>
   <!-- 게시글 수정 폼 안내 -->
@@ -33,14 +33,14 @@
   <hr>
 
   <!-- 게시판 선택 폼 일부 -->
-  <form th:action="@{'/' + ${shopId} + '/community/' + ${board} + '/' + ${article.shopArticleId} + '/update'}"
+  <form th:action="@{'/' + ${shopId} + '/community/' + ${article.board.name()} + '/' + ${article.shopArticleId} + '/update'}"
         method="post">
     <div class="mb-3">
       <label for="board-select" class="form-label">게시판</label>
-      <select name="board-id" id="board-select" class="form-select">
+      <select name="board" id="board-select" class="form-select">
         <option disabled selected th:text="${article.board.board}"></option>
-        <option th:each="board : ${filteredBoards}"
-                th:value="${board.name()}" th:text="${board.board}"></option>
+        <option th:each="filteredBoard : ${filteredBoards}"
+                th:value="${filteredBoard.name()}" th:text="${filteredBoard.board}"></option>
       </select>
     </div>
 
