@@ -49,29 +49,7 @@ public class ArticleController {
         return "community/commu-article-new";
     }
 
-    // 컨트롤러에서 리다이렉션 하는 방식
-//    // 게시글 작성 폼 제출
-//    @PostMapping("/article/create")
-//    public String create(
-//            @PathVariable("shopId")
-//            Long shopId,
-//            @RequestParam
-//            Board board,
-//            @ModelAttribute
-//            ArticleDto articleDto,
-//            RedirectAttributes redirectAttributes,
-//            Model model
-//    ) {
-//        Long newId = articleService.create(articleDto).getShopArticleId();
-//        model.addAttribute("boards", Board.values());
-//        redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
-//        if (board == Board.SECRET) {
-//            return String.format("redirect:/%d/community/%s", shopId, articleDto.getBoard().name());
-//        }
-//        return String.format("redirect:/%d/community/%s/%d", shopId, articleDto.getBoard().name(), newId);
-//    }
-
-    // ajax에서 리다이렉션 하는 방식 : 응답에 상태코드랑 데이터를 json형태로 클라이언트에 전달
+    //컨트롤러에서 리다이렉션 하는 방식
     // 게시글 작성 폼 제출
     @PostMapping("/article/create")
     public String create(
@@ -84,7 +62,7 @@ public class ArticleController {
             RedirectAttributes redirectAttributes,
             Model model
     ) {
-        Long newId = articleService.create(articleDto).getShopArticleId();
+        Long newId = articleService.create(articleDto, shopId).getShopArticleId();
         model.addAttribute("boards", Board.values());
         redirectAttributes.addFlashAttribute("message", "게시글이 작성되었습니다.");
         if (board == Board.SECRET) {
@@ -109,7 +87,7 @@ public class ArticleController {
         Page<ArticleDto> articles;
         Page<ArticleDto> noticeArticles = articleService.findNoticeArticles(shopId, PageRequest.of(0, 3));
         if (keyword != null && !keyword.isEmpty()) {
-            articles = articleService.search(type, keyword, pageable);
+            articles = articleService.search(type, keyword, pageable, shopId);
         } else {
             articles = articleService.readPage(shopId, pageable);
         }
@@ -139,7 +117,7 @@ public class ArticleController {
         Page<ArticleDto> articles;
         Page<ArticleDto> noticeArticles = articleService.findNoticeArticles(shopId, PageRequest.of(0, 3));
         if (keyword != null && !keyword.isEmpty()) {
-            articles = articleService.searchWithBoard(type, keyword, board, pageable);
+            articles = articleService.searchWithBoard(type, keyword, board, pageable, shopId);
         } else {
             articles = articleService.readPageByBoard(board, shopId, pageable);
         }
@@ -188,20 +166,20 @@ public class ArticleController {
     public String editForm(
             @PathVariable("shopId")
             Long shopId,
-            @PathVariable("board")
-            String board,
+            @RequestParam(value = "board", required = false)
+            Board selectedBoard,
             @PathVariable("shopArticleId")
             Long shopArticleId,
             Model model
     ) {
             articleService.checkAccountId(shopArticleId, shopId);
             Optional<Article> article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId);
-            List<Board> filteredBoards = Arrays.stream(Board.values())
-                    .filter(b -> !b.name().equals(board.toUpperCase()))
-                    .collect(Collectors.toList());
+        List<Board> filteredBoards = Arrays.stream(Board.values())
+                .filter(b -> selectedBoard == null || !b.equals(selectedBoard))
+                .collect(Collectors.toList());
 
             model.addAttribute("shopId", shopId);
-            model.addAttribute("board", board);
+            model.addAttribute("selectedBoard", selectedBoard);
             model.addAttribute("boards", Board.values());
             model.addAttribute("filteredBoards", filteredBoards);
             model.addAttribute("article", article.get());
@@ -210,7 +188,7 @@ public class ArticleController {
             return "community/commu-article-edit";
         }
 
-    // 게시글 수정 처리
+    // 게시글 수정 폼 제출
     @PostMapping("{board}/{shopArticleId}/update")
     public String update(
             @PathVariable("shopId")
@@ -224,9 +202,11 @@ public class ArticleController {
             RedirectAttributes redirectAttributes,
             Model model
     ) {
+        Board selectedBoard = Board.valueOf(board.toUpperCase());
         articleService.update(shopId, shopArticleId, articleDto);
         model.addAttribute("boards", Board.values());
         model.addAttribute("shopArticleId", shopArticleId);
+        model.addAttribute("selectedBoard", selectedBoard);
         redirectAttributes.addFlashAttribute("message", "게시글이 수정되었습니다.");
         return "redirect:/" + shopId + "/community/" + articleDto.getBoard().name();
     }
