@@ -16,7 +16,7 @@
 <a href="/email-check">이메일 확인하기</a>
 <hr>
 <a href="/shop">아르바이트 매장 추가하기</a>
-<div>
+<div id="account-shop">
     <!-- 아르바이트 매장 정보가 여기에 표시됩니다 -->
 </div>
 <hr>
@@ -84,7 +84,7 @@
                         // SUBMITTED 상태인 shop id 리스트 만들기
                         const submittedShopIds = [];
                         for (let i = 0; i < accountShop.length; i++) {
-                            if (accountShop[i].status === "SUBMITTED") {
+                            if (accountShop[i].status === "ACCEPT") {
                                 submittedShopIds.push(accountShop[i].id);
                             }
                         }
@@ -93,11 +93,16 @@
                         console.log("Submitted Account IDs:", submittedShopIds);
 
                         // HTML 업데이트
+                        const accountShopDiv = $(`#account-shop`);
 
-
-                        // 데이터를 가지고 HTML 구성
-
-                    })
+                        submittedShopIds.forEach(id => {
+                            const attendanceLink = `attendance/${accountId}/${id}`;
+                            const anchorTag = `<li><a href="${attendanceLink}">${shopName}</a></li>`;
+                            accountShopDiv.append(`<p>${anchorTag}</p>`);
+                        });
+                    }).fail(function (error) {
+                        console.error('Error:', error);
+                    });
                 }
                 updatePage();
             },
