@@ -47,10 +47,7 @@ public class WebSecurityConfig {
                                         "/account/register",
                                         "/account/users-register",
                                         "/account/business-register",
-                                        "/account/logout",
-
-                                        //근무표 관련 테스트중
-                                        "/schedule/**"
+                                        "/account/logout"
 
                                 )
                                 .permitAll()
@@ -104,6 +101,46 @@ public class WebSecurityConfig {
                                         "/api/shop/{id}/shop-account/account-name",
                                         "/api/shop/{id}/shop-account/account-status",
                                         "/api/shop/{shopId}/shop-account/accept/{accountShopId}")
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority()
+                                )
+
+                                // 근무표 url - 인증받은 사람만 가능
+                                .requestMatchers(
+                                        "/schedule/{shopId}",
+                                        "/schedule/list-schedule/{shopId}",
+                                        "/schedule/change-worktime/{shopId}"
+                                )
+                                .authenticated()
+                                // 근무표 url - 매니저, 관리자 가능
+                                .requestMatchers(
+                                        "/schedule/manage-schedule/{shopId}",
+                                        "/schedule/view-change-worktime/{shopId}"
+                                )
+                                .hasAnyAuthority(Authority.ROLE_ADMIN.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority()
+                                )
+                                // 근무표 api - 인증받은 사람만 가능
+                                .requestMatchers(
+                                        "/api/schedule/read/{shopId}",
+                                        "/api/schedule/read-one/{workTimeId}",
+                                        "/api/schedule/view-month/{shopId}",
+                                        "/api/schedule/view-period/{shopId}",
+                                        "/api/schedule/create-change/{shopId}",
+                                        "/api/schedule/read-change/{shopId}"
+                                )
+                                .authenticated()
+                                // 근무표 api - 매니저, 관리자만 가능
+                                .requestMatchers(
+                                        "/api/schedule/account-shop",
+                                        "/api/schedule/make",
+                                        "/api/schedule/create",
+                                        "/api/schedule/update/{workTimeId}",
+                                        "/api/schedule/delete/{workTimeId}",
+                                        "/api/schedule/confirm-change",
+                                        "/api/schedule/decline-change"
+                                )
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
