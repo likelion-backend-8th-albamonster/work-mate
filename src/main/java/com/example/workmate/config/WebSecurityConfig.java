@@ -77,6 +77,7 @@ public class WebSecurityConfig {
                                 // 이메일 인증 - 비활성 유저
                                 .requestMatchers(
                                         "/email-check",
+                                        "/check-code",
                                         "/profile/email-check",
                                         "/profile/check-code")
                                 .hasAnyAuthority(
