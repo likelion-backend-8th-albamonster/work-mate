@@ -79,28 +79,28 @@
     </tr>
     </tbody>
 </table>
-<div th:if="${!attendanceLogList.isEmpty()}">
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item" th:each="page : ${#numbers.sequence(1,attendanceLogList.getTotalPages())}">
-                <a
-                        class="page-link"
-                        th:href="
-                                @{/attendance/showLog/search/{accountId}?searchDuration={searchDuration}&searchType={searchType}&searchWord={searchWord}&pageNumber={page}(
-                                    accountId=${account.getId()},
-                                    searchDuration=${searchDuration},
-                                    searchType=${searchType},
-                                    searchWord=${searchWord},
-                                    page=${page - 1}
-                                )
-                            }"
-                >
-                    <span aria-hidden="true" th:text="${page}"></span>
-                </a>
-            </li>
-        </ul>
-    </nav>
-</div>
+<!--<div th:if="${!attendanceLogList.isEmpty()}">-->
+<!--    <nav aria-label="Page navigation example">-->
+<!--        <ul class="pagination">-->
+<!--            <li class="page-item" th:each="page : ${#numbers.sequence(1,attendanceLogList.getTotalPages())}">-->
+<!--                <a-->
+<!--                        class="page-link"-->
+<!--                        th:href="-->
+<!--                                @{/attendance/showLog/search/{accountId}?searchDuration={searchDuration}&searchType={searchType}&searchWord={searchWord}&pageNumber={page}(-->
+<!--                                    accountId=${account.getId()},-->
+<!--                                    searchDuration=${searchDuration},-->
+<!--                                    searchType=${searchType},-->
+<!--                                    searchWord=${searchWord},-->
+<!--                                    page=${page - 1}-->
+<!--                                )-->
+<!--                            }"-->
+<!--                >-->
+<!--                    <span aria-hidden="true" th:text="${page}"></span>-->
+<!--                </a>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </nav>-->
+<!--</div>-->
 <!-- 페이지 -->
 <div th:if="${!attendanceLogList.isEmpty()}" class="d-flex justify-content-center mt-3">
     <!-- 특정 매장 선택 없을 때 -->
