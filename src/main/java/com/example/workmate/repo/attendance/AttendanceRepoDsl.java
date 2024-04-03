@@ -1,31 +1,28 @@
 package com.example.workmate.repo.attendance;
 
-import com.example.workmate.dto.attendance.AttendanceDto;
 import com.example.workmate.dto.attendance.AttendanceLogDto;
 import com.example.workmate.dto.attendance.AttendanceLogUpdateDto;
-import com.example.workmate.entity.AccountShop;
 import com.example.workmate.entity.QShop;
 import com.example.workmate.entity.account.Authority;
+import com.example.workmate.entity.account.QAccount;
+import com.example.workmate.entity.attendance.Attendance;
 import com.example.workmate.entity.attendance.QAttendance;
 import com.example.workmate.entity.attendance.Status;
-import com.querydsl.core.Tuple;
-import com.querydsl.core.types.CollectionExpression;
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +37,23 @@ public class AttendanceRepoDsl {
 
     private QAttendance qAttendance = QAttendance.attendance;
     private QShop qShop = QShop.shop;
+    private QAccount qAccount = QAccount.account;
+
+    //pageable 동적 정렬을 위한 OrderSpecifier 객체
+    private List<OrderSpecifier> getOrderSpecifier(Sort sort){
+        List<OrderSpecifier> orders = new ArrayList<>();
+        //sort
+        sort.stream().forEach(order -> {
+            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+            String prop = order.getProperty();
+            //매장명이나
+            PathBuilder orderByExpression = new PathBuilder<>(Attendance.class, "attendance");
+            orders.add(new OrderSpecifier(direction, orderByExpression.get(prop)));
+        });
+        return orders;
+    }
+
+
     //여러 출퇴근데이터 update
     @Transactional
     public void udpateAttendanceList(
@@ -63,8 +77,6 @@ public class AttendanceRepoDsl {
     
     //한 사용자에 대한 정보
     public Page<AttendanceLogDto> readUserAttendanceLog(Long accountId, Pageable pageable){
-        //QAttendance qAttendance = new QAttendance("attendance");
-        //QShop qShop = new QShop("shop");
         
         // 쿼리의 결과를 DTO 클래스로 매핑해서 가져오기
         List<AttendanceLogDto> attendanceLogDtoList =
@@ -76,12 +88,15 @@ public class AttendanceRepoDsl {
                                 qAttendance.checkInTime,
                                 qAttendance.checkOutTime,
                                 qAttendance.status,
-                                qShop.name
+                                qShop.name,
+                                qAccount.name
                                 )
                 )
                 .from(qAttendance)
                 .innerJoin(qAttendance.shop, qShop)
+                .innerJoin(qAttendance.account, qAccount)
                 .where(qAttendance.account.id.eq(accountId))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())//페이지번호
                 .limit(pageable.getPageSize())//페이지사이즈
                 .fetch();
@@ -93,6 +108,7 @@ public class AttendanceRepoDsl {
                                 )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(qAttendance.account.id.eq(accountId))
                         .fetchOne();
 
@@ -164,8 +180,6 @@ public class AttendanceRepoDsl {
     //여러 매장의 모든 출근 정보(관리자)
     //shopId를 받아올 수 없는 상황이라, 메서드 분리
     public Page<AttendanceLogDto> readUserAttendanceLogForAdmin(List<Long> accountShopList, Pageable pageable){
-        //QAttendance qAttendance = new QAttendance("attendance");
-        //QShop qShop = new QShop("shop");
 
         // 쿼리의 결과를 DTO 클래스로 매핑해서 가져오기
         List<AttendanceLogDto> attendanceLogDtoList =
@@ -177,12 +191,15 @@ public class AttendanceRepoDsl {
                                         qAttendance.checkInTime,
                                         qAttendance.checkOutTime,
                                         qAttendance.status,
-                                        qShop.name
+                                        qShop.name,
+                                        qAccount.name
                                 )
                         )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(qAttendance.shop.id.in(accountShopList))
+                        .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                         .offset(pageable.getOffset())//페이지번호
                         .limit(pageable.getPageSize())//페이지사이즈
                         .fetch();
@@ -193,6 +210,7 @@ public class AttendanceRepoDsl {
                                 )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(
                                 qAttendance.shop.id.in(accountShopList)
                         )
@@ -266,8 +284,7 @@ public class AttendanceRepoDsl {
 
     //한 사용자의 한 매장에 대한 정보
     public Page<AttendanceLogDto> readUserOneShopAttendanceLog(Long accountId, Long shopId, Pageable pageable, Authority authority){
-        //QAttendance qAttendance = new QAttendance("attendance");
-        //QShop qShop = new QShop("shop");
+
         List<AttendanceLogDto> attendanceLogDtoList = new ArrayList<>();
         Long attendanceLogDtoListSize = 0L;
         //관리자
@@ -282,14 +299,17 @@ public class AttendanceRepoDsl {
                                             qAttendance.checkInTime,
                                             qAttendance.checkOutTime,
                                             qAttendance.status,
-                                            qShop.name
+                                            qShop.name,
+                                            qAccount.name
                                     )
                             )
                             .from(qAttendance)
                             .innerJoin(qAttendance.shop, qShop)
+                            .innerJoin(qAttendance.account, qAccount)
                             .where(
                                     qAttendance.shop.id.eq(shopId)
                             )
+                            .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                             .offset(pageable.getOffset())//페이지번호
                             .limit(pageable.getPageSize())//페이지사이즈
                             .fetch();
@@ -300,6 +320,7 @@ public class AttendanceRepoDsl {
                                     )
                             .from(qAttendance)
                             .innerJoin(qAttendance.shop, qShop)
+                            .innerJoin(qAttendance.account, qAccount)
                             .where(
                                     qAttendance.shop.id.eq(shopId)
                             )
