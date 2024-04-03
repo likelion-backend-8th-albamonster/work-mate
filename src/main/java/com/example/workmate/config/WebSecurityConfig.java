@@ -39,7 +39,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
-                                        "/account/home",
+                                        "/",
                                         "/account/login",
 
                                         // 로그인, 매장 아르바이트 요청 html
@@ -55,7 +55,9 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/my-profile",
                                         "/profile",
-                                        "/profile/{id}",
+                                        "/profile/{accountId}/account-shop",
+                                        "/profile/{accountId}/account-shop/shop-name",
+                                        "/profile/{accountId}/account-shop/account-status",
                                         "/my-profile/update",
                                         "/profile/update",
                                         "/account/oauth")

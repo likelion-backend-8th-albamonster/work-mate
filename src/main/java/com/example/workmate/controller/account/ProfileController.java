@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class ProfileController {
+    @GetMapping
+    public String home() {
+        return "account/index";
+    }
 
     @GetMapping("/my-profile")
     public String myProfile() {
