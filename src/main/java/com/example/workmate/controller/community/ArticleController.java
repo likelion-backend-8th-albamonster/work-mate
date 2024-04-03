@@ -45,6 +45,9 @@ public class ArticleController {
             Board selectedBoard,
             Model model
     ) {
+        AccountDto dto = accountService.readOneAccount();
+
+        model.addAttribute("accountId", dto.getId());
         model.addAttribute("shopId", shopId);
         model.addAttribute("boards", Board.values());
         model.addAttribute("selectedBoard", selectedBoard);
@@ -52,7 +55,6 @@ public class ArticleController {
         return "community/commu-article-new";
     }
 
-    //컨트롤러에서 리다이렉션 하는 방식
     // 게시글 작성 폼 제출
     @PostMapping("/article/create")
     public String create(
@@ -90,11 +92,15 @@ public class ArticleController {
         Page<ArticleDto> articles;
         Page<ArticleDto> noticeArticles = articleService.findNoticeArticles(shopId, PageRequest.of(0, 3));
         AccountDto dto = accountService.readOneAccount();
+
+        // 검색
         if (keyword != null && !keyword.isEmpty()) {
             articles = articleService.search(type, keyword, pageable, shopId);
         } else {
             articles = articleService.readPage(shopId, pageable);
         }
+
+        // view 전달
         model.addAttribute("accountId", dto.getId());
         model.addAttribute("shopId", shopId);
         model.addAttribute("boards", Board.values());
@@ -119,13 +125,20 @@ public class ArticleController {
             Pageable pageable,
             Model model
     ) {
+        AccountDto dto = accountService.readOneAccount();
+
         Page<ArticleDto> articles;
         Page<ArticleDto> noticeArticles = articleService.findNoticeArticles(shopId, PageRequest.of(0, 3));
+
+        // 검색
         if (keyword != null && !keyword.isEmpty()) {
             articles = articleService.searchWithBoard(type, keyword, board, pageable, shopId);
         } else {
             articles = articleService.readPageByBoard(board, shopId, pageable);
         }
+
+        // view 전달
+        model.addAttribute("accountId", dto.getId());
         model.addAttribute("shopId", shopId);
         model.addAttribute("boards", Board.values());
         model.addAttribute("selectedBoard", board);
@@ -148,7 +161,10 @@ public class ArticleController {
             Model model
     ) {
         ArticleDto article = articleService.readOne(shopId, shopArticleId);
+        AccountDto dto = accountService.readOneAccount();
 
+        // view 전달
+        model.addAttribute("accountId", dto.getId());
         model.addAttribute("boards", Board.values());
         model.addAttribute("shopId", shopId);
         model.addAttribute("board", board);
@@ -163,6 +179,7 @@ public class ArticleController {
             return "community/commu-secret-password";
         }
         httpSession.removeAttribute(shopArticleId.toString());
+
         return "community/commu-article-read";
     }
 
@@ -177,21 +194,23 @@ public class ArticleController {
             Long shopArticleId,
             Model model
     ) {
-            articleService.checkAccountId(shopArticleId, shopId);
-            Optional<Article> article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId);
+        AccountDto dto = accountService.readOneAccount();
+        articleService.checkAccountId(shopArticleId, shopId);
+        Optional<Article> article = articleRepo.findByShopArticleIdAndShopId(shopArticleId, shopId);
         List<Board> filteredBoards = Arrays.stream(Board.values())
                 .filter(b -> selectedBoard == null || !b.equals(selectedBoard))
                 .collect(Collectors.toList());
 
-            model.addAttribute("shopId", shopId);
-            model.addAttribute("selectedBoard", selectedBoard);
-            model.addAttribute("boards", Board.values());
-            model.addAttribute("filteredBoards", filteredBoards);
-            model.addAttribute("article", article.get());
-            model.addAttribute("shopArticleId", shopArticleId);
+        model.addAttribute("accountId", dto.getId());
+        model.addAttribute("shopId", shopId);
+        model.addAttribute("selectedBoard", selectedBoard);
+        model.addAttribute("boards", Board.values());
+        model.addAttribute("filteredBoards", filteredBoards);
+        model.addAttribute("article", article.get());
+        model.addAttribute("shopArticleId", shopArticleId);
 
-            return "community/commu-article-edit";
-        }
+        return "community/commu-article-edit";
+    }
 
     // 게시글 수정 폼 제출
     @PostMapping("{board}/{shopArticleId}/update")
