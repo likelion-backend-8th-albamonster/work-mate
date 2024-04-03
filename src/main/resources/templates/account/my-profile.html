@@ -102,7 +102,7 @@
                         submittedShopIds.forEach((shopId, index) => {
                             const shopName = shopNames[index];
                             const attendanceLink = `attendance/${accountId}/${shopId}`;
-                            const communityLink = `community/${shopId}`;
+                            const communityLink = `${shopId}/community`;
                             const listItem = `<li><a href="${attendanceLink}">${shopName}</a> | <a href="${communityLink}">${shopName} 커뮤니티</a></li>`;
                             accountShopDiv.append(`<p>${listItem}</p>`);
                         });
