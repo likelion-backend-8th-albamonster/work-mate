@@ -2,32 +2,26 @@ package com.example.workmate.controller.schedule;
 
 import com.example.workmate.component.ScheduleUtil;
 import com.example.workmate.dto.account.AccountDto;
-import com.example.workmate.dto.schedule.PeriodScheduleDto;
+import com.example.workmate.dto.schedule.ScheduleRequestDto;
 import com.example.workmate.dto.schedule.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
 import com.example.workmate.dto.shop.ShopDto;
-import com.example.workmate.entity.Shop;
-import com.example.workmate.entity.account.Account;
-import com.example.workmate.entity.schedule.QChangeRequest;
 import com.example.workmate.service.ShopService;
 import com.example.workmate.service.account.AccountService;
-import com.example.workmate.service.schedule.ScheduleDataService;
 import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.Format;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -62,7 +56,7 @@ public class ScheduleController {
         }
         else
             log.info("auth is null");
-        PeriodScheduleDto periodScheduleDto = new PeriodScheduleDto();
+        ScheduleRequestDto scheduleRequestDto = new ScheduleRequestDto();
         List<WorkTimeDto> schedules = scheduleService.viewMonth(shopId, dto);
         ShopDto shopDto = shopService.readOneShop(shopId);
         AccountDto accountDto = accountService.readOneAccount();
@@ -75,7 +69,7 @@ public class ScheduleController {
             model.addAttribute("username",null);
         }
         model.addAttribute("accountId", accountDto.getId());
-        model.addAttribute("periodScheduleDto", periodScheduleDto);
+        model.addAttribute("scheduleRequestDto", scheduleRequestDto);
         model.addAttribute("schedules", schedules);
         model.addAttribute("shop", shopDto);
         model.addAttribute("calender",scheduleUtil.makeCalender(dto));
@@ -120,7 +114,7 @@ public class ScheduleController {
     }
 
     // 근무표 관리
-    @RequestMapping("/manage-schedule/{shopId}")
+    @GetMapping ("/manage-schedule/{shopId}")
     public String manageSchedule(
             @PathVariable("shopId")
             Long shopId
@@ -131,9 +125,43 @@ public class ScheduleController {
     // 근무교체 보기
     @RequestMapping("/view-change-worktime/{shopId}")
     public String viewChangeWorkTime(
+            Model model,
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable,
             @PathVariable("shopId")
             Long shopId
     ){
+        Page<ChangeRequestDto> schedulePage = scheduleService.readChangePage(shopId,pageable);
+        AccountDto accountDto = accountService.readOneAccount();
+
+        ScheduleRequestDto dto = new ScheduleRequestDto();
+        model.addAttribute("scheduleRequestDto",dto);
+        model.addAttribute("schedules",schedulePage);
+        model.addAttribute("accountDto",accountDto);
+        model.addAttribute("shopId",shopId);
+
         return "schedule/view-change-worktime";
+    }
+    @PostMapping ("/confirm-change/{shopId}")
+    public String confirmChange(
+            @PathVariable("shopId")
+            Long shopId,
+            @RequestParam("id")
+            Long changeRequestId
+    ){
+        scheduleService.confirmChange(changeRequestId);
+        return String.format("redirect:/schedule/view-change-worktime/%d",shopId);
+    }
+
+    //근무 교체 거절
+    @PostMapping("/decline-change/{shopId}")
+    public String declineChange(
+            @PathVariable("shopId")
+            Long shopId,
+            @RequestParam("id")
+            Long changeRequestId
+    ){
+        scheduleService.declineChange(changeRequestId);
+        return String.format("redirect:/schedule/view-change-worktime/%d",shopId);
     }
 }

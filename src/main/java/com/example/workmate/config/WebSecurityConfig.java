@@ -123,9 +123,12 @@ public class WebSecurityConfig {
                                 // 근무표 url - 매니저, 관리자 가능
                                 .requestMatchers(
                                         "/schedule/manage-schedule/{shopId}",
-                                        "/schedule/view-change-worktime/{shopId}"
+                                        "/schedule/view-change-worktime/{shopId}",
+                                        "/schedule/confirm-change/{shopId}",
+                                        "/schedule/decline-change/{shopId}"
                                 )
-                                .hasAnyAuthority(Authority.ROLE_ADMIN.getAuthority(),
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
                                 // 근무표 api - 인증받은 사람만 가능
@@ -134,7 +137,7 @@ public class WebSecurityConfig {
                                         "/api/schedule/read-one/{workTimeId}",
                                         "/api/schedule/view-month/{shopId}",
                                         "/api/schedule/view-period/{shopId}",
-                                        "/api/schedule/create-change/{shopId}",
+                                        "/api/schedule/create-change",
                                         "/api/schedule/read-change/{shopId}"
                                 )
                                 .authenticated()
