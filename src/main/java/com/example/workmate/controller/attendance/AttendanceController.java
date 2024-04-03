@@ -16,6 +16,7 @@ import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -273,6 +274,8 @@ public class AttendanceController {
             Integer pageNumber,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false)
             Integer pageSize,
+            @RequestParam(value = "sortType", defaultValue = "checkInTime",required = false)
+            String sortType,
             Model model
     ){
         //페이징
@@ -288,13 +291,13 @@ public class AttendanceController {
         if (shopId == 0){
             //한 유저의 모든 매장 출근 데이터 가져오기
             attendanceLogList
-                    = attendanceService.showLogAll(pageNumber,pageSize, accountId, account.getAuthority());
+                    = attendanceService.showLogAll(pageNumber,pageSize,sortType, accountId, account.getAuthority());
         }
         //매장 id가 주어지고, 아르바이트생일 때
         else {
             //한 유저의 한 매장 출근 데이터 가져오기
             attendanceLogList
-                    = attendanceService.showLog(pageNumber,pageSize, accountId, shopId, account.getAuthority());
+                    = attendanceService.showLog(pageNumber,pageSize,sortType, accountId, shopId, account.getAuthority());
         }
 
         //사용자
@@ -329,6 +332,8 @@ public class AttendanceController {
             String searchWord,
             @RequestParam(value = "searchType", defaultValue = "shopName", required = true)
             String searchType,
+            @RequestParam(value = "sortType", defaultValue = "check_in_time",required = false)
+            String sortType,
             Model model
     ){
         //사용자정보 확인
