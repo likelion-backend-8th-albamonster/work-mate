@@ -55,7 +55,9 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/my-profile",
                                         "/profile",
-                                        "/profile/{id}",
+                                        "/profile/{accountId}/account-shop",
+                                        "/profile/{accountId}/account-shop/shop-name",
+                                        "/profile/{accountId}/account-shop/account-status",
                                         "/my-profile/update",
                                         "/profile/update",
                                         "/account/oauth")
