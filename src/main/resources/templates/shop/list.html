@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <title>Shop List</title>
+</head>
+<body>
+<h1>Shop List</h1>
+<a href="/shop/create">매장 등록하기</a>
+<hr>
+
+<p>매장에 출근 등록을 원하신다면, 매장 이름을 정확히 입력하세요.</p>
+<form action="/profile/submit" method="post">
+    <input id="shop-name" name="shop-name" type="text" placeholder="매장 이름">
+    <button id="shop-submit" type="submit">
+        <label for="shop-name">제출</label>
+    </button>
+</form>
+<hr>
+<h2>매장 목록</h2>
+<!-- 아르바이트 가능 매장이 없는 경우 -->
+<div th:if="${shops.isEmpty()}">
+    <p>아르바이트 가능한 매장이 없습니다.</p>
+</div>
+
+<!-- 매장이 있는 경우 -->
+<div id="shops" th:unless="${shops.isEmpty()}" th:each="shop : ${shops}">
+    <div>
+        <a th:href="@{/shop/{id}(id=${shop.id})}"><h3 th:text="${shop.name}"></h3></a>
+    </div>
+    <hr>
+</div>
+<a href="/my-profile">Back</a>
+<script>
+    // 제출 버튼 클릭했을 때 submit
+    $(document).ready(function (){
+        // 로그인 페이지에서 저장한 토큰을 가져옴
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        console.log(token);
+        $('#shop-submit').click(function(e) {
+            e.preventDefault(); // 기본 제출 이벤트를 막음
+
+            const formData = {
+                name: $('input[name="shop-name"]').val() // 입력 필드에서 매장 이름을 가져옴
+            };
+
+            console.log(formData);
+
+            $.ajax({
+                type: "POST",
+                url: "/profile/submit",
+                headers: headers,
+                contentType: "application/json", // Content-Type을 application/json으로 설정
+                data: JSON.stringify(formData), // JSON 형식의 데이터 전송
+                success: function (data) {
+                    alert("요청을 보냈습니다.");
+                    console.log("success: ", data);
+                },
+                error: function (xhr, status, error) {
+                    if (xhr.status === 404) {
+                        alert("매장을 찾을 수 없습니다.")
+                    } else if (xhr.status === 400) {
+                        alert("해당 매장에 이미 출근 요청을 보냈습니다.")
+                    }
+                    console.log("Error:", xhr.status, xhr.responseText);
+
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

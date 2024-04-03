@@ -19,15 +19,22 @@ public class CustomAccountDetails implements UserDetails {
     private Long id;
     private String username;
     private String password;
+    private String name;
     private String email;
     private String businessNumber;
+    private boolean mailAuth;
     private Authority authority;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = authority.getAuthority();
-        return Collections.singleton(new SimpleGrantedAuthority(role));
+        if (authority != null) {
+            String role = authority.getAuthority();
+            return Collections.singleton(new SimpleGrantedAuthority(role));
+        } else {
+            return Collections.emptySet();
+        }
     }
+    private Account account;
 
     @Override
     public String getPassword() {

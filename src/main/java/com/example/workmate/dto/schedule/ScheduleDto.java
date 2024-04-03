@@ -12,5 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ScheduleDto {
     private Integer year;
     private Integer month;
+    @Setter
     private Integer day;
 }

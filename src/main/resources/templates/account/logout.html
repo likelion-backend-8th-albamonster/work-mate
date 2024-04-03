@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logout</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<script>
+    $(document).ready(function () {
+        // 쿠키 이름을 사용하여 쿠키 삭제
+        document.cookie = "jwtToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem("jwtToken");
+
+        location.href = '/account/home';
+    })
+</script>
+</body>
+</html>

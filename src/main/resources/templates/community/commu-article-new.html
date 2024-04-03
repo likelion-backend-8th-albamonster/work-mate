@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>새 게시글 작성하기</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+
+<body class="p-3">
+<!-- 기능 목록 -->
+<div class="container-fluid bg-secondary text-white py-3">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- 메인 기능 링크 : 중앙 -->
+      <div class="ms-auto me-auto">
+        <a th:href="@{'/attendance/' + ${accountId} + '/' + ${shopId}}" class="btn btn-light mx-5">출퇴근 기록</a>
+        <a th:href="@{'/schedule/' + ${shopId}}" class="btn btn-light mx-5">월별 근무표</a>
+        <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-light mx-5">커뮤니티</a>
+      </div>
+      <!-- 프로필, 로그아웃 링크 : 우측 -->
+      <div>
+        <a th:href="@{'/my-profile'}" class="btn btn-outline-light me-2">프로필</a>
+        <a th:href="@{'/account/logout'}" class="btn btn-outline-light">로그아웃</a>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+
+<!-- 게시판 목록 -->
+<div class="d-flex justify-content-center mt-3 fs-6">
+  <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-primary me-3">전체 게시글</a>
+  <div th:each="boardItem : ${boards}">
+    <a th:href="@{'/' + ${shopId} + '/community/' + ${boardItem.name()}}" th:text="${boardItem.board}"
+       class=" btn btn-info me-3"></a>
+  </div>
+</div>
+<hr>
+<div class="container mt-3 mb-5">
+  <!-- 선택한 게시판 이름 -->
+  <div class="d-flex align-items-center">
+    <h1 class="me-3" th:if="${selectedBoard == null}">전체 게시글</h1>
+    <h1 class="me-3" th:unless="${selectedBoard == null}" th:text="${selectedBoard.board}">게시판 이름</h1>
+  </div>
+  <hr>
+  <!-- 게시글 작성 폼 안내 -->
+  <div class="d-flex align-items-center">
+    <h1 class="me-3">게시글 작성</h1>
+    <a class="fs-3" th:href="@{'/' + ${shopId} + '/community'}">뒤로가기</a>
+  </div>
+  <hr>
+
+  <form th:action="@{'/' + ${shopId} + '/community/article/create'}" method="post">
+    <!-- 게시판 선택 폼 일부 -->
+    <div class="mb-3">
+      <label for="board-select" class="form-label" >게시판</label>
+      <select name="board" id="board-select" class="form-select" onchange="togglePasswordInput(this)">
+        <option th:each="board : ${boards}"
+                th:value="${board.name()}"
+                th:text="${board.board}"
+                th:selected="${selectedBoard != null and board.name() == selectedBoard.name()}">게시판 이름
+        </option>
+      </select>
+
+      <!-- 제목 입력 폼 일부  -->
+      <div class="mb-3">
+        <label for="title-input" class="form-label">제목</label>
+        <input type="text" name="title" class="form-control" id="title-input">
+      </div>
+
+      <!-- 내용 입력 폼 일부 -->
+      <div class="mb-3">
+        <label for="content-area" class="form-label">내용</label>
+        <textarea name="content" id="content-area" class="form-control"></textarea>
+      </div>
+    </div>
+
+    <!-- 비밀번호 입력 폼 일부 -->
+    <div class="mb-3" id="password-container" style="display:none;">
+      <label for="password-input" class="form-label">비밀번호</label>
+      <input type="password" name="password" id="password-input" class="form-control">
+    </div>
+
+    <!-- 폼 제출 버튼 -->
+    <input type="submit" value="글쓰기" class="btn btn-primary">
+  </form>
+</div>
+<script>
+    window.onload = function() {
+        var boardSelect = document.getElementById('board-select');
+        togglePasswordInput(boardSelect);
+    };
+
+    function togglePasswordInput(select) {
+        var passwordContainer = document.getElementById('password-container');
+        var selectedValue = select.value;
+        if(selectedValue === "SECRET") {
+            passwordContainer.style.display = 'block';
+        } else {
+            passwordContainer.style.display = 'none';
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+</html>

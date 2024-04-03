@@ -1,11 +1,7 @@
 package com.example.workmate.entity;
 
-import com.example.workmate.entity.account.Account;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -18,9 +14,12 @@ public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Setter
     private String name;
+    @Setter
     private String address;
 
+    @Setter
     @OneToMany(mappedBy = "shop")
     private List<AccountShop> accountShops;
 }

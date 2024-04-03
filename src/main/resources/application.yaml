@@ -1,11 +1,28 @@
+#spring:
+#  datasource:
+#    url: jdbc:sqlite:db.sqlite
+#    driver-class-name: org.sqlite.JDBC
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
+#    database-platform: org.hibernate.community.dialect.SQLiteDialect
+#    show-sql: true
+#  sql:
+#    init:
+#      mode: always
+#  profiles:
+#    active: git
+
 spring:
   datasource:
-    url: jdbc:sqlite:db.sqlite
-    driver-class-name: org.sqlite.JDBC
+    url: jdbc:mysql://<host IP>:3306/WorkMateDB
+    username: <username>
+    password: <password>
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
-    database-platform: org.hibernate.community.dialect.SQLiteDialect
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQL8Dialect
     show-sql: true
   sql:
     init:

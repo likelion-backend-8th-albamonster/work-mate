@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Check Email</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<h1>이메일 전송</h1>
+<p>이메일 인증 시 인증된 유저로 등급 변경됩니다.</p>
+<p>해당 정보를 정확히 입력하세요.</p>
+
+<form action="/profile/email-check" method="post">
+    <label for="username">ID</label>
+    <input id="username" name="username" type="text" placeholder="ID">
+    <br>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" placeholder="email">
+    <br>
+    <button id="email-submit" type="submit">
+        <label for="email-submit">제출</label>
+    </button>
+</form>
+
+<hr>
+<a href="/check-code">이메일 코드 인증하기</a>
+<hr>
+<a href="/my-profile">Back</a>
+</body>
+<script>
+    $(document).ready(function () {
+        // 로그인 페이지에서 저장한 토큰을 가져옴
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        console.log(token);
+
+        $(`#email-submit`).click(function (e) {
+            e.preventDefault();
+
+            const formData = {
+                username: $(`input[name="username"]`).val(),
+                email: $(`input[name="email"]`).val()
+            };
+
+            console.log(formData);
+
+            $.ajax({
+                type: "POST",
+                url: "/profile/email-check",
+                data: formData, // JSON 형식의 데이터 전송
+                headers: headers, // 헤더 정보 전송
+                success: function (response) {
+                    // 성공적으로 요청을 처리한 경우 실행되는 코드
+                    alert("이메일을 전송했습니다.")
+                    console.log(response); // 서버로부터의 응답 확인
+                },
+                error: function (xhr, status, error) {
+                    if (xhr.status === 400) {
+                        alert("아이디 또는 이메일이 일치하지 않습니다.");
+                    } else {
+                        console.error("Error:", error);
+                    }
+                }
+            });
+        });
+    });
+</script>
+</html>

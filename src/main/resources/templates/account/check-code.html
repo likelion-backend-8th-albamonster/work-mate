@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Check code</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<a href="/my-profile">Main</a>
+<hr>
+<h1>이메일 코드 인증</h1>
+<p>이메일이 전송됐다면, 코드를 확인하세요.</p>
+<p>해당 정보를 정확히 입력하세요.</p>
+<form action="/profile/check-code" method="post">
+    <label for="username">ID</label>
+    <input id="username" name="username" type="text" placeholder="ID">
+    <br>
+    <label for="code">code</label>
+    <input id="code" name="code" type="text" placeholder="code">
+    <br>
+    <button id="check-code" type="submit">
+        <label for="check-code">제출</label>
+    </button>
+</form>
+<hr>
+<p>인증을 위한 이메일을 전송 받으려면 이전 페이지로 돌아가세요.</p>
+<a href="/email-check">이메일 받기</a>
+</body>
+<script>
+    $(document).ready(function () {
+        // 로그인 페이지에서 저장한 토큰을 가져옴
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        console.log(token);
+
+        $(`#check-code`).click(function (e) {
+            e.preventDefault();
+
+            const formData = {
+                username: $(`input[name="username"]`).val(),
+                code: $(`input[name="code"]`).val()
+            }
+            console.log(formData);
+
+            $.ajax({
+                type: "POST",
+                url: "/profile/check-code",
+                data: formData, // formData 객체를 전송
+                headers: headers, // 헤더 정보 전송
+                success: function (response) {
+                    // 성공적으로 요청을 처리한 경우 실행되는 코드
+                    alert("인증을 완료했습니다.");
+                    console.log(response); // 서버로부터의 응답 확인
+                    window.location.href="/my-profile";
+                },
+                error: function (xhr, status, error) {
+                    if (xhr.status === 400) {
+                        alert("아이디 또는 코드가 일치하지 않습니다.");
+                    } else if (xhr.status === 410) {
+                        alert("인증 시간이 만료되었습니다. 메일을 재전송합니다.");
+                    }else {
+                        console.error("Error:", error);
+                    }
+                }
+            });
+        })
+    });
+</script>
+</html>

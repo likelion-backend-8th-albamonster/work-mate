@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table, th, td, day {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+            width : 500px;
+            height: 50px;
+        }
+        th, td {
+            padding: 20px;
+        }
+        th {
+            text-align: center;
+        }
+    </style>
+    <title>근무표 교환</title>
+</head>
+<body>
+<p>
+    <a th:href="@{/schedule/{shopId}(shopId = ${shopId})}">월 별 근무표로 돌아가기</a>
+</p>
+<h1>근무표 교환신청 보기</h1>
+<table>
+    <thead>
+        <tr>
+            <th>이름</th>
+            <th>내 근무ID</th>
+            <th>바꿀 근무ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        <th:block th:unless="${schedules} != null">
+            <td>
+                비었습니다.
+            </td>
+        </th:block>
+        <th:block th:if="${schedules} != null">
+            <th:block th:each="schedule : ${schedules}">
+                <tr>
+                    <td th:text="${schedule.name}"></td>
+                    <td th:text="${schedule.myWorkTimeId}"></td>
+                    <td th:text="${schedule.changeWorkTimeId}"></td>
+                    <td>
+                        <form th:action="@{/schedule/confirm-change/{shopId}(shopId = ${shopId})}"
+                              th:object="${scheduleRequestDto}" method="post">
+                            <input type="hidden" name="id"
+                                   th:value="${schedule.id}" />
+                            <input type="submit" value = "승인">
+                        </form>
+                        <p></p>
+                        <form th:action="@{/schedule/decline-change/{shopId}(shopId = ${shopId})}"
+                              th:object="${scheduleRequestDto}" method="post">
+                            <input type="hidden" name="id"
+                                   th:value="${schedule.id}" />
+                            <input type="submit" value = "거절">
+                        </form>
+                    </td>
+                </tr>
+            </th:block>
+        </th:block>
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-center mt-3">
+    <ul class="pagination">
+        <!-- 처음 페이지 링크 -->
+        <li class="page-item" th:classappend="${schedules.first} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=0|}">처음</a>
+        </li>
+        <!-- 이전 페이지 링크 -->
+        <li class="page-item" th:classappend="${articles.hasPrevious} ? '' : 'disabled'">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${articles.number - 1}|}">이전</a>
+        </li>
+        <!-- 페이지 번호 링크 -->
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, articles.totalPages - 1)}"
+            th:classappend="${pageNum == articles.number} ? 'active' : ''">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${pageNum}|}"
+               th:text="${pageNum + 1}"></a>
+        </li>
+        <!-- 다음 페이지 링크 -->
+        <li class="page-item" th:classappend="${articles.hasNext} ? '' : 'disabled'">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${articles.number + 1}|}">다음</a>
+        </li>
+        <!-- 마지막 페이지 링크 -->
+        <li class="page-item" th:classappend="${articles.last} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${articles.totalPages - 1}|}">끝</a>
+        </li>
+    </ul>
+</div>
+</body>
+</html>

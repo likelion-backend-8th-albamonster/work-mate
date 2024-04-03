@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table, th, td{
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+            width : 500px;
+            height: 50px;
+        }
+        th, td {
+            padding: 20px;
+        }
+    </style>
+    <title>근무 리스트</title>
+</head>
+<body>
+<p>
+    <a th:href="@{/schedule/{shopId}(shopId = ${shopId})}">월 별 근무표로 돌아가기</a>
+</p>
+<p>
+    <a th:href="@{/schedule/change-worktime/{shopId}(shopId = ${shopId})}">근무 변경신청</a>
+</p>
+<h1>기간 근무표</h1>
+<table style>
+    <tr th:if="${schedules.isEmpty()}">
+        해당 기간 근무가 없습니다.
+    </tr>
+    <tr th:unless="${schedules.isEmpty()}" th:each="listSchedule : ${listSchedules}">
+
+        <th th:text="${#temporals.month(listSchedule)} + '월 ' + ${#temporals.day(listSchedule)} + '일'">
+        </th>
+        <th:block th:each="schedule : ${schedules}">
+            <th:block th:if="${#temporals.year(schedule.workStartTime)} eq ${#temporals.year(listSchedule)}">
+                <th:block th:if="${#temporals.month(schedule.workStartTime)} eq ${#temporals.month(listSchedule)}">
+                    <th:block th:if="${#temporals.day(schedule.workStartTime)} eq ${#temporals.day(listSchedule)}">
+                        <td th:text="${schedule.name} + ' : ' + ${#temporals.hour(schedule.workStartTime)}
+                                + ' ~ ' + ${#temporals.hour(schedule.workEndTime)}"></td>
+                    </th:block>
+                </th:block>
+            </th:block>
+        </th:block>
+
+    </tr>
+</table>
+</body>
+</html>
