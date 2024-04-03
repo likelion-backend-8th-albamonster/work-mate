@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -120,7 +122,7 @@ public class ScheduleController {
     }
 
     // 근무표 관리
-    @RequestMapping("/manage-schedule/{shopId}")
+    @GetMapping ("/manage-schedule/{shopId}")
     public String manageSchedule(
             @PathVariable("shopId")
             Long shopId
@@ -131,9 +133,43 @@ public class ScheduleController {
     // 근무교체 보기
     @RequestMapping("/view-change-worktime/{shopId}")
     public String viewChangeWorkTime(
+            Model model,
+            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC)
+            Pageable pageable,
             @PathVariable("shopId")
             Long shopId
     ){
+        Page<ChangeRequestDto> schedulePage = scheduleService.readChangePage(shopId,pageable);
+        AccountDto accountDto = accountService.readOneAccount();
+
+        model.addAttribute("schedules",schedulePage);
+        model.addAttribute("accountDto",accountDto);
+        model.addAttribute("shopId",shopId);
+
         return "schedule/view-change-worktime";
+    }
+    @GetMapping ("/confirm-change/{changeRequestId}/{shopId}")
+    public String confirmChange(
+            @PathVariable("changeRequestId")
+            Long changeRequestId,
+            @PathVariable("shopId")
+            Long shopId
+    ){
+        log.info("confirm");
+        scheduleService.confirmChange(changeRequestId);
+        return String.format("redirect:/schedule/%d",shopId);
+    }
+
+    //근무 교체 거절
+    @GetMapping("/decline-change/{changeRequestId}")
+    public String declineChange(
+            @PathVariable
+            Long changeRequestId,
+            @RequestParam
+            Long shopId
+    ){
+        log.info("decline");
+        scheduleService.declineChange(changeRequestId);
+        return String.format("redirect:/schedule/%d",shopId);
     }
 }

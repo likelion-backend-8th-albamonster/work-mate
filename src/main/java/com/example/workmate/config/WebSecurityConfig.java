@@ -109,12 +109,14 @@ public class WebSecurityConfig {
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
-                                       
+
                                 // 근무표 url - 인증받은 사람만 가능
                                 .requestMatchers(
                                         "/schedule/{shopId}",
                                         "/schedule/list-schedule/{shopId}",
-                                        "/schedule/change-worktime/{shopId}"
+                                        "/schedule/change-worktime/{shopId}",
+                                        "/schedule/confirm-change/{changeRequestId}/{shopId}",
+                                        "/schedule/decline-change/{changeRequestId}/{shopId}"
                                 )
                                 .authenticated()
                                 // 근무표 url - 매니저, 관리자 가능
@@ -122,7 +124,8 @@ public class WebSecurityConfig {
                                         "/schedule/manage-schedule/{shopId}",
                                         "/schedule/view-change-worktime/{shopId}"
                                 )
-                                .hasAnyAuthority(Authority.ROLE_ADMIN.getAuthority(),
+                                .hasAnyAuthority(
+                                        Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
                                 // 근무표 api - 인증받은 사람만 가능
@@ -131,7 +134,7 @@ public class WebSecurityConfig {
                                         "/api/schedule/read-one/{workTimeId}",
                                         "/api/schedule/view-month/{shopId}",
                                         "/api/schedule/view-period/{shopId}",
-                                        "/api/schedule/create-change/{shopId}",
+                                        "/api/schedule/create-change",
                                         "/api/schedule/read-change/{shopId}"
                                 )
                                 .authenticated()
@@ -149,7 +152,7 @@ public class WebSecurityConfig {
                                         Authority.ROLE_ADMIN.getAuthority(),
                                         Authority.ROLE_BUSINESS_USER.getAuthority()
                                 )
- 
+
                                 // 매장 커뮤니티 접속 권한
                                 .requestMatchers(
                                         "/{shopId}/community",
@@ -177,7 +180,32 @@ public class WebSecurityConfig {
                                         Authority.ROLE_BUSINESS_USER.getAuthority(),
                                         Authority.ROLE_USER.getAuthority()
                                 )
-                                       
+
+                                //출퇴근 관련 : 아르바이트생 이상 확인 가능
+                                .requestMatchers(
+                                        "/attendance/{accountId}/{shopId}",//출퇴근 페이지
+                                        "/attendance/checkIn/{accountId}/{shopId}",//출근 요청
+                                        "/attendance/checkOut/{accountId}/{shopId}",//퇴근 요청
+                                        "/attendance/restIn/{accountId}/{shopId}",//쉬는시간 요청
+                                        "/attendance/restOut/{accountId}/{shopId}",//쉬는시간 종료 요청
+                                        "/attendance/showLog/{accountId}",//출퇴근 기록 확인 페이지
+                                        "/attendance/showLog/search/{accountId}" //출퇴근 기록 검색 페이지
+
+                                )
+                                .hasAnyAuthority(
+                                        Authority.ROLE_USER.getAuthority(),
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_ADMIN.getAuthority()
+                                )
+                                //출퇴근 수정 : 매니저 이상 가능
+                                .requestMatchers(
+                                        "/attendance/update/{accountId}"//출퇴근 수정
+                                )
+                                .hasAnyAuthority(
+                                        Authority.ROLE_BUSINESS_USER.getAuthority(),
+                                        Authority.ROLE_ADMIN.getAuthority()
+                                )
+
                 )
                 .oauth2Login(oauth2Login -> oauth2Login
                         .loginPage("/account/login")

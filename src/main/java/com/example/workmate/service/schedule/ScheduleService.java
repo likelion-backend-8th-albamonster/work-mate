@@ -221,6 +221,16 @@ public class ScheduleService {
         }
         return dtos;
     }
+
+    //변경요청 페이지로 조회
+    public Page<ChangeRequestDto> readChangePage(Long shopId, Pageable pageable){
+        // 해당 매장 근무자만 가능
+        checkMember(shopId);
+
+        return changeRequestRepo.findAllByShop_IdAndStatus(shopId,ChangeRequest.Status.OFFERED, pageable)
+                .map(ChangeRequestDto::fromEntity);
+    }
+
     @Transactional
     // 근무표 변경요청 승인하기
     public ChangeRequestDto confirmChange(Long changeRequestId){

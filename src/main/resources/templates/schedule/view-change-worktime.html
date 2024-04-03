@@ -1,7 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <style>
+        table, th, td, day {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+            width : 500px;
+            height: 50px;
+        }
+        th, td {
+            padding: 20px;
+        }
+        th {
+            text-align: center;
+        }
+    </style>
     <title>근무표 교환</title>
 </head>
 <body>
@@ -9,8 +24,34 @@
     <a th:href="@{/schedule/{shopId}(shopId = ${shopId})}">월 별 근무표로 돌아가기</a>
 </p>
 <h1>근무표 교환신청 보기</h1>
-I'm working on it.
-I'm working on it.
-I'm working on it.
+<table>
+    <thead>
+        <tr>
+            <th>이름</th>
+            <th>내 근무ID</th>
+            <th>바꿀 근무ID</th>
+        </tr>
+    </thead>
+    <tbody>
+        <th:block th:unless="${schedules} != null">
+            <td>
+                비었습니다.
+            </td>
+        </th:block>
+        <th:block th:if="${schedules} != null">
+            <th:block th:each="schedule : ${schedules}">
+                <tr>
+                    <td th:text="${schedule.name}"></td>
+                    <td th:text="${schedule.myWorkTimeId}"></td>
+                    <td th:text="${schedule.changeWorkTimeId}"></td>
+                    <td>
+                        <a th:href="@{/schedule/confirm-change/{changeRequestId}/{shopId}(changeRequstId = ${schedule.id}, shopId = ${shopId})}">승인</a>
+                        <a th:href="@{/schedule/decline-change/{changeRequestId}/{shopId}(changeRequstId = ${schedule.id}, shopId = ${shopId})}">거절</a>
+                    </td>
+                </tr>
+            </th:block>
+        </th:block>
+    </tbody>
+</table>
 </body>
 </html>

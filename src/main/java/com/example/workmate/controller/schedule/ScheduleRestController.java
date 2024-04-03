@@ -17,17 +17,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/schedule")
-@CrossOrigin
 public class ScheduleRestController {
     private final ScheduleService scheduleService;
     private final ScheduleDataService scheduleDataService;
     private final ScheduleUtil scheduleUtil;
 
     // 사람, 상점, accountShop 만들기
-    @ResponseBody
     @PostMapping("/account-shop")
     public String accountshop(){
         scheduleDataService.accountShop();
@@ -35,7 +33,6 @@ public class ScheduleRestController {
     }
 
     // 한 사람의 한 달 동안의 랜덤시간 근무 만들기
-    @ResponseBody
     @PostMapping("/make")
     public String make(
             @RequestParam
