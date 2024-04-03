@@ -52,9 +52,16 @@ public class AccountService {
     }
 
     // 사용자 정보 수정
-    public AccountDto updateAccount(Long id, AccountDto dto) {
-        Account target = accountRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public AccountDto updateAccount(AccountDto dto) {
+        Account target = authFacade.getAccount();
+
+        log.info("auth user: {}", authFacade.getAuth().getName());
+        log.info("page username: {}", target.getUsername());
+
+        // 토큰으로 접근 시도한 유저와, 페이지의 유저가 다른경우 예외
+        if (!authFacade.getAuth().getName().equals(target.getUsername())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
         target.setName(dto.getName());
         target.setEmail(dto.getEmail());

@@ -40,9 +40,9 @@ public class ProfileRestController {
     }
 
     // 정보 업데이트
-    @PostMapping("/{id}/update")
-    public AccountDto updateAccount(@PathVariable("id") Long id, AccountDto dto) {
-        return service.updateAccount(id, dto);
+    @PostMapping("/update")
+    public AccountDto updateAccount(@RequestBody AccountDto dto) {
+        return service.updateAccount(dto);
     }
 
     // 이메일 코드를 보낸다.

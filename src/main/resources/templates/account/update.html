@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<h1>회원 정보 수정</h1>
+<form action="/profile/update" method="post">
+    <label for="name">이름</label>
+    <input id="name" name="name" type="text" placeholder="변경할 이름을 입력하세요.">
+    <br>
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" placeholder="변경할 이메일을 입력하세요.">
+    <button id="submit" type="submit">
+        <label for="submit">제출</label>
+    </button>
+</form>
+<hr>
+<a href="/my-profile">Back</a>
+</body>
+<script>
+    $(document).ready(function () {
+        // 로그인 페이지에서 저장한 토큰을 가져옴
+        const token = localStorage.getItem("jwtToken");
+        const headers = {};
+
+        // 토큰이 있으면 헤더에 추가
+        if (token) {
+            headers["Authorization"] = "Bearer " + token; // 토큰을 Authorization 헤더에 담아 전달
+        }
+
+        $(`#submit`).click(function(e) {
+            e.preventDefault();
+
+            if ($("#name").val() === '' || $("#email").val() === '') {
+                alert("이름과 이메일을 입력해주세요.");
+                return;
+            }
+
+            const formData = {
+                name: $(`input[name="name"]`).val(),
+                email: $(`input[name="email"]`).val()
+            };
+
+            $.ajax({
+                type: "POST",
+                url: "/profile/update",
+                contentType: "application/json",
+                data:JSON.stringify(formData),
+                success: function (data) {
+                    alert("변경이 적용되었습니다.");
+                    console.log(data);
+                },
+                error: function (xhr, status, error) {
+                    console.log(error);
+                }
+            });
+        });
+    })
+</script>
+</html>
