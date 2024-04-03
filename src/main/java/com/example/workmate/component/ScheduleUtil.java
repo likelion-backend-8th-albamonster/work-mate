@@ -40,12 +40,7 @@ public class ScheduleUtil {
         int endOfDay = month.atEndOfMonth().getDayOfMonth();
         int dayOfWeek = getDayOfWeek(dto);
         List<Integer> days = new ArrayList<>();
-
-        log.info("dayOfweek: {}",dayOfWeek);
-        log.info("endOfDay: {}",endOfDay);
-
         int allWeek = (dayOfWeek + endOfDay) / 7 + 1;
-        log.info("allWeek: {}",allWeek);
         log.info("allWeek * 7 - dayOfWeek - 1: {}",(allWeek * 7 - dayOfWeek - 1));
         for (int i = 0; i < (allWeek * 7); i++) {
             if((i >= dayOfWeek)&&(i < endOfDay + dayOfWeek)){

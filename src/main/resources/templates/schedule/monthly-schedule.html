@@ -54,7 +54,7 @@
             </td>
             <td style="border: none;">
                 <form th:action="@{/schedule/list-schedule/{shopId}(shopId = ${shop.getId()})}"
-                      th:object="${periodScheduleDto}" method="post">
+                      th:object="${scheduleRequestDto}" method="post">
                     <label for="startDate">시작 날짜</label>
                     <input type="date" name="startDate" id="startDate"
                            th:value="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}" />

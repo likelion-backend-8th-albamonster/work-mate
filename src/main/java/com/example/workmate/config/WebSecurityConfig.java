@@ -115,15 +115,15 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/schedule/{shopId}",
                                         "/schedule/list-schedule/{shopId}",
-                                        "/schedule/change-worktime/{shopId}",
-                                        "/schedule/confirm-change/{changeRequestId}/{shopId}",
-                                        "/schedule/decline-change/{changeRequestId}/{shopId}"
+                                        "/schedule/change-worktime/{shopId}"
                                 )
                                 .authenticated()
                                 // 근무표 url - 매니저, 관리자 가능
                                 .requestMatchers(
                                         "/schedule/manage-schedule/{shopId}",
-                                        "/schedule/view-change-worktime/{shopId}"
+                                        "/schedule/view-change-worktime/{shopId}",
+                                        "/schedule/confirm-change/{shopId}",
+                                        "/schedule/decline-change/{shopId}"
                                 )
                                 .hasAnyAuthority(
                                         Authority.ROLE_ADMIN.getAuthority(),

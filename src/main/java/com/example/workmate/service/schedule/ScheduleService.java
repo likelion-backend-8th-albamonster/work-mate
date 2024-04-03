@@ -237,7 +237,6 @@ public class ScheduleService {
         ChangeRequest changeRequest = changeRequestRepo.findById(changeRequestId).orElseThrow(
                 ()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "change request failed")
         );
-
         //해당 매장의 매니저 이상 가능
         Account account = checkMember(changeRequest.getShop().getId());
         checkManagerOrAdmin(account);
@@ -305,7 +304,7 @@ public class ScheduleService {
 
     // 해당 직원의 매니저 이상 권한 확인하기
     public void checkManagerOrAdmin(Account account){
-        if(account.getAuthority() == Authority.ROLE_USER)
+        if(account.getAuthority().equals(Authority.ROLE_USER))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 }

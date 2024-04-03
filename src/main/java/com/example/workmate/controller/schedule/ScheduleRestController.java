@@ -2,7 +2,7 @@ package com.example.workmate.controller.schedule;
 
 import com.example.workmate.component.ScheduleUtil;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
-import com.example.workmate.dto.schedule.PeriodScheduleDto;
+import com.example.workmate.dto.schedule.ScheduleRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
 import com.example.workmate.dto.schedule.WorkTimeDto;
 import com.example.workmate.service.schedule.ScheduleDataService;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +26,13 @@ public class ScheduleRestController {
 
     // 사람, 상점, accountShop 만들기
     @PostMapping("/account-shop")
-    public String accountshop(){
-        scheduleDataService.accountShop();
+    public String accountshop(
+            @RequestParam
+            Long accountId,
+            @RequestParam
+            Long shopId
+    ){
+        scheduleDataService.accountShop(accountId,shopId);
         return "done";
     }
 
@@ -111,7 +115,7 @@ public class ScheduleRestController {
             @PathVariable("shopId")
             Long shopId,
             @RequestBody
-            PeriodScheduleDto dto
+            ScheduleRequestDto dto
     ){
         return scheduleService.viewPeriod(shopId,dto.getStartDate(), dto.getEndDate());
     }
