@@ -80,8 +80,10 @@
                 function updatePage() {
                     $.when(getAccountShop(accountId), getShopName(accountId), getAccountStatus(accountId)).done(function (accountShopData, shopNameData, accountStatusData) {
                         const accountShop = accountShopData[0];
-                        const shopName = shopNameData[0];
+                        const shopNames = shopNameData[0];
                         const accountStatus = accountStatusData[0];
+
+                        console.log(shopNames);
 
                         // SUBMITTED 상태인 shop id 리스트 만들기
                         const submittedShopIds = [];
@@ -97,7 +99,8 @@
                         // HTML 업데이트
                         const accountShopDiv = $(`#account-shop`);
 
-                        submittedShopIds.forEach(shopId => {
+                        submittedShopIds.forEach((shopId, index) => {
+                            const shopName = shopNames[index];
                             const attendanceLink = `attendance/${accountId}/${shopId}`;
                             const communityLink = `community/${shopId}`;
                             const listItem = `<li><a href="${attendanceLink}">${shopName}</a> | <a href="${communityLink}">${shopName} 커뮤니티</a></li>`;
