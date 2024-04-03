@@ -39,7 +39,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(
                                         "/token/issue",
                                         "/token/validate",
-                                        "/account/home",
+                                        "/",
                                         "/account/login",
 
                                         // 로그인, 매장 아르바이트 요청 html

@@ -2,10 +2,8 @@ package com.example.workmate.controller.account;
 
 import com.example.workmate.entity.account.Authority;
 import com.example.workmate.entity.account.CustomAccountDetails;
-import com.example.workmate.facade.AuthenticationFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Controller;
@@ -18,15 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
     private final UserDetailsManager manager;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationFacade authFacade;
-
-    @GetMapping("/home")
-    public String home() {
-        log.info(SecurityContextHolder.getContext().getAuthentication().getName());
-        log.info(authFacade.getAuth().getName());
-
-        return "account/index";
-    }
 
     @GetMapping("/login")
     public String loginForm() {
