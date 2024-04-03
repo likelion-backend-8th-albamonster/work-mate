@@ -15,6 +15,11 @@ public class ProfileController {
         return "account/my-profile";
     }
 
+    @GetMapping("/my-profile/update")
+    public String profileUpdate() {
+        return "account/update";
+    }
+
     @GetMapping("/email-check")
     public String emailCheck() {
         return "account/check-email";

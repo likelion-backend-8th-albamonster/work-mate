@@ -54,8 +54,10 @@ public class WebSecurityConfig {
 
                                 .requestMatchers(
                                         "/my-profile",
-                                        "/profile/**",
+                                        "/profile",
                                         "/profile/{id}",
+                                        "/my-profile/update",
+                                        "/profile/update",
                                         "/account/oauth")
                                 .authenticated()
 
