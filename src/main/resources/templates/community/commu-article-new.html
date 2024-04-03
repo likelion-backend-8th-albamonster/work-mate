@@ -8,17 +8,36 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 </head>
 
+<body class="p-3">
+<!-- 기능 목록 -->
+<div class="container-fluid bg-secondary text-white py-3">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- 메인 기능 링크 : 중앙 -->
+      <div class="ms-auto me-auto">
+        <a th:href="@{'/attendance/' + ${accountId} + '/' + ${shopId}}" class="btn btn-light mx-5">출퇴근 기록</a>
+        <a th:href="@{'/schedule/' + ${shopId}}" class="btn btn-light mx-5">월별 근무표</a>
+        <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-light mx-5">커뮤니티</a>
+      </div>
+      <!-- 프로필, 로그아웃 링크 : 우측 -->
+      <div>
+        <a th:href="@{'/my-profile'}" class="btn btn-outline-light me-2">프로필</a>
+        <a th:href="@{'/account/logout'}" class="btn btn-outline-light">로그아웃</a>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
+
 <!-- 게시판 목록 -->
 <div class="d-flex justify-content-center mt-3 fs-6">
-  <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-primary me-3">전체 게시판</a>
+  <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-primary me-3">전체 게시글</a>
   <div th:each="boardItem : ${boards}">
     <a th:href="@{'/' + ${shopId} + '/community/' + ${boardItem.name()}}" th:text="${boardItem.board}"
        class=" btn btn-info me-3"></a>
   </div>
 </div>
 <hr>
-
-<body class="p-3" data-shop-id="${shopId}" >
 <div class="container mt-3 mb-5">
   <!-- 선택한 게시판 이름 -->
   <div class="d-flex align-items-center">
