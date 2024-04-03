@@ -17,6 +17,7 @@ public class CommentDto {
     private Long shopArticleId;
     private String accountName;
     private String content;
+    private String commentAuthority;
     private LocalDateTime commentWriteTime;
 
     public static CommentDto fromEntity(Comment entity) {
@@ -27,6 +28,7 @@ public class CommentDto {
                 .shopArticleId(entity.getArticle().getShopArticleId())
                 .accountId(entity.getAccount().getId())
                 .accountName(entity.getAccount().getName())
+                .commentAuthority(String.valueOf(entity.getAccount().getAuthority()))
                 .commentWriteTime(entity.getCommentWriteTime())
                 .build();
     }

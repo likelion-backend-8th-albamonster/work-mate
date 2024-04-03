@@ -8,6 +8,28 @@
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 
+
+
+<body class="p-3">
+<!-- 기능 목록 -->
+<div class="container-fluid bg-secondary text-white py-3">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- 메인 기능 링크 : 중앙 -->
+      <div class="ms-auto me-auto">
+        <a th:href="@{'/attendance/' + ${accountId} + '/' + ${shopId}}" class="btn btn-light mx-5">출퇴근 기록</a>
+        <a th:href="@{'/schedule/' + ${shopId}}" class="btn btn-light mx-5">월별 근무표</a>
+        <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-light mx-5">커뮤니티</a>
+      </div>
+      <!-- 프로필, 로그아웃 링크 : 우측 -->
+      <div>
+        <a th:href="@{'/my-profile'}" class="btn btn-outline-light me-2">프로필</a>
+        <a th:href="@{'/account/logout'}" class="btn btn-outline-light">로그아웃</a>
+      </div>
+    </div>
+  </div>
+</div>
+<hr>
 <!-- 게시판 목록 -->
 <div class="d-flex justify-content-center mt-3 fs-6">
   <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-primary me-3">전체 게시글</a>
@@ -17,8 +39,6 @@
   </div>
 </div>
 <hr>
-
-<body class="p-3">
 <div class="container mt-3 mb-5">
   <div class="d-flex align-items-center justify-content-between">
     <!-- 게시판 이름  -->
@@ -80,22 +100,26 @@
   </div>
   <!-- 댓글 리스트 : 댓글 있을 때 -->
   <div th:unless="${article.comments.isEmpty()}" th:each="comment: ${article.comments}">
-    <!-- 유저 이름 -->
     <div class="d-flex justify-content-between align-items-center">
       <div>
+        <!-- 유저 이름 -->
+        <span th:classappend="${comment.commentAuthority == 'ROLE_ADMIN' ? 'badge bg-danger' :
+                            comment.commentAuthority == 'ROLE_BUSINESS_USER' ? 'badge bg-warning' :
+                            'badge bg-success'}"
+              th:text="${comment.commentAuthority == 'ROLE_ADMIN' ? '관리자' :
+                     comment.commentAuthority == 'ROLE_BUSINESS_USER' ? '매니저' :
+                     '직원'}"></span>
         <span class="me-3" th:text="${comment.accountName}"></span>
         <!-- 작성 시간 -->
         <span th:text="${#temporals.format(comment.commentWriteTime, 'yyyy-MM-dd HH:mm')}"></span>
       </div>
       <!-- 댓글 삭제 폼 제출 -->
-
       <form class="d-flex align-items-center justify-content-end"
             th:action="@{'/' + ${shopId} + '/community/' + ${board} + '/' + ${shopArticleId} + '/comment/' + ${comment.id} + '/delete'}"
             method="post">
         <!-- 댓글 삭제 버튼 -->
         <input type="submit" class="btn btn-danger" value="댓글 삭제">
       </form>
-
     </div>
     <!-- 댓글 내용 -->
     <p th:text="${comment.content}"></p>

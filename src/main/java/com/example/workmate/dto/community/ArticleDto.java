@@ -26,6 +26,7 @@ public class ArticleDto {
     private String content;
     private String accountName;
     private String password;
+    private String authorAuthority;
     private LocalDateTime articleWriteTime;
 
     public static ArticleDto fromEntity(Article entity) {
@@ -46,6 +47,7 @@ public class ArticleDto {
                 .accountName(entity.getAccount() != null ? entity.getAccount().getName() : "익명") //임시
                 .shopId(entity.getShop().getId())
                 .password(entity.getPassword())
+                .authorAuthority(String.valueOf(entity.getAccount().getAuthority()))
                 .articleWriteTime(entity.getArticleWriteTime())
                 .build();
     }

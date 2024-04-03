@@ -32,19 +32,20 @@
 
 <body class="p-3">
 <!-- 기능 목록 -->
-<div class="container">
-  <div class="row justify-content-between">
-    <div class="col-auto">
-      <!-- 메인 기능 링크 -->
-      <a th:href="@{'/attendance/' + ${accountId} + '/' + ${shopId}}">출퇴근 기록</a>
-      <a th:href="@{'/schedule/' + ${shopId}}">월별 근무표</a>
-      <a th:href="@{'/' + ${shopId} + '/community'}">커뮤니티</a>
-    </div>
-
-    <div class="col-auto">
-      <!-- 프로필, 로그아웃 링크 -->
-      <a th:href="@{'/my-profile'}">프로필</a>
-      <a th:href="@{'/account/logout'}">로그아웃</a>
+<div class="container-fluid bg-secondary text-white py-3">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- 메인 기능 링크 : 중앙 -->
+      <div class="ms-auto me-auto">
+        <a th:href="@{'/attendance/' + ${accountId} + '/' + ${shopId}}" class="btn btn-light mx-5">출퇴근 기록</a>
+        <a th:href="@{'/schedule/' + ${shopId}}" class="btn btn-light mx-5">월별 근무표</a>
+        <a th:href="@{'/' + ${shopId} + '/community'}" class="btn btn-light mx-5">커뮤니티</a>
+      </div>
+      <!-- 프로필, 로그아웃 링크 : 우측 -->
+      <div>
+        <a th:href="@{'/my-profile'}" class="btn btn-outline-light me-2">프로필</a>
+        <a th:href="@{'/account/logout'}" class="btn btn-outline-light">로그아웃</a>
+      </div>
     </div>
   </div>
 </div>
@@ -87,7 +88,16 @@
             <a th:href="@{'/' + ${shopId} + '/community/NOTICE/' + ${notice.shopArticleId}}"
                th:text="${notice.title}"></a>
           </td>
-          <td th:text="${notice.accountName}"></td>
+          <td>
+            <!-- 권한에 따라 배지 색상, 텍스트 변경 -->
+            <span th:classappend="${notice.authorAuthority == 'ROLE_ADMIN' ? 'badge bg-danger' :
+                              notice.authorAuthority == 'ROLE_BUSINESS_USER' ? 'badge bg-warning' :
+                              'badge bg-success'}"
+                  th:text="${notice.authorAuthority == 'ROLE_ADMIN' ? '관리자' :
+                       notice.authorAuthority == 'ROLE_BUSINESS_USER' ? '매니저' :
+                       '직원'}"></span>
+            <span th:text="${notice.accountName}"></span>
+          </td>
           <td th:text="${#temporals.format(notice.articleWriteTime, 'yyyy-MM-dd HH:mm')}"></td>
         </tr>
         <!-- 공지사항이 없을 때 메시지 -->
@@ -107,7 +117,16 @@
             <a th:href="@{'/' + ${shopId} + '/community/' + ${article.board} + '/' + ${article.shopArticleId}}"
                th:text="${article.title}"></a>
           </td>
-          <td th:text="${article.accountName}"></td>
+          <td>
+            <!-- 권한에 따라 배지 색상, 텍스트 변경 -->
+            <span th:classappend="${article.authorAuthority == 'ROLE_ADMIN' ? 'badge bg-danger' :
+                              article.authorAuthority == 'ROLE_BUSINESS_USER' ? 'badge bg-warning' :
+                              'badge bg-success'}"
+                  th:text="${article.authorAuthority == 'ROLE_ADMIN' ? '관리자' :
+                       article.authorAuthority == 'ROLE_BUSINESS_USER' ? '매니저' :
+                       '직원'}"></span>
+            <span th:text="${article.accountName}"></span>
+          </td>
           <td th:text="${#temporals.format(article.articleWriteTime, 'yyyy-MM-dd HH:mm')}"></td>
         </tr>
         </tbody>

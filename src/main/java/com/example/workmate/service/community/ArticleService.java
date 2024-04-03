@@ -63,16 +63,34 @@ public class ArticleService {
         return accountShopsOpt.orElseGet(Collections::emptyList);
     }
 
-    // 사용자 인증 정보를 기반으로 athority를 가져오기
-    public String getAuthority() {
-        Long accountId = getAccountId();
-        Optional<Account> accountOpt = accountRepo.findById(accountId);
-        Account account = accountOpt.get();
+//    // 사용자 인증 정보를 기반으로 athority를 가져오기
+//    public String getAuthority() {
+//        Long accountId = getAccountId();
+//        Optional<Account> accountOpt = accountRepo.findById(accountId);
+//        Account account = accountOpt.get();
+//
+//        if(account.getAuthority().equals(ROLE_ADMIN)) return "관리자";
+//        else if (account.getAuthority().equals(ROLE_BUSINESS_USER)) return "매니저";
+//        else if (account.getAuthority().equals(ROLE_USER)) return "직원";
+//        return "권한 없음";
+//    }
 
-        if(account.getAuthority().equals(ROLE_ADMIN)) return "관리자";
-        else if (account.getAuthority().equals(ROLE_BUSINESS_USER)) return "매니저";
-        else if (account.getAuthority().equals(ROLE_USER)) return "직원";
-        return "권한 없음";
+    public String getArticleAuthority(Long articleId) {
+        return articleRepo.findById(articleId)
+                .map(Article::getAccount)
+                .map(account -> {
+                    switch(account.getAuthority()) {
+                        case ROLE_ADMIN:
+                            return "관리자";
+                        case ROLE_BUSINESS_USER:
+                            return "매니저";
+                        case ROLE_USER:
+                            return "직원";
+                        default:
+                            return "권한 없음";
+                    }
+                })
+                .orElse("게시글 또는 사용자 정보를 찾을 수 없습니다.");
     }
 
     // 사용자 & 매장 매칭 정보 & 상태 확인하기
@@ -168,6 +186,7 @@ public class ArticleService {
                 .map(ArticleDto::fromEntity);
     }
 
+    // 게시판별 게시글 목록 읽기
     public Page<ArticleDto> readPageByBoard(
             Board board,
             Long shopId,
