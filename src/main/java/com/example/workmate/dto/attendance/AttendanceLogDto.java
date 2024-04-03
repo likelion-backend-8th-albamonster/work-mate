@@ -30,6 +30,8 @@ public class AttendanceLogDto {
     private Status status;
     //매장명
     private String shopName;
+    //사용자 name
+    private String name;
 
 
 }

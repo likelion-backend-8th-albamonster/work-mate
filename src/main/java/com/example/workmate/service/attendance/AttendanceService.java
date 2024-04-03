@@ -160,11 +160,12 @@ public class AttendanceService {
     public Page<AttendanceLogDto> showLogAll(
             Integer pageNumber,
             Integer pageSize,
+            String sortType,
             Long accountId,
             Authority authority
     ){
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
-                Sort.by("id").descending());
+                Sort.by(sortType).descending());
 
         Page<AttendanceLogDto> attendanceLogDtoPage;
         //권한 확인
@@ -205,6 +206,7 @@ public class AttendanceService {
     public Page<AttendanceLogDto> showLogAllForSearch(
             Integer pageNumber,
             Integer pageSize,
+            String sortType,
             Long accountId,
             Authority authority,
             String searchDuration,
@@ -212,7 +214,7 @@ public class AttendanceService {
             String searchType
     ){
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
-                Sort.by("id").descending());
+                Sort.by(sortType).descending());
 
         Page<AttendanceLogDto> attendanceLogDtoPage;
 
@@ -278,6 +280,7 @@ public class AttendanceService {
     public Page<AttendanceLogDto> showLog(
             Integer pageNumber,
             Integer pageSize,
+            String sortType,
             Long accountId,
             Long shopId,
             Authority authority
@@ -294,7 +297,7 @@ public class AttendanceService {
                 );
 
         Pageable pageable = PageRequest.of(pageNumber,pageSize,
-                Sort.by("id").descending());
+                Sort.by(sortType).descending());
 
         //한 계정의 한 매장에 대한 것만 가져온다.
         Page<AttendanceLogDto> attendanceLogDtoPage
@@ -448,6 +451,7 @@ public class AttendanceService {
             Long accountId,
             Integer pageNumber,
             Integer pageSize,
+            String sortType,
             String searchDuration,
             String searchWord,
             String searchType,
@@ -457,7 +461,7 @@ public class AttendanceService {
         //한 유저의 모든 매장 출근 검색 데이터 가져오기
         attendanceLogList
                 = showLogAllForSearch(
-                        pageNumber,pageSize,
+                        pageNumber,pageSize,sortType,
                         accountId, account.getAuthority(),
                         searchDuration,searchWord,searchType);
 
