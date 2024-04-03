@@ -86,7 +86,7 @@
                         const submittedShopIds = [];
                         for (let i = 0; i < accountShop.length; i++) {
                             if (accountShop[i].status === "ACCEPT") {
-                                submittedShopIds.push(accountShop[i].id);
+                                submittedShopIds.push(accountShop[i].shopId);
                             }
                         }
 
@@ -96,10 +96,11 @@
                         // HTML 업데이트
                         const accountShopDiv = $(`#account-shop`);
 
-                        submittedShopIds.forEach(id => {
-                            const attendanceLink = `attendance/${accountId}/${id}`;
-                            const anchorTag = `<li><a href="${attendanceLink}">${shopName}</a></li>`;
-                            accountShopDiv.append(`<p>${anchorTag}</p>`);
+                        submittedShopIds.forEach(shopId => {
+                            const attendanceLink = `attendance/${accountId}/${shopId}`;
+                            const communityLink = `community/${shopId}`;
+                            const listItem = `<li><a href="${attendanceLink}">${shopName}</a> | <a href="${communityLink}">${shopName} 커뮤니티</a></li>`;
+                            accountShopDiv.append(`<p>${listItem}</p>`);
                         });
                     }).fail(function (error) {
                         console.error('Error:', error);

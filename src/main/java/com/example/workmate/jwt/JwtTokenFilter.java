@@ -61,7 +61,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                         .parseClaims(token)
                         .getSubject();
 
-                log.info("getSubject: {}", username);
                 UserDetails userDetails = manager.loadUserByUsername(username);
                 for (GrantedAuthority authority :userDetails.getAuthorities()) {
                     log.info("authority: {}", authority.getAuthority());
@@ -91,7 +90,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                         .parseClaims(cookieToken)
                         .getSubject();
 
-                log.info("getSubject: {}", username);
+
                 UserDetails userDetails = manager.loadUserByUsername(username);
                 for (GrantedAuthority authority :userDetails.getAuthorities()) {
                     log.info("authority: {}", authority.getAuthority());

@@ -1,9 +1,11 @@
 package com.example.workmate.controller.community;
 
+import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.community.ArticleDto;
 import com.example.workmate.entity.community.Article;
 import com.example.workmate.entity.community.Board;
 import com.example.workmate.repo.community.ArticleRepo;
+import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.community.ArticleService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class ArticleController {
     private final ArticleService articleService;
     private final ArticleRepo articleRepo;
+    private final AccountService accountService;
 
 
     // 게시글 작성 페이지로 이동
@@ -86,11 +89,13 @@ public class ArticleController {
 
         Page<ArticleDto> articles;
         Page<ArticleDto> noticeArticles = articleService.findNoticeArticles(shopId, PageRequest.of(0, 3));
+        AccountDto dto = accountService.readOneAccount();
         if (keyword != null && !keyword.isEmpty()) {
             articles = articleService.search(type, keyword, pageable, shopId);
         } else {
             articles = articleService.readPage(shopId, pageable);
         }
+        model.addAttribute("accountId", dto.getId());
         model.addAttribute("shopId", shopId);
         model.addAttribute("boards", Board.values());
         model.addAttribute("articles", articles);

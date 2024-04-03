@@ -137,8 +137,6 @@ public class ScheduleService {
         LocalDateTime endDay = scheduleUtil.getDay(false, dto).atTime(LocalTime.MAX);
 
         int dayOfWeek = scheduleUtil.getDayOfWeek(dto);
-        log.info("dayOfWeek : {}",dayOfWeek);
-        log.info("dayOfWeek + endDay : {}",dayOfWeek + endDay.getDayOfMonth());
         log.info("startDay: {}, endDay: {}",startDay,endDay);
         List<WorkTime> workTimes = workTimeRepo
                 .findAllByShop_IdAndWorkStartTimeBetweenOrderByWorkStartTimeAsc(
@@ -151,10 +149,6 @@ public class ScheduleService {
         for (WorkTime workTime : workTimes){
             dtos.add(WorkTimeDto.fromEntity(workTime));
         }
-
-        log.info("worTimes size: {}",workTimes.size());
-        log.info("dto size: {}",dtos.size());
-
         return dtos;
     }
     // 처음 근무표 확인으로 들어왔을 때 정한 기간의 근무표를 보기
@@ -165,7 +159,6 @@ public class ScheduleService {
     ){
         checkMember(shopId);
 
-        log.info("viewPeriod");
         // 시작일과 마지막날 구하기
         LocalDateTime startDay = start.atStartOfDay();
         LocalDateTime endDay = end.atTime(LocalTime.MAX);
@@ -263,8 +256,6 @@ public class ScheduleService {
                 changeStartTime,
                 changeEndTime
         );
-
-        log.info("after workTime: {}",myWorkTime.getWorkStartTime());
 
         changeRequestRepo.save(changeRequest);
         workTimeRepo.saveAll(List.of(myWorkTime,changeWorkTime));

@@ -271,7 +271,7 @@ public class AttendanceController {
             Long shopId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "5", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false)
             Integer pageSize,
             Model model
     ){
@@ -321,7 +321,7 @@ public class AttendanceController {
             Long accountId,
             @RequestParam(value = "pageNumber", defaultValue = "0", required = false)
             Integer pageNumber,
-            @RequestParam(value = "pageSize", defaultValue = "2", required = false)
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false)
             Integer pageSize,
             @RequestParam(value = "searchDuration", defaultValue = "allDay", required = true)
             String searchDuration,

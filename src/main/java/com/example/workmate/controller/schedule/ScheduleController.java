@@ -1,14 +1,17 @@
 package com.example.workmate.controller.schedule;
 
 import com.example.workmate.component.ScheduleUtil;
+import com.example.workmate.dto.account.AccountDto;
 import com.example.workmate.dto.schedule.PeriodScheduleDto;
 import com.example.workmate.dto.schedule.WorkTimeDto;
 import com.example.workmate.dto.schedule.ChangeRequestDto;
 import com.example.workmate.dto.schedule.ScheduleDto;
 import com.example.workmate.dto.shop.ShopDto;
 import com.example.workmate.entity.Shop;
+import com.example.workmate.entity.account.Account;
 import com.example.workmate.entity.schedule.QChangeRequest;
 import com.example.workmate.service.ShopService;
+import com.example.workmate.service.account.AccountService;
 import com.example.workmate.service.schedule.ScheduleDataService;
 import com.example.workmate.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,7 @@ public class ScheduleController {
     private final ScheduleService scheduleService;
     private final ScheduleUtil scheduleUtil;
     private final ShopService shopService;
+    private final AccountService accountService;
 
     // 근무표 메인페이지
     @RequestMapping("/{shopId}")
@@ -61,6 +65,8 @@ public class ScheduleController {
         PeriodScheduleDto periodScheduleDto = new PeriodScheduleDto();
         List<WorkTimeDto> schedules = scheduleService.viewMonth(shopId, dto);
         ShopDto shopDto = shopService.readOneShop(shopId);
+        AccountDto accountDto = accountService.readOneAccount();
+
         if (auth != null){
             model.addAttribute("authority",auth.getAuthorities().toString());
             model.addAttribute("username",auth.getName());
@@ -68,6 +74,7 @@ public class ScheduleController {
             model.addAttribute("authority", "anonymous");
             model.addAttribute("username",null);
         }
+        model.addAttribute("accountId", accountDto.getId());
         model.addAttribute("periodScheduleDto", periodScheduleDto);
         model.addAttribute("schedules", schedules);
         model.addAttribute("shop", shopDto);
