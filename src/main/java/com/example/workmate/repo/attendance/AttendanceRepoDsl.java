@@ -128,8 +128,6 @@ public class AttendanceRepoDsl {
             String searchWord,
             String searchType
     ){
-        //QAttendance qAttendance = new QAttendance("attendance");
-        //QShop qShop = new QShop("shop");
 
         // 쿼리의 결과를 DTO 클래스로 매핑해서 가져오기
         List<AttendanceLogDto> attendanceLogDtoList =
@@ -141,16 +139,19 @@ public class AttendanceRepoDsl {
                                         qAttendance.checkInTime,
                                         qAttendance.checkOutTime,
                                         qAttendance.status,
-                                        qShop.name
+                                        qShop.name,
+                                        qAccount.name
                                 )
                         )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(
                                 qAttendance.account.id.eq(accountId),
                                 cotainWord(searchWord, searchType),
                                 betweenTime(thisTime,searchTime)
                         )
+                        .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                         .offset(pageable.getOffset())//페이지번호
                         .limit(pageable.getPageSize())//페이지사이즈
                         .fetch();
@@ -162,6 +163,7 @@ public class AttendanceRepoDsl {
                         )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(
                                 qAttendance.account.id.eq(accountId),
                                 cotainWord(searchWord, searchType),
@@ -234,8 +236,6 @@ public class AttendanceRepoDsl {
             String searchWord,
             String searchType
     ){
-        //QAttendance qAttendance = new QAttendance("attendance");
-        //QShop qShop = new QShop("shop");
 
         // 쿼리의 결과를 DTO 클래스로 매핑해서 가져오기
         List<AttendanceLogDto> attendanceLogDtoList =
@@ -247,16 +247,19 @@ public class AttendanceRepoDsl {
                                         qAttendance.checkInTime,
                                         qAttendance.checkOutTime,
                                         qAttendance.status,
-                                        qShop.name
+                                        qShop.name,
+                                        qAccount.name
                                 )
                         )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(
                                 qAttendance.shop.id.in(accountShopList),
                                 cotainWord(searchWord, searchType),
                                 betweenTime(thisTime,searchTime)
                         )
+                        .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                         .offset(pageable.getOffset())//페이지번호
                         .limit(pageable.getPageSize())//페이지사이즈
                         .fetch();
@@ -267,6 +270,7 @@ public class AttendanceRepoDsl {
                         )
                         .from(qAttendance)
                         .innerJoin(qAttendance.shop, qShop)
+                        .innerJoin(qAttendance.account, qAccount)
                         .where(
                                 qAttendance.shop.id.in(accountShopList),
                                 cotainWord(searchWord, searchType),

@@ -332,7 +332,7 @@ public class AttendanceController {
             String searchWord,
             @RequestParam(value = "searchType", defaultValue = "shopName", required = true)
             String searchType,
-            @RequestParam(value = "sortType", defaultValue = "check_in_time",required = false)
+            @RequestParam(value = "sortType", defaultValue = "checkInTime",required = false)
             String sortType,
             Model model
     ){
@@ -347,7 +347,7 @@ public class AttendanceController {
         //검색 서비스
         Page<AttendanceLogDto> attendanceLogList
                 = attendanceService.showLogSearch(
-                        accountId,pageNumber,pageSize,
+                        accountId,pageNumber,pageSize, sortType,
                         searchDuration,searchWord,searchType, account);
         //사용자
         model.addAttribute("account", account);
