@@ -64,5 +64,37 @@
         </th:block>
     </tbody>
 </table>
+
+<div class="d-flex justify-content-center mt-3">
+    <ul class="pagination">
+        <!-- 처음 페이지 링크 -->
+        <li class="page-item" th:classappend="${schedules.first} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=0|}">처음</a>
+        </li>
+        <!-- 이전 페이지 링크 -->
+        <li class="page-item" th:classappend="${articles.hasPrevious} ? '' : 'disabled'">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${articles.number - 1}|}">이전</a>
+        </li>
+        <!-- 페이지 번호 링크 -->
+        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, articles.totalPages - 1)}"
+            th:classappend="${pageNum == articles.number} ? 'active' : ''">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${pageNum}|}"
+               th:text="${pageNum + 1}"></a>
+        </li>
+        <!-- 다음 페이지 링크 -->
+        <li class="page-item" th:classappend="${articles.hasNext} ? '' : 'disabled'">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${articles.number + 1}|}">다음</a>
+        </li>
+        <!-- 마지막 페이지 링크 -->
+        <li class="page-item" th:classappend="${articles.last} ? 'disabled' : ''">
+            <a class="page-link"
+               th:href="@{|/${shopId}/community${selectedBoard != null ? '/' + selectedBoard.name : ''}?page=${articles.totalPages - 1}|}">끝</a>
+        </li>
+    </ul>
+</div>
 </body>
 </html>

@@ -41,10 +41,10 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	//sqlite, h2datebase
-	implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
-	runtimeOnly 'org.hibernate.orm:hibernate-community-dialects:6.2.4.Final'
-	runtimeOnly 'com.h2database:h2'
+	//sqlite, h2datebase	
+  implementation 'org.xerial:sqlite-jdbc:3.41.2.2'
+  runtimeOnly 'org.hibernate.orm:hibernate-community-dialects:6.2.4.Final'
+  runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// Querydsl
