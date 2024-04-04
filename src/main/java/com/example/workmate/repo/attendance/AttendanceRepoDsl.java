@@ -342,15 +342,18 @@ public class AttendanceRepoDsl {
                                             qAttendance.checkInTime,
                                             qAttendance.checkOutTime,
                                             qAttendance.status,
-                                            qShop.name
+                                            qShop.name,
+                                            qAccount.name
                                     )
                             )
                             .from(qAttendance)
                             .innerJoin(qAttendance.shop, qShop)
+                            .innerJoin(qAttendance.account, qAccount)
                             .where(
                                     qAttendance.account.id.eq(accountId),
                                     qAttendance.shop.id.eq(shopId)
                             )
+                            .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                             .offset(pageable.getOffset())//페이지번호
                             .limit(pageable.getPageSize())//페이지사이즈
                             .fetch();
@@ -361,6 +364,7 @@ public class AttendanceRepoDsl {
                             )
                             .from(qAttendance)
                             .innerJoin(qAttendance.shop, qShop)
+                            .innerJoin(qAttendance.account, qAccount)
                             .where(
                                     qAttendance.account.id.eq(accountId),
                                     qAttendance.shop.id.eq(shopId)
